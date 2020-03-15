@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="CodePain.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="CodePainPCH.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Resources\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Resources\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Resources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Resources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Resources\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Resources\Context</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Resources\SceneGraph\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameRate.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CodePain.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="CodePainPCH.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Resources\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Resources\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Resources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Resources\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Resources\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Resources\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Resources\Context</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseComponent.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Resources\SceneGraph\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameRate.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{19b40ec9-355f-4d0d-8500-e5983c51c35f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Base">
+      <UniqueIdentifier>{e5918e95-69a7-4950-8105-d50f2e4d256b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics">
+      <UniqueIdentifier>{5d4d9538-bb36-47f7-a1aa-65f77e200c7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Components">
+      <UniqueIdentifier>{d3387c6c-68f9-4173-99b8-f68fe2a83440}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Context">
+      <UniqueIdentifier>{3416675c-7f1c-48d0-920b-f4cbe7fbad0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Diagnostics">
+      <UniqueIdentifier>{eddfc8ca-517b-4c82-be10-7168fe5f943b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\SceneGraph">
+      <UniqueIdentifier>{3aba5d30-4755-47bd-a7d0-a9ce33d024ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Helpers">
+      <UniqueIdentifier>{5ace4049-4e26-495b-9fd4-a1c1897eb67a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\DirectX">
+      <UniqueIdentifier>{83d6f97a-4c62-4693-b4d4-c8f862abf512}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\SceneGraph\Objects">
+      <UniqueIdentifier>{2841deac-2430-47fe-8387-a019b0759a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Systems">
+      <UniqueIdentifier>{f7b68498-a964-4a25-9687-e6a8efd7d020}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
