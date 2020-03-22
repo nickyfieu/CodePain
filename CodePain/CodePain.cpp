@@ -79,6 +79,10 @@ void cp::CodePain::Cleanup()
 
 void cp::CodePain::Run()
 {
+#if _DEBUG
+	AllocConsole();
+#endif
+
 	Initialize();
 
 	// tell the resource manager where he can find the game data

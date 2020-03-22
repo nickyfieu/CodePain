@@ -13,9 +13,6 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Resources\SceneGraph</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>Resources</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Resources\Graphics</Filter>
     </ClCompile>
@@ -42,6 +39,9 @@
     </ClCompile>
     <ClCompile Include="FrameRate.cpp">
       <Filter>Resources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
