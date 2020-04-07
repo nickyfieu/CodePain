@@ -38,7 +38,7 @@ void cp::CodePain::Initialize()
  */
 void cp::CodePain::LoadGame() const
 {
-	cp::Scene* scene = SceneManager::GetInstance().CreateScene("Demo");
+	cp::Scene* scene = SceneManager::GetInstance().CreateScene("Game");
 
 	// background
 	GameObject* daeBackground = new GameObject();
@@ -64,9 +64,7 @@ void cp::CodePain::LoadGame() const
 	pText = new Text("0 FPS", pFont, SDL_Color{255, 255, 0});
 	pText->SetLocalOffset(1.f, 1.f, 0.f);
 	fpsCounter->AddComponent(pText);
-
-	FrameRate* pFrameRate = new FrameRate();
-	fpsCounter->AddComponent(pFrameRate);
+	fpsCounter->AddComponent(new FrameRate());
 }
 
 void cp::CodePain::Cleanup()
