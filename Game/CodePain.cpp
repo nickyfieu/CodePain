@@ -9,6 +9,11 @@
 #include "GameObject.h"
 #include "Components.h"
 #include "Scene.h"
+#ifdef _DEBUG
+	#include "Imgui\imgui.h"
+	#include "Imgui_Sdl\imgui_sdl.h"
+	#include "Imgui_Sdl\imgui_impl_sdl.h"
+#endif
 
 void cp::CodePain::Initialize()
 {
@@ -21,8 +26,13 @@ void cp::CodePain::Initialize()
 		"Programming 4 assignment",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
+#ifdef _DEBUG
+		960,
+		500,
+#else
 		640,
-		480,
+		500,
+#endif
 		SDL_WINDOW_OPENGL
 	);
 	if (m_Window == nullptr) 
@@ -31,6 +41,18 @@ void cp::CodePain::Initialize()
 	}
 
 	Renderer::GetInstance().Init(m_Window);
+
+#ifdef _DEBUG
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+	io.ConfigDockingWithShift = true;
+
+	ImGui_ImplSDL2_InitForMetal(m_Window); // done to fix a sertain assertion error
+
+
+#endif
 }
 
 /**
@@ -102,8 +124,26 @@ void cp::CodePain::Run()
 
 			doContinue = input.ProcessInput();
 			sceneManager.Update(elapsedSec);
+#ifdef _DEBUG
+			ImGui::NewFrame();
+			bool open = true;
+			ImGui::SetNextWindowPos(ImVec2(640.0f, 0.f));
+			ImGui::SetNextWindowSizeConstraints(ImVec2(320.f, 500.f), ImVec2(320.f, 500.f));
+			ImGui::Begin("My DockSpace",&open,ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration);
+			ImGuiID dockspace_id = ImGui::GetID("DebugDockSpace");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_NoResize);
+			ImGui::End();
+			// debug window
+			ImGui::Begin("Performance Profiler");
+			ImGui::Text("This will never happen!");
+			ImGui::End();
+			ImGui::Begin("Debug Logger");
+			ImGui::Text("To be implemented soon!");
+			ImGui::End();
+#endif
+
 			renderer.Render();
-			
+
 			lastTime = currentTime;
 		}
 	}

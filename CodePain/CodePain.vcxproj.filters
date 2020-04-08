@@ -22,9 +22,6 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Resources\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Font.cpp">
-      <Filter>Resources\DirectX</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Resources\Context</Filter>
     </ClCompile>
@@ -36,6 +33,27 @@
     </ClCompile>
     <ClCompile Include="FrameRate.cpp">
       <Filter>Resources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Resources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui_Sdl\imgui_sdl.cpp">
+      <Filter>Resources\ImGuiSDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui.cpp">
+      <Filter>Resources\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_demo.cpp">
+      <Filter>Resources\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_draw.cpp">
+      <Filter>Resources\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_widgets.cpp">
+      <Filter>Resources\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui_Sdl\imgui_impl_sdl.cpp">
+      <Filter>Resources\ImGuiSDL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +81,6 @@
     <ClInclude Include="Transform.h">
       <Filter>Resources\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Font.h">
-      <Filter>Resources\DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Resources\Context</Filter>
     </ClInclude>
@@ -83,6 +98,33 @@
     </ClInclude>
     <ClInclude Include="FrameRate.h">
       <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Resources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui_Sdl\imgui_sdl.h">
+      <Filter>Resources\ImGuiSDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imconfig.h">
+      <Filter>Resources\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui.h">
+      <Filter>Resources\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui_internal.h">
+      <Filter>Resources\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_rectpack.h">
+      <Filter>Resources\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_textedit.h">
+      <Filter>Resources\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_truetype.h">
+      <Filter>Resources\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui_Sdl\imgui_impl_sdl.h">
+      <Filter>Resources\ImGuiSDL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -110,11 +152,14 @@
     <Filter Include="Resources\Helpers">
       <UniqueIdentifier>{5ace4049-4e26-495b-9fd4-a1c1897eb67a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources\DirectX">
-      <UniqueIdentifier>{83d6f97a-4c62-4693-b4d4-c8f862abf512}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resources\SceneGraph\Objects">
       <UniqueIdentifier>{2841deac-2430-47fe-8387-a019b0759a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\ImGui">
+      <UniqueIdentifier>{a889e54b-c0be-42a2-9ce5-1ae0488894b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\ImGuiSDL">
+      <UniqueIdentifier>{28ca7431-8df1-49ab-9426-c696779d6fd6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
