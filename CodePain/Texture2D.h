@@ -1,7 +1,7 @@
 #pragma once
 #include "BaseComponent.h"
+#include <SDL.h>
 
-struct SDL_Texture;
 namespace cp
 {
 	/**
@@ -16,17 +16,24 @@ namespace cp
 
 		virtual void Update(float elapsedSec) override;
 
-		Texture2D(const Texture2D &) = delete;
-		Texture2D(Texture2D &&) = delete;
-		Texture2D & operator= (const Texture2D &) = delete;
-		Texture2D & operator= (const Texture2D &&) = delete;
+		Texture2D(const Texture2D&) = delete;
+		Texture2D(Texture2D&&) = delete;
+		Texture2D& operator= (const Texture2D&) = delete;
+		Texture2D& operator= (const Texture2D&&) = delete;
 
 		void SetLocalOffset(float x, float y, float z);
-		glm::vec3 GetLocalOffset() const;
-		SDL_Texture* GetSDLTexture() const;
+		void SetDstRect(const SDL_Rect& newDstRect);
+		void SetSrcRect(const SDL_Rect& newSrcRect);
+
+		const glm::vec3& GetLocalOffset() const;
+		const SDL_Rect& GetDstRect() const;
+		const SDL_Rect& GetSrcRect() const;
+		inline SDL_Texture* GetSDLTexture() const { return m_pTexture; };
 
 	private:
 		SDL_Texture* m_pTexture;
 		Transform* m_pLocalOffset;
+		SDL_Rect m_SrcRect;
+		SDL_Rect m_DstRect;
 	};
 }

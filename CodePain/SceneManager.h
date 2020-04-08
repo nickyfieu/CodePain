@@ -1,5 +1,6 @@
 #pragma once
 #include "Singleton.h"
+#include <list>
 
 namespace cp
 {
@@ -16,6 +17,6 @@ namespace cp
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
-		std::vector<Scene*> m_Scenes;
+		std::list<Scene*> m_Scenes;
 	};
 }

@@ -52,7 +52,7 @@
 // SDL
 // (the multi-viewports feature requires SDL features supported from SDL 2.0.4+. SDL 2.0.5+ is highly recommended)
 #include <SDL.h>
-#include <SDL_syswm.h>
+//#include <SDL_syswm.h> PERSONALY DISABLED DUE TO PACKAGING ERRORS!
 #if defined(__APPLE__)
 #include "TargetConditionals.h"
 #endif
@@ -217,12 +217,12 @@ static bool ImGui_ImplSDL2_Init(SDL_Window* window, void* sdl_gl_context)
     // Our mouse update function expect PlatformHandle to be filled for the main viewport
     ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     main_viewport->PlatformHandle = (void*)window;
-#if defined(_WIN32)
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    if (SDL_GetWindowWMInfo(window, &info))
-        main_viewport->PlatformHandleRaw = info.info.win.window;
-#endif
+//#if defined(_WIN32)
+//    SDL_SysWMinfo info;
+//    SDL_VERSION(&info.version);
+//    if (SDL_GetWindowWMInfo(window, &info))
+//        main_viewport->PlatformHandleRaw = info.info.win.window;
+//#endif
 
     // Update monitors
     ImGui_ImplSDL2_UpdateMonitors();
@@ -530,12 +530,12 @@ static void ImGui_ImplSDL2_CreateWindow(ImGuiViewport* viewport)
         SDL_GL_MakeCurrent(data->Window, backup_context);
 
     viewport->PlatformHandle = (void*)data->Window;
-#if defined(_WIN32)
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    if (SDL_GetWindowWMInfo(data->Window, &info))
-        viewport->PlatformHandleRaw = info.info.win.window;
-#endif
+//#if defined(_WIN32)
+//    SDL_SysWMinfo info;
+//    SDL_VERSION(&info.version);
+//    if (SDL_GetWindowWMInfo(data->Window, &info))
+//        viewport->PlatformHandleRaw = info.info.win.window;
+//#endif
 }
 
 static void ImGui_ImplSDL2_DestroyWindow(ImGuiViewport* viewport)
@@ -556,26 +556,26 @@ static void ImGui_ImplSDL2_DestroyWindow(ImGuiViewport* viewport)
 static void ImGui_ImplSDL2_ShowWindow(ImGuiViewport* viewport)
 {
     ImGuiViewportDataSDL2* data = (ImGuiViewportDataSDL2*)viewport->PlatformUserData;
-#if defined(_WIN32)
-    HWND hwnd = (HWND)viewport->PlatformHandleRaw;
-
-    // SDL hack: Hide icon from task bar
-    // Note: SDL 2.0.6+ has a SDL_WINDOW_SKIP_TASKBAR flag which is supported under Windows but the way it create the window breaks our seamless transition.
-    if (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon)
-    {
-        LONG ex_style = ::GetWindowLong(hwnd, GWL_EXSTYLE);
-        ex_style &= ~WS_EX_APPWINDOW;
-        ex_style |= WS_EX_TOOLWINDOW;
-        ::SetWindowLong(hwnd, GWL_EXSTYLE, ex_style);
-    }
-
-    // SDL hack: SDL always activate/focus windows :/
-    if (viewport->Flags & ImGuiViewportFlags_NoFocusOnAppearing)
-    {
-        ::ShowWindow(hwnd, SW_SHOWNA);
-        return;
-    }
-#endif
+//#if defined(_WIN32)
+//    HWND hwnd = (HWND)viewport->PlatformHandleRaw;
+//
+//    // SDL hack: Hide icon from task bar
+//    // Note: SDL 2.0.6+ has a SDL_WINDOW_SKIP_TASKBAR flag which is supported under Windows but the way it create the window breaks our seamless transition.
+//    if (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon)
+//    {
+//        LONG ex_style = ::GetWindowLong(hwnd, GWL_EXSTYLE);
+//        ex_style &= ~WS_EX_APPWINDOW;
+//        ex_style |= WS_EX_TOOLWINDOW;
+//        ::SetWindowLong(hwnd, GWL_EXSTYLE, ex_style);
+//    }
+//
+//    // SDL hack: SDL always activate/focus windows :/
+//    if (viewport->Flags & ImGuiViewportFlags_NoFocusOnAppearing)
+//    {
+//        ::ShowWindow(hwnd, SW_SHOWNA);
+//        return;
+//    }
+//#endif
 
     SDL_ShowWindow(data->Window);
 }

@@ -21,8 +21,9 @@ void cp::SceneManager::Render()
 cp::Scene* cp::SceneManager::CreateScene(const std::string& name)
 {
 	const size_t posNewScene = m_Scenes.size();
-	m_Scenes.push_back(new Scene(name));
-	return m_Scenes.at(posNewScene);
+	cp::Scene* pScene = new Scene(name);
+	m_Scenes.push_back(pScene);
+	return pScene;
 }
 
 cp::SceneManager::~SceneManager()
@@ -31,4 +32,5 @@ cp::SceneManager::~SceneManager()
 	{
 		SAFE_DELETE(pToDelete);
 	}
+	if (!m_Scenes.empty()) m_Scenes.clear();
 }

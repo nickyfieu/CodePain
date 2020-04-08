@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "Components.h"
 #include "Scene.h"
+#include "Logger.h"
 #ifdef _DEBUG
 	#include "Imgui\imgui.h"
 	#include "Imgui_Sdl\imgui_sdl.h"
@@ -50,8 +51,6 @@ void cp::CodePain::Initialize()
 	io.ConfigDockingWithShift = true;
 
 	ImGui_ImplSDL2_InitForMetal(m_Window); // done to fix a sertain assertion error
-
-
 #endif
 }
 
@@ -60,26 +59,25 @@ void cp::CodePain::Initialize()
  */
 void cp::CodePain::LoadGame() const
 {
-	cp::Scene* scene = SceneManager::GetInstance().CreateScene("Game");
-
+	cp::Scene* scene = SceneManager::GetInstance().CreateScene("FPSScene");
 	// background
 	GameObject* daeBackground = new GameObject();
-	scene->Add(daeBackground);
-
 	SDL_Texture* pTex = ResourceManager::GetInstance().LoadSDLTexture("background.jpg");
 	daeBackground->AddComponent(new Texture2D(pTex));
-
+	scene->Add(daeBackground);
 	// dae logo
 	pTex = ResourceManager::GetInstance().LoadSDLTexture("logo.png");
 	Texture2D* pTex2D = new Texture2D(pTex);
-	daeBackground->AddComponent(pTex2D);
 	pTex2D->SetLocalOffset(216.f, 180.f, 0.f);
-
+	daeBackground->AddComponent(pTex2D);
+	// Text
 	cp::Font* pFont = ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 	Text* pText = new Text("Programming 4 Assignment", pFont);
 	pText->SetLocalOffset(80.f, 20.f, 0.f);
 	daeBackground->AddComponent(pText);
-
+	pText->Update(0.0f);
+	pText->GetTexture2D()->SetDstRect(SDL_Rect{ 0, 0, 600, 300 });
+	// Fps Counter
 	GameObject* fpsCounter = new GameObject();
 	scene->Add(fpsCounter);
 	pFont = ResourceManager::GetInstance().LoadFont("Lingua.otf", 18);
@@ -114,7 +112,35 @@ void cp::CodePain::Run()
 		Renderer& renderer = Renderer::GetInstance();
 		SceneManager& sceneManager = SceneManager::GetInstance();
 		InputManager& input = InputManager::GetInstance();
+		Logger& logger = Logger::GetInstance();
 		auto lastTime = std::chrono::high_resolution_clock::now();
+
+		LogLevel logLevel;
+		char msg[40];
+		logLevel = LogLevel::Debug;
+		for (int i = 0; i < 1000; i++)
+		{
+			sprintf_s(msg, "%i", i);
+			logger.Log(logLevel, (std::string)msg, true);
+		}
+		logLevel = LogLevel::Info;
+		for (int i = 0; i < 10; i++)
+		{
+			sprintf_s(msg, "%i", i);
+			logger.Log(logLevel, (std::string)msg, true);
+		}
+		logLevel = LogLevel::Warning;
+		for (int i = 0; i < 10; i++)
+		{
+			sprintf_s(msg, "%i", i);
+			logger.Log(logLevel, (std::string)msg, true);
+		}
+		logLevel = LogLevel::Critical;
+		for (int i = 0; i < 10; i++)
+		{
+			sprintf_s(msg, "%i", i);
+			logger.Log(logLevel, (std::string)msg, true);
+		}
 
 		bool doContinue = true;
 		while (doContinue)
@@ -126,20 +152,14 @@ void cp::CodePain::Run()
 			sceneManager.Update(elapsedSec);
 #ifdef _DEBUG
 			ImGui::NewFrame();
-			bool open = true;
 			ImGui::SetNextWindowPos(ImVec2(640.0f, 0.f));
 			ImGui::SetNextWindowSizeConstraints(ImVec2(320.f, 500.f), ImVec2(320.f, 500.f));
-			ImGui::Begin("My DockSpace",&open,ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration);
+			ImGui::Begin("My DockSpace", nullptr,ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration);
 			ImGuiID dockspace_id = ImGui::GetID("DebugDockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_NoResize);
 			ImGui::End();
 			// debug window
-			ImGui::Begin("Performance Profiler");
-			ImGui::Text("This will never happen!");
-			ImGui::End();
-			ImGui::Begin("Debug Logger");
-			ImGui::Text("To be implemented soon!");
-			ImGui::End();
+			logger.DrawLoggedInformation();
 #endif
 
 			renderer.Render();

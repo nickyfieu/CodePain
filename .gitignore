@@ -6,3 +6,4 @@ Debug/
 Game/Release/Main.obj
 Game/Release/
 Release/
+Game/*.txt

@@ -55,6 +55,9 @@
     <ClCompile Include="Imgui_Sdl\imgui_impl_sdl.cpp">
       <Filter>Resources\ImGuiSDL</Filter>
     </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Resources\Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -125,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="Imgui_Sdl\imgui_impl_sdl.h">
       <Filter>Resources\ImGuiSDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Resources\Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

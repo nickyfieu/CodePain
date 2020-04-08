@@ -2,13 +2,17 @@
 #include "BaseComponent.h"
 #include "Transform.h"
 #include "Texture2D.h"
-#include <SDL.h>
 
 cp::Texture2D::Texture2D(SDL_Texture* texture)
 	: BaseComponent{ cp::ComponentType::_Texture2D }
 {
 	m_pTexture = texture;
 	m_pLocalOffset = new Transform();
+	int width;
+	int height;
+	SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
+	m_SrcRect = SDL_Rect{ 0,0,width,height};
+	m_DstRect = SDL_Rect{ 0,0,width,height };
 }
 
 cp::Texture2D::~Texture2D()
@@ -26,12 +30,27 @@ void cp::Texture2D::SetLocalOffset(const float x,const float y,const float z)
 	m_pLocalOffset->SetPosition(x, y, z);
 }
 
-glm::vec3 cp::Texture2D::GetLocalOffset() const
+void cp::Texture2D::SetDstRect(const SDL_Rect& newDstRect)
+{
+	m_DstRect = newDstRect;
+}
+
+void cp::Texture2D::SetSrcRect(const SDL_Rect& newSrcRect)
+{
+	m_SrcRect = newSrcRect;
+}
+
+const glm::vec3& cp::Texture2D::GetLocalOffset() const
 {
 	return m_pLocalOffset->GetPosition();
 }
 
-SDL_Texture* cp::Texture2D::GetSDLTexture() const
+const SDL_Rect& cp::Texture2D::GetDstRect() const
 {
-	return m_pTexture;
+	return m_DstRect;
+}
+
+const SDL_Rect& cp::Texture2D::GetSrcRect() const
+{
+	return m_SrcRect;
 }

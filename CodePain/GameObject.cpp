@@ -36,20 +36,21 @@ void cp::GameObject::Render() const
 
 			if (IS_VALID(pTexture2D))
 			{
-				float x = 0.f, y = 0.f;
+				SDL_Rect dst = pTexture2D->GetDstRect();
+				SDL_Rect src = pTexture2D->GetDstRect();
 				// if for whatever reason ptrans == nullptr we have this check
 				// it should never be nullptr as the transform component is the first
 				// component to be added to the components container
 				if (IS_VALID(pTransform))
 				{
-					x += pTransform->GetPosition().x;
-					y += pTransform->GetPosition().y;
+					dst.x += (int)pTransform->GetPosition().x;
+					dst.y += (int)pTransform->GetPosition().y;
 				}
 
-				x += pTexture2D->GetLocalOffset().x;
-				y += pTexture2D->GetLocalOffset().y;
+				dst.x += (int)pTexture2D->GetLocalOffset().x;
+				dst.y += (int)pTexture2D->GetLocalOffset().y;
 
-				rendererRef.RenderTexture(*pTexture2D, x, y);
+				rendererRef.RenderTexture(*pTexture2D, src, dst);
 			}
 
 			break;
@@ -60,20 +61,22 @@ void cp::GameObject::Render() const
 
 			if (IS_VALID(pText))
 			{
-				float x = 0.f, y = 0.f;
+				Texture2D* pTextTexture = pText->GetTexture2D();
+				SDL_Rect dst = pTextTexture->GetDstRect();
+				SDL_Rect src = pTextTexture->GetSrcRect();
 				// if for whatever reason ptrans == nullptr we have this check
 				// it should never be nullptr as the transform component is the first
 				// component to be added to the components container
 				if (IS_VALID(pTransform))
 				{
-					x += pTransform->GetPosition().x;
-					y += pTransform->GetPosition().y;
+					dst.x += (int)pTransform->GetPosition().x;
+					dst.y += (int)pTransform->GetPosition().y;
 				}
 
-				x += pText->GetLocalOffset().x;
-				y += pText->GetLocalOffset().y;
+				dst.x += (int)pText->GetLocalOffset().x;
+				dst.y += (int)pText->GetLocalOffset().y;
 
-				rendererRef.RenderTexture(*pText->GetTexture2D(), x, y);
+				rendererRef.RenderTexture(*pTextTexture, src, dst);
 			}
 			break;
 #pragma endregion
