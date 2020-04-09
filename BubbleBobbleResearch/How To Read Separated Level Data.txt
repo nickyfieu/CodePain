@@ -1,4 +1,4 @@
-Reading "SeperatedEnemyData.dat"
+Reading "SeperatedLevelData.dat"
 
 levels 100
 blocks wide per level 32

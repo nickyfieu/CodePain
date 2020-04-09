@@ -27,11 +27,10 @@ Byte 2 Mask 0b00000100 = Unknown Bool 1
 Byte 2 Mask 0b00000010 = Unknown Bool 2
 Byte 2 Mask 0b00000001 = Unknown Bool 3
 
-Byte 3 Mask 0b10000000 = Unknown Bool 4
-Byte 3 Mask 0b01000000 = Unknown Bool 5
-Byte 3 Mask 0b00100000 = Unknown Bool 6
+Byte 3 Mask 0b10000000 = Unknown Bool 4 
+Byte 3 Mask 0b01000000 = ( false = mov/look right / true = mov/look left ) Bool 5 
 
-Byte 3 Mask 0b00011111 = delay has offset = to (>> 1)
+Byte 3 Mask 0b00111111 = delay has offset = to (>> 1)
 to fix this -> delay = (delay << 1)
 delay = nr of frame of delay
 actual delay time = delay * 0.017f ( 17 ms +- );

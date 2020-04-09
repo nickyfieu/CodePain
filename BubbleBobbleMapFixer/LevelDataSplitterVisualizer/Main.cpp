@@ -126,7 +126,7 @@ int main()
 				bool bit5 = byte3 & 0b01000000;
 				bool bit6 = byte3 & 0b00100000;
 
-				float delay = unsigned int((byte3 & 0b00011111) << 1) * 0.017f;
+				float delay = unsigned int((byte3 & 0b00111111) << 1) * 0.017f;
 
 				printf("\nLevel(%i) Enemy(%i) Type(%s)"			\
 					"\n\tByte1["								\
@@ -138,11 +138,11 @@ int main()
 					"\n\tByte3["								\
 					PRINTFBYTEPATERN							\
 					"]"											\
-					"\nCol/Row[%i / %i]"						\
-					"\nUnknown bool bits byte 2[%s ,%s ,%s]"	\
-					"\nUnknown bool bits byte 3[%s ,%s ,%s]"	\
-					"\nDelay[%f]"								\
-					"\n\n", amountRead, enemy, enemyTypeStr, PRINTFBYTE(byte1), PRINTFBYTE(byte2), PRINTFBYTE(byte3), col, row, (bit1) ? "True" : "False", (bit2) ? "True" : "False", (bit3) ? "True" : "False", (bit4) ? "True" : "False", (bit5) ? "True" : "False", (bit6) ? "True" : "False", delay);
+					"\n\tCol/Row[%i / %i]"						\
+					"\n\tUnknown bool bits [%s ,%s ,%s | %s ]"	\
+					"\n\tMoving dir = %s"							\
+					"\n\tDelay[%f]"								\
+					"\n\n", amountRead, enemy, enemyTypeStr, PRINTFBYTE(byte1), PRINTFBYTE(byte2), PRINTFBYTE(byte3), col, row, (bit1) ? "True" : "False", (bit2) ? "True" : "False", (bit3) ? "True" : "False", (bit4) ? "True" : "False", (bit5) ? "Left" : "Right", delay);
 				enemy++;
 			}
 			else
