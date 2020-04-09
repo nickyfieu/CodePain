@@ -1,9 +1,9 @@
 #pragma once
 #include <list>
+#include "BaseComponent.h"
 
 namespace cp
 {
-	class BaseComponent;
 	class GameObject final
 	{
 	public:
@@ -13,7 +13,8 @@ namespace cp
 		void AddComponent(BaseComponent* pToAdd);
 
 		GameObject();
-		virtual ~GameObject();
+		~GameObject();
+
 		GameObject(const GameObject& other) = delete;
 		GameObject(GameObject&& other) = delete;
 		GameObject& operator=(const GameObject& other) = delete;
@@ -25,23 +26,34 @@ namespace cp
 
 
 		template <class T>
-		bool HasComponent()
+		bool HasComponent(ComponentType type)
 		{
-			return GetComponent<T>() != nullptr;
+			return GetComponent<T>(type) != nullptr;
 		}
 
 		template <class T>
-		T* GetComponent()
+		T* GetComponent(ComponentType type)
 		{
-			const type_info& typeInfo = typeid(T);
-
 			for (BaseComponent* component : m_pComponents)
 			{
-				if (component && (typeid(*component) == typeInfo))
+				if (component->GetComponentType() == type)
 					return static_cast<T*>(component);
 			}
 
 			return nullptr;
+		}
+
+		template <class T>
+		std::vector<T*> GetAllComponentsOfType(ComponentType type)
+		{
+			std::vector<T*> componentsOfType;
+			for (BaseComponent* component : m_pComponents)
+			{
+				if (component->GetComponentType() == type)
+					componentsOfType.push_back(static_cast<T*>(component));
+			}
+
+			return componentsOfType;
 		}
 	};
 }

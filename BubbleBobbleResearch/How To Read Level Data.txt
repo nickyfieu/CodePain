@@ -1,0 +1,32 @@
+Reading "SeperatedEnemyData.dat"
+
+levels 100
+blocks wide per level 32
+blocks high per level 25
+blocks per byte 8
+
+read (100 * 32 * 25) / 8 | unsigned char ( 1 byte )
+
+to know what tile is what you bit mask starting at
+0b1000 0000 for the first tile		(1)
+0b0100 0000 for the second tile		(2)
+0b0010 0000 for the third tile		(3)
+0b0001 0000 for the fourth tile 	(4)
+0b0000 1000 for the fift tile 		(5)
+0b0000 0100 for the sixth tile 		(6)
+0b0000 0010 for the seventh tile	(7)
+0b0000 0001 for the eight tile 		(8)
+
+A line is made up of 4 bytes
+12345678 12345678 12345678 12345678 for 1 line do this times 25 for a level
+
+To know the BASE tile texture of each level it starts from
+the topleft of "blocks.png" starting at level 1 for each next level it moves to the right
+each block is 8x8 pixels
+
+left = 		((levelNr - 1) % 10) * 8;
+bottom = 	((levelNr - 1) / 10) * 8;
+width = 	8;
+height =	8; 
+
+Wall Tiles Currently not a clue on how to read those in;

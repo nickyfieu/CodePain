@@ -24,7 +24,7 @@ namespace cp
 	class BaseComponent
 	{
 	public:
-		BaseComponent(ComponentType type)
+		explicit BaseComponent(ComponentType type)
 			: m_ComponentType{ type }
 		{
 

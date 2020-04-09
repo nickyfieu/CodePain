@@ -13,18 +13,39 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Source Files\BubbleBobbleDataReading">
+      <UniqueIdentifier>{ee563739-120f-463d-ba02-ffb4a13049fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scenes">
+      <UniqueIdentifier>{88478395-14a9-4f5f-baeb-459f71dcd158}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CodePain.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="BubbleBobbleLevelReader.cpp">
+      <Filter>Source Files\BubbleBobbleDataReading</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene1.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneLoader.cpp">
+      <Filter>Source Files\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CodePain.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="BubbleBobbleLevelReader.h">
+      <Filter>Source Files\BubbleBobbleDataReading</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene1.h">
+      <Filter>Source Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes.h">
+      <Filter>Source Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneLoader.h">
+      <Filter>Source Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

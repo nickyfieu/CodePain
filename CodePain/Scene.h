@@ -14,6 +14,7 @@ namespace cp
 		void Render() const;
 
 		~Scene();
+
 		Scene(const Scene& other) = delete;
 		Scene(Scene&& other) = delete;
 		Scene& operator=(const Scene& other) = delete;

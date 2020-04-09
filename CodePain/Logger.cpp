@@ -4,7 +4,7 @@
 #include <string>
 #include <codecvt>
 
-cp::ExampleAppLog cp::Logger::my_log = cp::ExampleAppLog();
+cp::ImGuiLogger cp::Logger::my_log = cp::ImGuiLogger();
 
 cp::Logger::~Logger()
 {

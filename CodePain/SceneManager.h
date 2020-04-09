@@ -12,6 +12,11 @@ namespace cp
 
 		virtual ~SceneManager();
 
+		SceneManager(const SceneManager& other) = delete;
+		SceneManager(SceneManager&& other) = delete;
+		SceneManager& operator=(const SceneManager& other) = delete;
+		SceneManager& operator=(SceneManager&& other) = delete;
+
 		void Update(float elapsedSec);
 		void Render();
 	private:

@@ -56,7 +56,10 @@
       <Filter>Resources\ImGuiSDL</Filter>
     </ClCompile>
     <ClCompile Include="Logger.cpp">
-      <Filter>Resources\Helpers</Filter>
+      <Filter>Resources\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="CodePain.cpp">
+      <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,8 +132,14 @@
     <ClInclude Include="Imgui_Sdl\imgui_impl_sdl.h">
       <Filter>Resources\ImGuiSDL</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.h">
+    <ClInclude Include="BinaryReaderWriter.h">
       <Filter>Resources\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Resources\Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="CodePain.h">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

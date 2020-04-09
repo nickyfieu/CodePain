@@ -36,19 +36,19 @@ void cp::GameObject::Render() const
 
 			if (IS_VALID(pTexture2D))
 			{
-				SDL_Rect dst = pTexture2D->GetDstRect();
-				SDL_Rect src = pTexture2D->GetDstRect();
+				SDL_FRect dst = pTexture2D->GetDstRect();
+				SDL_Rect src = pTexture2D->GetSrcRect();
 				// if for whatever reason ptrans == nullptr we have this check
 				// it should never be nullptr as the transform component is the first
 				// component to be added to the components container
 				if (IS_VALID(pTransform))
 				{
-					dst.x += (int)pTransform->GetPosition().x;
-					dst.y += (int)pTransform->GetPosition().y;
+					dst.x += pTransform->GetPosition().x;
+					dst.y += pTransform->GetPosition().y;
 				}
 
-				dst.x += (int)pTexture2D->GetLocalOffset().x;
-				dst.y += (int)pTexture2D->GetLocalOffset().y;
+				dst.x += pTexture2D->GetLocalOffset().x;
+				dst.y += pTexture2D->GetLocalOffset().y;
 
 				rendererRef.RenderTexture(*pTexture2D, src, dst);
 			}
@@ -62,19 +62,19 @@ void cp::GameObject::Render() const
 			if (IS_VALID(pText))
 			{
 				Texture2D* pTextTexture = pText->GetTexture2D();
-				SDL_Rect dst = pTextTexture->GetDstRect();
+				SDL_FRect dst = pTextTexture->GetDstRect();
 				SDL_Rect src = pTextTexture->GetSrcRect();
 				// if for whatever reason ptrans == nullptr we have this check
 				// it should never be nullptr as the transform component is the first
 				// component to be added to the components container
 				if (IS_VALID(pTransform))
 				{
-					dst.x += (int)pTransform->GetPosition().x;
-					dst.y += (int)pTransform->GetPosition().y;
+					dst.x += pTransform->GetPosition().x;
+					dst.y += pTransform->GetPosition().y;
 				}
 
-				dst.x += (int)pText->GetLocalOffset().x;
-				dst.y += (int)pText->GetLocalOffset().y;
+				dst.x += pText->GetLocalOffset().x;
+				dst.y += pText->GetLocalOffset().y;
 
 				rendererRef.RenderTexture(*pTextTexture, src, dst);
 			}
@@ -102,7 +102,7 @@ void cp::GameObject::Render() const
 
 void cp::GameObject::AddComponent(BaseComponent* pToAdd)
 {
-	if (typeid(*pToAdd) == typeid(Transform) && HasComponent<Transform>())
+	if ((pToAdd->GetComponentType() == ComponentType::_Transform) && HasComponent<Transform>(ComponentType::_Transform))
 		return;
 
 	m_pComponents.push_back(pToAdd);

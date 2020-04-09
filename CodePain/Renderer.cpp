@@ -58,5 +58,19 @@ void cp::Renderer::Destroy()
 void cp::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst) const
 {
 	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst);
-	
+}
+
+void cp::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_FRect& dst) const
+{
+	SDL_RenderCopyF(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst);
+}
+
+void cp::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst, const double angle, const SDL_Point& center, const SDL_RendererFlip flip) const
+{
+	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst,angle,&center, flip);
+}
+
+void cp::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_FRect& dst, const double angle, const SDL_FPoint& center, const SDL_RendererFlip flip) const
+{
+	SDL_RenderCopyExF(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst, angle, &center, flip);
 }

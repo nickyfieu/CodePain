@@ -23,6 +23,7 @@
     <ProjectGuid>{BC1E3F5C-857D-440A-9F69-773933B1B799}</ProjectGuid>
     <RootNamespace>BubbleBobbleMapFixer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>LevelDataSplitterVisualizer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

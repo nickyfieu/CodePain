@@ -1,0 +1,39 @@
+Enemy data is 3 Bytes per Enemy
+
+To read Read 1 byte if that byte is equal to 0b00000000
+this means that it is the end of the current level
+if not read the next 2 bytes ( those 3 bytes are for 1 enemys data in the current level )
+
+topleft of level = collumn 0 row 0
+
+ENEMY DATA
+
+Byte 1 Mask 0b00000111 = enemy type
+
+000 = Zen chan
+110 = Mighta
+100 = Monsta
+011 = Pulpul
+010 = Banebou
+001 = Hidegons
+101 = Drunk
+111 = Invader
+
+Byte 1 Mask 0b11111000 = collumn has offset = to (<< 3)
+to fix this -> collumn = (collumn >> 3)
+
+Byte 2 Mask 0b11111000 = row has offset = to (<< 3)
+to fix this -> row = (row >> 3)
+
+Byte 2 Mask 0b00000100 = Unknown Bool 1
+Byte 2 Mask 0b00000010 = Unknown Bool 2
+Byte 2 Mask 0b00000001 = Unknown Bool 3
+
+Byte 3 Mask 0b10000000 = Unknown Bool 4
+Byte 3 Mask 0b01000000 = Unknown Bool 5
+Byte 3 Mask 0b00100000 = Unknown Bool 6
+
+Byte 3 Mask 0b00011111 = delay has offset = to (>> 1)
+to fix this -> delay = (delay << 1)
+delay = nr of frame of delay
+actual delay time = delay * 0.017f ( 17 ms +- );

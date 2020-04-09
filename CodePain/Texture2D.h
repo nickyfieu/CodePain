@@ -22,11 +22,11 @@ namespace cp
 		Texture2D& operator= (const Texture2D&&) = delete;
 
 		void SetLocalOffset(float x, float y, float z);
-		void SetDstRect(const SDL_Rect& newDstRect);
+		void SetDstRect(const SDL_FRect& newDstRect);
 		void SetSrcRect(const SDL_Rect& newSrcRect);
 
 		const glm::vec3& GetLocalOffset() const;
-		const SDL_Rect& GetDstRect() const;
+		const SDL_FRect& GetDstRect() const;
 		const SDL_Rect& GetSrcRect() const;
 		inline SDL_Texture* GetSDLTexture() const { return m_pTexture; };
 
@@ -34,6 +34,6 @@ namespace cp
 		SDL_Texture* m_pTexture;
 		Transform* m_pLocalOffset;
 		SDL_Rect m_SrcRect;
-		SDL_Rect m_DstRect;
+		SDL_FRect m_DstRect;
 	};
 }

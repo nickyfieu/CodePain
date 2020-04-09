@@ -1,9 +1,6 @@
 #pragma once
 #include "Singleton.h"
-
-struct SDL_Window;
-struct SDL_Renderer;
-struct SDL_Rect;
+#include <SDL.h>
 
 namespace cp
 {
@@ -14,11 +11,23 @@ namespace cp
 	class Renderer final : public Singleton<Renderer>
 	{
 	public:
+		Renderer() = default;
+		virtual ~Renderer() = default;
+
+		Renderer(const Renderer& other) = delete;
+		Renderer(Renderer&& other) = delete;
+		Renderer& operator=(const Renderer& other) = delete;
+		Renderer& operator=(Renderer&& other) = delete;
+
 		void Init(SDL_Window* window);
 		void Render() const;
 		void Destroy();
 
 		void RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst) const;
+		void RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_FRect& dst) const;
+
+		void RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst, const double angle, const SDL_Point& center, const SDL_RendererFlip flip) const;
+		void RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_FRect& dst, const double angle, const SDL_FPoint& center, const SDL_RendererFlip flip) const;
 
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; }
 	private:

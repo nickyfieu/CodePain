@@ -12,7 +12,7 @@ cp::Texture2D::Texture2D(SDL_Texture* texture)
 	int height;
 	SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
 	m_SrcRect = SDL_Rect{ 0,0,width,height};
-	m_DstRect = SDL_Rect{ 0,0,width,height };
+	m_DstRect = SDL_FRect{ 0.f,0.f,(float)width,(float)height };
 }
 
 cp::Texture2D::~Texture2D()
@@ -30,7 +30,7 @@ void cp::Texture2D::SetLocalOffset(const float x,const float y,const float z)
 	m_pLocalOffset->SetPosition(x, y, z);
 }
 
-void cp::Texture2D::SetDstRect(const SDL_Rect& newDstRect)
+void cp::Texture2D::SetDstRect(const SDL_FRect& newDstRect)
 {
 	m_DstRect = newDstRect;
 }
@@ -45,7 +45,7 @@ const glm::vec3& cp::Texture2D::GetLocalOffset() const
 	return m_pLocalOffset->GetPosition();
 }
 
-const SDL_Rect& cp::Texture2D::GetDstRect() const
+const SDL_FRect& cp::Texture2D::GetDstRect() const
 {
 	return m_DstRect;
 }

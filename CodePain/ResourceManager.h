@@ -8,6 +8,13 @@ namespace cp
 	class ResourceManager final : public Singleton<ResourceManager>
 	{
 	public:
+		virtual ~ResourceManager() = default;
+
+		ResourceManager(const ResourceManager& other) = delete;
+		ResourceManager(ResourceManager&& other) = delete;
+		ResourceManager& operator=(const ResourceManager& other) = delete;
+		ResourceManager& operator=(ResourceManager&& other) = delete;
+
 		void Init(const std::string& data);
 		SDL_Texture* LoadSDLTexture(const std::string& file) const;
 		Font* LoadFont(const std::string& file, unsigned int size) const;
