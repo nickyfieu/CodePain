@@ -3,6 +3,17 @@
 #include <string>
 #include <fstream>
 
+#define PRINTFBYTEPATERN "%c%c%c%c%c%c%c%c"
+#define PRINTFBYTE(byte)	 \
+  (byte & 0x80 ? '1' : '0'), \
+  (byte & 0x40 ? '1' : '0'), \
+  (byte & 0x20 ? '1' : '0'), \
+  (byte & 0x10 ? '1' : '0'), \
+  (byte & 0x08 ? '1' : '0'), \
+  (byte & 0x04 ? '1' : '0'), \
+  (byte & 0x02 ? '1' : '0'), \
+  (byte & 0x01 ? '1' : '0') 
+
 int main()
 {
 	BinaryReaderWriter readerWriter{ "leveldata.dat" };
@@ -26,7 +37,6 @@ int main()
 			readerWriter.BinaryWriting(byte);
 			amountRead++;
 		}
-		std::cout << amountRead << '\n';
 		readerWriter.CloseFileToWrite();
 	}
 
@@ -60,9 +70,25 @@ int main()
 
 				byte1 = byte1 << 3;
 				byte2 = byte2 << 3;
-				byte3 = byte3 << 3;
 
-				printf("Level(%i) Enemy(%i) Collumn[%u] Row[%u] ???[%u]\n", amountRead, enemy, byte1, byte2, byte3);
+				bool IsMovingLeft = byte3 & 0b10000000;
+				bool IsLookingLeft = byte3 & 0b01000000;
+
+				printf("Level(%i) Enemy(%i)" \
+					"\n{"					 \
+					"\n\tCollumn["			 \
+					PRINTFBYTEPATERN		 \
+					"]"						 \
+					"\n\tRow["				 \
+					PRINTFBYTEPATERN		 \
+					"]"						 \
+					"\n\tExtra Data["		 \
+					PRINTFBYTEPATERN		 \
+					"]"						 \
+					"\n}"					 \
+					"\nMoving Left = %s"	 \
+					"\nLooking left = %s"	 \
+					"\n", amountRead, enemy, PRINTFBYTE(byte1), PRINTFBYTE(byte2), PRINTFBYTE(byte3), IsMovingLeft ? "true" : "false", IsLookingLeft ? "true" : "false");
 				enemy++;
 			}
 			else
@@ -88,19 +114,31 @@ int main()
 		unsigned char byte = ' ';
 		int amountRead = 0;
 		int size = ((100 * 25 * 32) / 8);
+		int level = 1;
 		for (int i = 0; i < size; i++)
 		{
+			if ((amountRead % (4 * 25)) == 0)
+			{
+				printf("\n------------------------ Begin of Level %i ------------------------\n", level);
+			}
 			readerWriter.BinaryReading(byte);
 			unsigned char mask = 0b10000000;
 			for (unsigned char i = 0; i < 8; i++)
 			{
-				if (byte & mask) std::cout << "1";
-				else std::cout << "0";
+				if (byte & mask) std::cout << char(219) << char(219);
+				else std::cout << ' ' << ' ';
 
 				mask = mask >> 1;
 			}
 			amountRead++;
+			if ((amountRead % (4 * 25)) == 0)
+			{
+				printf("\n------------------------- End of Level %i -------------------------\n", level);
+				level++;
+			}
 			if ((amountRead % 4) == 0) std::cout << '\n';
+			
+			
 		}
 	}
 	readerWriter.CloseFileToRead();
