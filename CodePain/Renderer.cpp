@@ -55,26 +55,8 @@ void cp::Renderer::Destroy()
 #endif 
 }
 
-void cp::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y) const
-{
-	SDL_Rect dst;
-	dst.x = static_cast<int>(x);
-	dst.y = static_cast<int>(y);
-	SDL_QueryTexture(texture.GetSDLTexture(), nullptr, nullptr, &dst.w, &dst.h);
-	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
-}
-
-void cp::Renderer::RenderTexture(const Texture2D& texture, const float dstLeft, const float dstBottom, const float dstWidth, const float dstHeight) const
-{
-	SDL_Rect dst;
-	dst.x = static_cast<int>(dstLeft);
-	dst.y = static_cast<int>(dstBottom);
-	dst.w = static_cast<int>(dstWidth);
-	dst.h = static_cast<int>(dstHeight);
-	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
-}
-
 void cp::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst) const
 {
 	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst);
+	
 }
