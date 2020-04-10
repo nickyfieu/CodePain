@@ -109,6 +109,15 @@ void cp::GameObject::AddComponent(BaseComponent* pToAdd)
 }
 
 cp::GameObject::GameObject()
+	:m_Type{GameObjectType::none}
+{
+	// Forces Transform Component to be the first component so it will always be found before anything else
+	// There will also only be 1 transform component per gameobject never more ( unless there are local transform components in other components )
+	AddComponent(new Transform());
+}
+
+cp::GameObject::GameObject(GameObjectType type)
+	: m_Type{type}
 {
 	// Forces Transform Component to be the first component so it will always be found before anything else
 	// There will also only be 1 transform component per gameobject never more ( unless there are local transform components in other components )
@@ -121,4 +130,9 @@ cp::GameObject::~GameObject()
 	{
 		SAFE_DELETE(components);
 	}
+}
+
+void cp::GameObject::SetActive(bool active)
+{
+	m_IsActive = active;
 }

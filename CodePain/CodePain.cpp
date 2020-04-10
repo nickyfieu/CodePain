@@ -16,6 +16,10 @@
 	#include "Imgui_Sdl\imgui_impl_sdl.h"
 #endif
 
+#define DEBUGLOGGER
+#define DEBUGLEVELS
+
+
 void cp::CodePain::Initialize()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) 
@@ -91,16 +95,65 @@ void cp::CodePain::Run()
 
 		doContinue = input.ProcessInput();
 		sceneManager.Update(elapsedSec);
-#ifdef _DEBUG
+
+#ifdef _DEBUG // all imgui stuf 
+		
 		ImGui::NewFrame();
+		// debug dockspace
 		ImGui::SetNextWindowPos(ImVec2(640.0f, 0.f));
 		ImGui::SetNextWindowSizeConstraints(ImVec2(320.f, 500.f), ImVec2(320.f, 500.f));
-		ImGui::Begin("My DockSpace", nullptr,ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration);
-		ImGuiID dockspace_id = ImGui::GetID("DebugDockSpace");
-		ImGui::DockSpace(dockspace_id, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_NoResize);
+		ImGui::Begin(" ", nullptr,ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration);
+			ImGuiID dockspace_id = ImGui::GetID(" ");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_NoResize);
 		ImGui::End();
-		// debug window
+
+// debug logger window
+#ifdef DEBUGLOGGER
 		logger.DrawLoggedInformation();
+#endif
+// debug level window
+#ifdef DEBUGLEVELS
+		ImGui::Begin("Level window", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+		bool prevLevel = ImGui::Button("PreviousLevel");
+		ImGui::SameLine();
+		bool nextLevel = ImGui::Button("NextLevel");
+		static int levelToDisplay = 1;
+		int oldLevel = (int)levelToDisplay;
+		if (prevLevel && levelToDisplay > 1) levelToDisplay--;
+		if (nextLevel && levelToDisplay < 100) levelToDisplay++;
+		ImGui::PushItemWidth(-100);
+		ImGui::SliderInt("Current Level", &levelToDisplay, 1, 100);
+		Scene* scene = sceneManager.GetActiveScene();
+		if (scene)
+		{
+			std::vector<GameObject*> level;
+
+			level = scene->GetAllGameObjectsOfType(GameObjectType::level);
+			size_t amountOfLevels = level.size();
+			if (amountOfLevels > 0)
+			{
+				GameObject* gameObj = level.at(0);
+				Transform* transform = gameObj->GetComponent<Transform>(ComponentType::_Transform);
+				unsigned int levelHeight = 500;
+				if ((transform->GetPosition().y / 500) != (levelToDisplay - 1))
+				{
+					// disabling old level and enableing new level
+					level[oldLevel - 1]->SetActive(false);
+					level[levelToDisplay - 1]->SetActive(true);
+
+					float heightLvl0 = float((levelToDisplay - 1) * levelHeight);
+					for (size_t i = 0; i < amountOfLevels; i++)
+					{
+						gameObj = level.at(i);
+						transform = gameObj->GetComponent<Transform>(ComponentType::_Transform);
+						transform->SetPosition(0.f, float(heightLvl0 - (i * levelHeight)),0.f);
+					}
+				}
+			}
+		}
+		ImGui::End();
+#endif
+
 #endif
 		renderer.Render();
 

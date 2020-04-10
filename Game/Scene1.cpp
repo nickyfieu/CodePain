@@ -5,10 +5,11 @@
 #include "GameObject.h"
 #include "ResourceManager.h"
 #include "Components.h"
+#include "BubbleBobbleLevelReader.h"
 
 void Game::Scene1::LoadSceneData() const
 {
-	cp::Scene* scene = cp::SceneManager::GetInstance().CreateScene("FPSScene");
+	cp::Scene* scene = cp::SceneManager::GetInstance().CreateScene("Scene1");
 	// background
 	cp::GameObject* daeBackground = new cp::GameObject();
 	SDL_Texture* pTex = cp::ResourceManager::GetInstance().LoadSDLTexture("background.jpg");
@@ -34,4 +35,5 @@ void Game::Scene1::LoadSceneData() const
 	pText->SetLocalOffset(1.f, 1.f, 0.f);
 	fpsCounter->AddComponent(pText);
 	fpsCounter->AddComponent(new cp::FrameRate());
+
 }

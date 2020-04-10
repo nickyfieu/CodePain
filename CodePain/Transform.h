@@ -1,6 +1,6 @@
 #pragma once
-
 #include "BaseComponent.h"
+
 namespace cp
 {
 	class Transform final : public BaseComponent

@@ -140,7 +140,7 @@ int main()
 					"]"											\
 					"\n\tCol/Row[%i / %i]"						\
 					"\n\tUnknown bool bits [%s ,%s ,%s | %s ]"	\
-					"\n\tMoving dir = %s"							\
+					"\n\tMoving dir = %s"						\
 					"\n\tDelay[%f]"								\
 					"\n\n", amountRead, enemy, enemyTypeStr, PRINTFBYTE(byte1), PRINTFBYTE(byte2), PRINTFBYTE(byte3), col, row, (bit1) ? "True" : "False", (bit2) ? "True" : "False", (bit3) ? "True" : "False", (bit4) ? "True" : "False", (bit5) ? "Left" : "Right", delay);
 				enemy++;
@@ -193,8 +193,6 @@ int main()
 				level++;
 			}
 			if ((amountRead % 4) == 0) levelStr += "\n";
-			
-			
 		}
 	}
 	readerWriter.CloseFileToRead();

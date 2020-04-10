@@ -1,0 +1,47 @@
+Amount and animations ( if change the sprite sheet a bit so all the enemies are in the same sprie sheet )
+you can do some fancy stuf :)
+all you need to do is essentialy just move all of them over to a seperate file
+
+000 = Zen chan
+110 = Mighta
+100 = Monsta
+011 = Pulpul
+010 = Banebou
+001 = Hidegons
+101 = Drunk
+111 = Invader
+
+SingleAnimationMask = 0b011
+
+000 = Zen chan
+((ZenChan & SingleAnimationMask) == SingleAnimationMask) returns false meaning
+Zen chan 16 animation 
+
+001 = Hidegons
+((Hidegons & SingleAnimationMask) == SingleAnimationMask) returns false meaning
+Hidegons 16 animation 
+
+010 = Banebou
+((Banebou & SingleAnimationMask) == SingleAnimationMask) returns false meaning
+Banebou 16 animation 
+
+100 = Monsta
+((Monsta & SingleAnimationMask) == SingleAnimationMask) returns false meaning
+Monsta 16 animation 
+
+011 = Pulpul
+((Pulpul & SingleAnimationMask) == SingleAnimationMask) returns true meaning
+Pulpul 8 animation 
+
+110 = Mighta
+((Mighta & SingleAnimationMask) == SingleAnimationMask) returns false meaning
+Mighta 16 animation 
+
+101 = Drunk
+((Drunk & SingleAnimationMask) == SingleAnimationMask) returns false meaning
+Drunk 16 animation 
+
+111 = Invader
+((Invader & SingleAnimationMask) == SingleAnimationMask) returns true meaning
+Invader 8 animation 
+

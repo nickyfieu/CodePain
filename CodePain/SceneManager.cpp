@@ -4,18 +4,25 @@
 
 void cp::SceneManager::Update(const float elapsedSec)
 {
-	for(Scene* scene : m_Scenes)
-	{
-		scene->Update(elapsedSec);
-	}
+	(m_pActiveScene == nullptr) ? nullptr : m_pActiveScene->Update(elapsedSec);
 }
 
-void cp::SceneManager::Render()
+void cp::SceneManager::Render() const
 {
-	for (const Scene* scene : m_Scenes)
+	(m_pActiveScene == nullptr) ? nullptr : m_pActiveScene->Render();
+}
+
+bool cp::SceneManager::SetActiveScene(const std::string& name)
+{
+	for (Scene* pToCheck : m_Scenes)
 	{
-		scene->Render();
+		if (pToCheck->GetName() == name)
+		{
+			m_pActiveScene = pToCheck;
+			return true;
+		}
 	}
+	return false;
 }
 
 cp::Scene* cp::SceneManager::CreateScene(const std::string& name)
@@ -23,6 +30,7 @@ cp::Scene* cp::SceneManager::CreateScene(const std::string& name)
 	const size_t posNewScene = m_Scenes.size();
 	cp::Scene* pScene = new Scene(name);
 	m_Scenes.push_back(pScene);
+	(m_pActiveScene == nullptr) ? m_pActiveScene = pScene : nullptr;
 	return pScene;
 }
 

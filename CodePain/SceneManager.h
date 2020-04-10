@@ -1,6 +1,7 @@
 #pragma once
 #include "Singleton.h"
 #include <list>
+#include <string>
 
 namespace cp
 {
@@ -18,10 +19,16 @@ namespace cp
 		SceneManager& operator=(SceneManager&& other) = delete;
 
 		void Update(float elapsedSec);
-		void Render();
+		void Render() const;
+
+		inline Scene* GetActiveScene() const { return m_pActiveScene; }
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
+		Scene* m_pActiveScene;
 		std::list<Scene*> m_Scenes;
+	public:
+
+		bool SetActiveScene(const std::string& name);
 	};
 }

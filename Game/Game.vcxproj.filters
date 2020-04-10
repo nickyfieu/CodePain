@@ -13,11 +13,14 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\BubbleBobbleDataReading">
-      <UniqueIdentifier>{ee563739-120f-463d-ba02-ffb4a13049fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Scenes">
       <UniqueIdentifier>{88478395-14a9-4f5f-baeb-459f71dcd158}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Data">
+      <UniqueIdentifier>{96252942-0ee3-4c8c-bbff-46fd7c62adab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Data\BubbleBobbleDataReading">
+      <UniqueIdentifier>{ee563739-120f-463d-ba02-ffb4a13049fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,7 +28,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BubbleBobbleLevelReader.cpp">
-      <Filter>Source Files\BubbleBobbleDataReading</Filter>
+      <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
     </ClCompile>
     <ClCompile Include="Scene1.cpp">
       <Filter>Source Files\Scenes</Filter>
@@ -33,10 +36,13 @@
     <ClCompile Include="SceneLoader.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="LevelScene.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BubbleBobbleLevelReader.h">
-      <Filter>Source Files\BubbleBobbleDataReading</Filter>
+      <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
     </ClInclude>
     <ClInclude Include="Scene1.h">
       <Filter>Source Files\Scenes</Filter>
@@ -45,6 +51,12 @@
       <Filter>Source Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="SceneLoader.h">
+      <Filter>Source Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="BubbleBobbleData.h">
+      <Filter>Source Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelScene.h">
       <Filter>Source Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>

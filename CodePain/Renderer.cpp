@@ -27,8 +27,10 @@ void cp::Renderer::Init(SDL_Window * window)
 
 void cp::Renderer::Render() const
 {
+	// clear the renderer with black
 	SDL_RenderClear(m_Renderer);
 
+	SDL_RenderFillRect(m_Renderer, NULL);
 	SceneManager::GetInstance().Render();
 
 #ifdef _DEBUG

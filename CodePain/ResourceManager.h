@@ -18,6 +18,8 @@ namespace cp
 		void Init(const std::string& data);
 		SDL_Texture* LoadSDLTexture(const std::string& file) const;
 		Font* LoadFont(const std::string& file, unsigned int size) const;
+
+		inline const std::string& GetDataPath() const { return m_DataPath; }
 	private:
 		friend class Singleton<ResourceManager>;
 		ResourceManager() = default;

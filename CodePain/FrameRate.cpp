@@ -1,5 +1,6 @@
 #include "CodePainPCH.h"
 #include "FrameRate.h"
+#include "Logger.h"
 
 
 cp::FrameRate::FrameRate()
@@ -22,6 +23,7 @@ bool cp::FrameRate::GetFrameRate(float& container)
 	{
 		m_Time -= 1.f;
 		container = (float)m_FrameCounter;
+		Logger::GetInstance().Log(LogLevel::Info, "Fps " + std::to_string(m_FrameCounter), (m_FrameCounter%2));
 		m_FrameCounter = 0;
 		return true;
 	}

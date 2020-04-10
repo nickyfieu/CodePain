@@ -68,13 +68,8 @@ void cp::Logger::Log(LogLevel level, const std::string& msg, bool showTime)
 void cp::Logger::DrawLoggedInformation() const
 {
 	ImGui::SetNextWindowSize(ImVec2(320.f, 500.f));
-	ImGui::Begin("Logger", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-	{	// drawing the log
-		my_log.Draw("Log");
-	}
-
-	ImGui::End();
+	// drawing the log
+	my_log.Draw("Log");
 }
 
 

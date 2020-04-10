@@ -1,10 +1,19 @@
 #include "CodePainPCH.h"
 #include "Scene.h"
-#include "GameObject.h"
-
-unsigned int cp::Scene::m_IdCounter = 0;
 
 cp::Scene::Scene(const std::string& name) : m_Name(name) {}
+
+std::vector<cp::GameObject*> cp::Scene::GetAllGameObjectsOfType(GameObjectType type)
+{
+	size_t size = m_pObjects.size();
+	std::vector<GameObject*> vec;
+	vec.reserve(size / 2);
+	for (size_t i = 0; i < size; i++)
+	{
+		(m_pObjects[i]->GetType() == type) ? vec.push_back(m_pObjects[i]) : nullptr;
+	}
+	return vec;
+}
 
 void cp::Scene::Add(GameObject* object)
 {
@@ -15,7 +24,7 @@ void cp::Scene::Update(const float elapsedSec)
 {
 	for(GameObject* object : m_pObjects)
 	{
-		object->Update(elapsedSec);
+		(object->GetIsActive()) ? object->Update(elapsedSec) : nullptr;
 	}
 }
 
@@ -23,7 +32,7 @@ void cp::Scene::Render() const
 {
 	for (const GameObject* object : m_pObjects)
 	{
-		object->Render();
+		(object->GetIsActive()) ? object->Render() : nullptr;
 	}
 }
 
