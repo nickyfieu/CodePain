@@ -30,7 +30,7 @@ namespace cp
 		void RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst, const double angle, const SDL_Point& center, const SDL_RendererFlip flip) const;
 		void RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_FRect& dst, const double angle, const SDL_FPoint& center, const SDL_RendererFlip flip) const;
 
-		void RenderCollorRect(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b) const;
+		void RenderCollorRect(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255) const;
 
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; }
 

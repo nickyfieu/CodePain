@@ -17,6 +17,7 @@ namespace cp
 		_Text,
 		_FrameRate,
 		_CollisionBox,
+		_ColRect2D,
 	};
 
 	// BaseComponent is a pure virtual class

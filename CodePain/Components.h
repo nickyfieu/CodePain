@@ -6,3 +6,4 @@
 #include "Text.h"
 #include "FrameRate.h"
 #include "CollisionBox.h"
+#include "ColRect2D.h"

@@ -64,6 +64,9 @@
     <ClCompile Include="CollisionBox.cpp">
       <Filter>Resources\Components</Filter>
     </ClCompile>
+    <ClCompile Include="ColRect2D.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -145,6 +148,9 @@
       <Filter>Resources</Filter>
     </ClInclude>
     <ClInclude Include="CollisionBox.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ColRect2D.h">
       <Filter>Resources\Components</Filter>
     </ClInclude>
   </ItemGroup>

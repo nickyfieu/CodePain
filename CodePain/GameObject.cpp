@@ -16,11 +16,14 @@ void cp::GameObject::Update(const float elapsedSec)
 void cp::GameObject::Render() const
 {
 	Renderer& rendererRef = Renderer::GetInstance();
+	// are here to be used when needed for functionality if 2 components work together
+	// like text + framerate component
 	Transform* pTransform = nullptr;
 	Texture2D* pTexture2D = nullptr;
 	Text* pText = nullptr;
 	FrameRate* pFrameRate = nullptr;
 	CollisionBox* pCollisionBox = nullptr;
+	ColRect2D* pColRect2D = nullptr;
 	
 	for (BaseComponent* component : m_pComponents)
 	{
@@ -111,11 +114,35 @@ void cp::GameObject::Render() const
 					(side & CollisionSide::right) ? blue = 255 : blue;
 					(side & CollisionSide::up) ? green = 255 : green;
 					(side & CollisionSide::left) ? red = 255 : red;
-
+					(side & CollisionSide::down) ? red = green = 255 : red;
 					rendererRef.RenderCollorRect(box, red, green, blue);
 				}
 			}
 #endif
+			break;
+#pragma endregion
+#pragma region ColRect2D
+		case ComponentType::_ColRect2D:
+			pColRect2D = static_cast<ColRect2D*>(component);
+			{
+				SDL_Rect box = pColRect2D->GetColorBox();
+				// if for whatever reason ptrans == nullptr we have this check
+				// it should never be nullptr as the transform component is the first
+				// component to be added to the components container
+				if (IS_VALID(pTransform))
+				{
+					box.x += (int)pTransform->GetPosition().x;
+					box.y += (int)pTransform->GetPosition().y;
+				}
+
+				Uint32 rgba = pColRect2D->GetRGBA();
+				Uint8 r = Uint8(rgba >> 0);
+				Uint8 g = Uint8(rgba >> 8);
+				Uint8 b = Uint8(rgba >> 16);
+				Uint8 a = Uint8(rgba >> 24);
+
+				rendererRef.RenderCollorRect(box, r, g, b, a);
+			}
 			break;
 #pragma endregion
 		default:
