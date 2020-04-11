@@ -18,12 +18,12 @@ void Game::Scene1::LoadSceneData() const
 	// dae logo
 	pTex = cp::ResourceManager::GetInstance().LoadSDLTexture("logo.png");
 	cp::Texture2D* pTex2D = new cp::Texture2D(pTex);
-	pTex2D->SetLocalOffset(216.f, 180.f, 0.f);
+	pTex2D->SetLocalOffset(216.f, -180.f, 0.f);
 	daeBackground->AddComponent(pTex2D);
 	// Text
 	cp::Font* pFont = cp::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 	cp::Text* pText = new cp::Text("Programming 4 Assignment", pFont);
-	pText->SetLocalOffset(80.f, 20.f, 0.f);
+	pText->SetLocalOffset(80.f, -20.f, 0.f);
 	daeBackground->AddComponent(pText);
 	pText->Update(0.0f);
 	pText->GetTexture2D()->SetDstRect(SDL_FRect{ 0, 0, 600, 300 });
@@ -32,7 +32,7 @@ void Game::Scene1::LoadSceneData() const
 	scene->Add(fpsCounter);
 	pFont = cp::ResourceManager::GetInstance().LoadFont("Lingua.otf", 18);
 	pText = new cp::Text("0 FPS", pFont, SDL_Color{ 255, 255, 0 });
-	pText->SetLocalOffset(1.f, 1.f, 0.f);
+	pText->SetLocalOffset(1.f, -1.f, 0.f);
 	fpsCounter->AddComponent(pText);
 	fpsCounter->AddComponent(new cp::FrameRate());
 

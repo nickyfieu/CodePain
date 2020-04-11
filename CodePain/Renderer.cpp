@@ -8,7 +8,11 @@
 	#include "Imgui\imgui.h"
 	#include "Imgui_Sdl\imgui_sdl.h"
 	#include "Imgui_Sdl\imgui_impl_sdl.h"
+
+bool cp::Renderer::gd_RenderCollisionBoxes = false;
 #endif
+
+#define	SDL_RENDER_SCALE_QUALITY = 1;
 
 void cp::Renderer::Init(SDL_Window * window)
 {
@@ -23,14 +27,15 @@ void cp::Renderer::Init(SDL_Window * window)
 	ImGuiSDL::Initialize(m_Renderer, 960, 500);
 #endif
 
+
 }
 
 void cp::Renderer::Render() const
 {
 	// clear the renderer with black
 	SDL_RenderClear(m_Renderer);
-
 	SDL_RenderFillRect(m_Renderer, NULL);
+
 	SceneManager::GetInstance().Render();
 
 #ifdef _DEBUG
@@ -75,4 +80,11 @@ void cp::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, 
 void cp::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_FRect& dst, const double angle, const SDL_FPoint& center, const SDL_RendererFlip flip) const
 {
 	SDL_RenderCopyExF(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst, angle, &center, flip);
+}
+
+void cp::Renderer::RenderCollorRect(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b) const
+{
+	SDL_SetRenderDrawColor(m_Renderer, r, g, b, 255);
+	SDL_RenderFillRect(m_Renderer, &rect);
+	SDL_SetRenderDrawColor(m_Renderer, 0, 0, 0, 255);
 }

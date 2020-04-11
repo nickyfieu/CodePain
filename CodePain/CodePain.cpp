@@ -135,7 +135,7 @@ void cp::CodePain::Run()
 				GameObject* gameObj = level.at(0);
 				Transform* transform = gameObj->GetComponent<Transform>(ComponentType::_Transform);
 				unsigned int levelHeight = 500;
-				if ((transform->GetPosition().y / 500) != (levelToDisplay - 1))
+				if (abs(transform->GetPosition().y / 500) != (levelToDisplay - 1))
 				{
 					// disabling old level and enableing new level
 					level[oldLevel - 1]->SetActive(false);
@@ -151,6 +151,7 @@ void cp::CodePain::Run()
 				}
 			}
 		}
+		ImGui::Checkbox("Visualize Collision", &renderer.gd_RenderCollisionBoxes);
 		ImGui::End();
 #endif
 

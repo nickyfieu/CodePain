@@ -20,6 +20,14 @@ namespace Game
 		void ReadEnemyData() const;
 
 	private:
+		const unsigned int m_LevelTilesWide = 32;
+		const unsigned int m_LevelTilesHigh = 25;
+
+		const unsigned int m_WindowSizeX = 640;
+		const unsigned int m_WindowTileSize = m_WindowSizeX / m_LevelTilesWide;
+
 		BinaryReaderWriter m_ReadWrite{};
+
+		void CalculateLevelCollision(cp::GameObject* pLevelObj,const bool levelBlocks[800]);
 	};
 }

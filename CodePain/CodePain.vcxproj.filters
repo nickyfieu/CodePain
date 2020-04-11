@@ -61,6 +61,9 @@
     <ClCompile Include="CodePain.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionBox.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -140,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="CodePain.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionBox.h">
+      <Filter>Resources\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

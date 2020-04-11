@@ -15,7 +15,8 @@ namespace cp
 		_Texture2D,
 		_Transform,
 		_Text,
-		_FrameRate
+		_FrameRate,
+		_CollisionBox,
 	};
 
 	// BaseComponent is a pure virtual class

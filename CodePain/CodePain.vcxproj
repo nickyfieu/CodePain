@@ -244,6 +244,7 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
     <ClInclude Include="BaseComponent.h" />
     <ClInclude Include="BinaryReaderWriter.h" />
     <ClInclude Include="CodePain.h" />
+    <ClInclude Include="CollisionBox.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FrameRate.h" />
@@ -270,6 +271,7 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodePain.cpp" />
+    <ClCompile Include="CollisionBox.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FrameRate.cpp" />
     <ClCompile Include="GameObject.cpp" />

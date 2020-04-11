@@ -20,6 +20,7 @@ void cp::GameObject::Render() const
 	Texture2D* pTexture2D = nullptr;
 	Text* pText = nullptr;
 	FrameRate* pFrameRate = nullptr;
+	CollisionBox* pCollisionBox = nullptr;
 	
 	for (BaseComponent* component : m_pComponents)
 	{
@@ -83,6 +84,38 @@ void cp::GameObject::Render() const
 #pragma region FPS
 		case cp::ComponentType::_FrameRate:
 			pFrameRate = static_cast<FrameRate*>(component);
+			break;
+#pragma endregion
+#pragma region CollisionBox
+		case ComponentType::_CollisionBox:
+			pCollisionBox = static_cast<CollisionBox*>(component);
+#if _DEBUG
+			{
+				if (rendererRef.gd_RenderCollisionBoxes)
+				{
+					SDL_Rect box = pCollisionBox->GetCollisionBox();
+					CollisionSide side = pCollisionBox->GetCollisionSide();
+					// if for whatever reason ptrans == nullptr we have this check
+					// it should never be nullptr as the transform component is the first
+					// component to be added to the components container
+					if (IS_VALID(pTransform))
+					{
+						box.x += (int)pTransform->GetPosition().x;
+						box.y += (int)pTransform->GetPosition().y;
+					}
+
+					Uint8 red = 0;
+					Uint8 green = 0;
+					Uint8 blue = 0;
+
+					(side & CollisionSide::right) ? blue = 255 : blue;
+					(side & CollisionSide::up) ? green = 255 : green;
+					(side & CollisionSide::left) ? red = 255 : red;
+
+					rendererRef.RenderCollorRect(box, red, green, blue);
+				}
+			}
+#endif
 			break;
 #pragma endregion
 		default:
