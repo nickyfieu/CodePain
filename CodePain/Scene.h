@@ -21,6 +21,7 @@ namespace cp
 		Scene& operator=(Scene&& other) = delete;
 
 		inline std::string GetName() const { return m_Name; }
+		void ReserveGameObjects(size_t size);
 
 	private: 
 		explicit Scene(const std::string& name);

@@ -1,6 +1,11 @@
 #include "CodePainPCH.h"
 #include "Scene.h"
 
+void cp::Scene::ReserveGameObjects(size_t size)
+{
+	m_pObjects.reserve(size);
+}
+
 cp::Scene::Scene(const std::string& name) : m_Name(name) {}
 
 std::vector<cp::GameObject*> cp::Scene::GetAllGameObjectsOfType(GameObjectType type)

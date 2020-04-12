@@ -19,8 +19,11 @@ void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene)
 
 	SDL_Surface* pParallaxPixelData = pResourceManager.LoadSDLSurface("LevelData/LevelParallaxColors.png");
 
+	pScene->ReserveGameObjects(150);
+
 	for (unsigned int i = 0; i < amountOfLevels; i++)
 	{
+
 		Uint32 colRight = pResourceManager.GetPixel(pParallaxPixelData, i , 0);
 		Uint32 colLeft = pResourceManager.GetPixel(pParallaxPixelData, i, 1);
 
@@ -74,6 +77,7 @@ void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::
 	// bottom = collisionIndicies[first].y 
 	// width = some value
 	// height = (collisionIndicies[last].y + blockHeight) - bottom
+
 
 	cp::CollisionSide side = cp::CollisionSide::right;
 	const int colSize = 3;
@@ -354,7 +358,7 @@ void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelOb
 			{
 				// if true big block
 				// if false small bock
-				if (((blockID % m_LevelTilesWide) == 0) || ((blockID % m_LevelTilesWide) == (m_LevelTilesWide - 2)))
+				if (((blockID % m_LevelTilesWide) == 0) || ((blockID % m_LevelTilesWide) == (m_LevelTilesWide - 2))) 
 				{
 					levelBlocks[blockID] = false;
 					levelBlocks[blockID + 1] = false;

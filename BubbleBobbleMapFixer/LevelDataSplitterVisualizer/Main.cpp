@@ -124,7 +124,6 @@ int main()
 
 				bool bit4 = byte3 & 0b10000000;
 				bool bit5 = byte3 & 0b01000000;
-				bool bit6 = byte3 & 0b00100000;
 
 				float delay = unsigned int((byte3 & 0b00111111) << 1) * 0.017f;
 

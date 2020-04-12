@@ -23,7 +23,7 @@ namespace cp
 	// BaseComponent is a pure virtual class
 	// It only holds a component type object wich is used for safe casting
 
-	class BaseComponent
+	class BaseComponent abstract
 	{
 	public:
 		explicit BaseComponent(ComponentType type)
