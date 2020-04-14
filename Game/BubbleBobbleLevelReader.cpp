@@ -15,7 +15,7 @@ void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene)
 	m_ReadWrite.ChangeFilePath(LevelDataPath);
 	m_ReadWrite.OpenFileToRead();
 
-	bool levelBits[800]{0};
+	unsigned char levelBits[amountOfLevels];
 
 	SDL_Surface* pParallaxPixelData = pResourceManager.LoadSDLSurface("LevelData/LevelParallaxColors.png");
 
@@ -40,12 +40,7 @@ void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene)
 		{
 			unsigned char byte;
 			m_ReadWrite.BinaryReading(byte);
-			unsigned char mask = 0b10000000;
-			for (unsigned int k = 0; k < m_BitsInByte; k++)
-			{
-				(byte & mask) ? levelBits[(j * 8) + k] = true: levelBits[(j * 8) + k] = false;
-				mask = mask >> 1;
-			}
+			levelBits[j] = byte;
 		}
 		CalculateLevelCollisionAndParallaxBoxes(levelGameObject, levelBits, colRight, colLeft);
 		CreateLevelTextures(levelGameObject, i, levelBits);
@@ -58,7 +53,7 @@ void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene)
 	if (pParallaxPixelData) SDL_FreeSurface(pParallaxPixelData);
 }
 
-void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::GameObject* pLevelObj, const bool levelBlocks[800], Uint32 colRight, Uint32 colDown)
+void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::GameObject* pLevelObj, const unsigned char levelBlocks[100], Uint32 colRight, Uint32 colDown)
 {
 	std::vector<glm::tvec2<int>> collisionIndicies;
 	int cISize{0};
@@ -85,10 +80,17 @@ void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::
 	{
 		for (int row = 0; row < (int)m_LevelTilesHigh; row++)
 		{
-			int indexCurrent{row * (int)m_LevelTilesWide + col};
-			int indexToCheck{ indexCurrent + 1 };
+			unsigned char currentMask = 0b10000000 >> (col % m_BitsInByte);
+			unsigned char toCheckMask = currentMask >> 1;
+			int indexCurrent{int(row * m_BytesWide + (col / m_BitsInByte))};
+			int indexToCheck{ indexCurrent };
+			if (currentMask & 0b00000001)
+			{
+				indexToCheck++;
+				toCheckMask = 0b10000000;
+			}
 
-			if (levelBlocks[indexCurrent] && !levelBlocks[indexToCheck]) // current index = true && block to the right = false we have collision on the right side of this block
+			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block to the right = false we have collision on the right side of this block
 			{
 				glm::tvec2<int> pos{ 0,0 };
 				pos.x = col * m_WindowTileSize + m_WindowTileSize - colSize;
@@ -142,10 +144,12 @@ void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::
 	{
 		for (int col = 0; col < (int)m_LevelTilesWide; col++)
 		{
-			int indexCurrent{ row * (int)m_LevelTilesWide + col };
-			int indexToCheck{ indexCurrent - (int)m_LevelTilesWide }; // checks the one up
+			unsigned char currentMask = 0b10000000 >> (col % m_BitsInByte);
+			unsigned char toCheckMask = currentMask;
+			int indexCurrent{ int(row * m_BytesWide + (col / m_BitsInByte)) };
+			int indexToCheck{ indexCurrent - (int)m_BytesWide };
 
-			if (levelBlocks[indexCurrent] && !levelBlocks[indexToCheck]) // current index = true && block ontop = false we have collision on the up side of this block
+			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block ontop = false we have collision on the up side of this block
 			{
 				glm::tvec2<int> pos{ 0,0 };
 				pos.x = col * m_WindowTileSize;
@@ -198,10 +202,17 @@ void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::
 	{
 		for (int row = 0; row < (int)m_LevelTilesHigh; row++)
 		{
-			int indexCurrent{ row * (int)m_LevelTilesWide + col };
-			int indexToCheck{ indexCurrent -1 };
+			unsigned char currentMask = 0b10000000 >> (col% m_BitsInByte);
+			unsigned char toCheckMask = currentMask << 1;
+			int indexCurrent{ int(row * m_BytesWide + (col / m_BitsInByte)) };
+			int indexToCheck{ indexCurrent };
+			if (currentMask & 0b10000000)
+			{
+				indexToCheck--;
+				toCheckMask = 0b00000001;
+			}
 
-			if (levelBlocks[indexCurrent] && !levelBlocks[indexToCheck]) // current index = true && block to the left = false we have collision on the left side of this block
+			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block to the left = false we have collision on the left side of this block
 			{
 				glm::tvec2<int> pos{ 0,0 };
 				pos.x = col * m_WindowTileSize;
@@ -255,10 +266,12 @@ void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::
 	{
 		for (int col = 0; col < (int)m_LevelTilesWide; col++)
 		{
-			int indexCurrent{ row * (int)m_LevelTilesWide + col };
-			int indexToCheck{ indexCurrent + (int)m_LevelTilesWide }; // checks the one up
+			unsigned char currentMask = 0b10000000 >> (col% m_BitsInByte);
+			unsigned char toCheckMask = currentMask;
+			int indexCurrent{ int(row * m_BytesWide + (col / m_BitsInByte)) };
+			int indexToCheck{ indexCurrent + (int)m_BytesWide };
 
-			if (levelBlocks[indexCurrent] && !levelBlocks[indexToCheck]) // current index = true && block ontop = false we have collision on the up side of this block
+			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block ontop = false we have collision on the up side of this block
 			{
 				glm::tvec2<int> pos{ 0,0 };
 				pos.x = col * m_WindowTileSize;
@@ -320,7 +333,7 @@ void Game::BubbleBobbleLevelReader::CreateParallaxBoxTex(cp::GameObject* pLevelO
 	
 }
 
-void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, bool levelBlocks[800])
+void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, unsigned char levelBlocks[100])
 {
 	const unsigned int heightAndWithOfTile = 8;
 
@@ -347,32 +360,44 @@ void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelOb
 	{
 		// base destination rect for each byte in a level
 		SDL_FRect dst{};
-		dst.x = float((i % (m_LevelTilesWide / m_BitsInByte)) * m_WindowTileSize * m_BitsInByte);
-		dst.y = float((i / (m_LevelTilesWide / m_BitsInByte)) * m_WindowTileSize);
+		dst.x = float((i % m_BytesWide) * m_WindowTileSize * m_BitsInByte);
+		dst.y = float((i / m_BytesWide) * m_WindowTileSize);
 		dst.w = float(m_WindowTileSize);
 		dst.h = float(m_WindowTileSize);
+		unsigned char mask = 0b10000000;
 		for (unsigned int k = 0; k < m_BitsInByte; k++)
 		{
-			unsigned int blockID = (i * m_BitsInByte) + k;
-			if (levelBlocks[blockID])
+			if (levelBlocks[i] & mask)
 			{
 				// if true big block
 				// if false small bock
-				if (((blockID % m_LevelTilesWide) == 0) || ((blockID % m_LevelTilesWide) == (m_LevelTilesWide - 2))) 
+				if ((((i % m_BytesWide) == 0) && ((levelBlocks[i] & 0b11000000) == 0b11000000) && (k == 0)) || (((i % m_BytesWide) == 3) && ((levelBlocks[i] & 0b00000011) == 0b00000011) && (k == 6)))
 				{
-					levelBlocks[blockID] = false;
-					levelBlocks[blockID + 1] = false;
+					if ((i % m_BytesWide) == 0)
+					{
+						levelBlocks[i] = unsigned char(levelBlocks[i] & 0b00111111);
+					}
+					else
+					{
+						levelBlocks[i] = unsigned char(levelBlocks[i] & 0b11111100);
+					}
 					
 					float oldDSTW = dst.w;
 					float oldDSTH = dst.h;
 					int oldSRCBigBlock = srcBigBlock.h;
 
 					dst.w *= 2; //assuming the block to the right is also true ( should be true always )
-					blockID += m_LevelTilesWide;
-					if (blockID < 800) // not out of range
+					if (i < (100 - 4)) // not out of range
 					{
-						levelBlocks[blockID] = false;
-						levelBlocks[blockID + 1] = false;
+						if ((i % m_BytesWide) == 0)
+						{
+							levelBlocks[i + 4] = unsigned char(levelBlocks[i + 4] & 0b00111111);
+						}
+						else
+						{
+							levelBlocks[i + 4] = unsigned char(levelBlocks[i + 4] & 0b11111100);
+						}
+
 						dst.h *= 2; // we can assume if not out of range the block under the original one is true (should be true always )
 					}
 					else
@@ -398,6 +423,7 @@ void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelOb
 				}
 			}
 			dst.x += m_WindowTileSize;
+			mask = mask >> 1;
 		}
 	}
 }

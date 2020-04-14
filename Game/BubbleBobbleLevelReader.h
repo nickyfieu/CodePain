@@ -24,6 +24,7 @@ namespace Game
 		const unsigned int m_LevelTilesWide = 32;
 		const unsigned int m_LevelTilesHigh = 25;
 		const unsigned int m_BytesPerLevel = (m_LevelTilesWide * m_LevelTilesHigh) / m_BitsInByte;
+		const unsigned int m_BytesWide = (m_LevelTilesWide / m_BitsInByte);
 
 		const unsigned int m_WindowSizeX = 640;
 		const unsigned int m_WindowTileSize = m_WindowSizeX / m_LevelTilesWide;
@@ -34,9 +35,9 @@ namespace Game
 
 		std::vector<cp::CollisionBox*> m_pCollisionBoxes;
 
-		void CalculateLevelCollisionAndParallaxBoxes(cp::GameObject* pLevelObj,const bool levelBlocks[800], Uint32 colRight, Uint32 colDown);
+		void CalculateLevelCollisionAndParallaxBoxes(cp::GameObject* pLevelObj,const unsigned char levelBlocks[100], Uint32 colRight, Uint32 colDown);
 		void CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionSide side, int x, int y, int width, int height, Uint32 rgba);
-		void CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, bool levelBlocks[800]);
+		void CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, unsigned char levelBlocks[100]);
 		void CreateLevelCollision(cp::GameObject* pLevelObj);
 	};
 }
