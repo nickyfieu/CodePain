@@ -1,5 +1,6 @@
 #include "CodePainPCH.h"
 #include "InputManager.h"
+#include "Logger.h"
 #include <SDL.h>
 #ifdef _DEBUG
 	#include "Imgui\imgui.h"
@@ -64,6 +65,10 @@ bool cp::InputManager::ProcessInput()
 	io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 	io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 	io.MouseWheel = static_cast<float>(wheel);
+	
+	if (io.MouseDown[1] == true)
+		Logger::GetInstance().Log(cp::LogLevel::Info, "Mouse position: x " + std::to_string(io.MousePos.x) + " y " + std::to_string(io.MousePos.y), true);
+
 #endif
 
 	return true;

@@ -20,14 +20,14 @@ public:
 
 	}
 
-	inline bool OpenFileToWrite()
+	inline bool OpenFileToWrite() noexcept
 	{
 		m_Write.open(m_FilePath, std::ios::out | std::ios::binary);
 		return m_Write.is_open();
 	}
 
 	template<class T>
-	inline void BinaryWriting(const std::vector<T>& data)
+	inline void BinaryWriting(const std::vector<T>& data) noexcept
 	{
 		if (m_Write.is_open()) //to be safe check if it can open the file
 		{
@@ -41,7 +41,7 @@ public:
 	}
 
 	template<class T>
-	inline void BinaryWriting(const T& data)
+	inline void BinaryWriting(const T& data) noexcept
 	{
 		if (m_Write.is_open()) //to be safe check if it can open the file
 		{
@@ -50,7 +50,7 @@ public:
 	}
 
 	template<>
-	inline void BinaryWriting(const std::string& data)
+	inline void BinaryWriting(const std::string& data) noexcept
 	{
 		if (m_Write.is_open()) //to be safe check if it can open the file
 		{
@@ -60,19 +60,19 @@ public:
 		}
 	}
 
-	inline void CloseFileToWrite()
+	inline void CloseFileToWrite() noexcept
 	{
 		m_Write.close();
 	}
 
-	inline bool OpenFileToRead()
+	inline bool OpenFileToRead() noexcept
 	{
 		m_Read.open(m_FilePath, std::ios::in | std::ios::binary);
 		return m_Read.is_open();
 	}
 
 	template<class T>
-	inline void BinaryReading(T& data)
+	inline void BinaryReading(T& data) noexcept
 	{
 		if (m_Read.is_open()) //to be safe check if it can open the file
 		{
@@ -81,7 +81,7 @@ public:
 	}
 
 	template<class T>
-	inline void BinaryReading(std::vector<T>& data)
+	inline void BinaryReading(std::vector<T>& data) noexcept
 	{
 		if (m_Read.is_open()) //to be safe check if it can open the file
 		{
@@ -97,7 +97,7 @@ public:
 	}
 
 	template<>
-	inline void BinaryReading(std::string& data)
+	inline void BinaryReading(std::string& data) noexcept
 	{
 		if (m_Read.is_open()) //to be safe check if it can open the file
 		{
@@ -108,14 +108,43 @@ public:
 		}
 	}
 
-	inline void CloseFileToRead()
+	inline void CloseFileToRead() noexcept
 	{
 		m_Read.close();
 	}
 
-	inline void ChangeFilePath(const std::string& filePath)
+	inline void ChangeFilePath(const std::string& filePath) noexcept
 	{
 		m_FilePath = filePath;
+	}
+
+	// returns negative 1 when file is not open
+	inline int AmountCharsInFile() noexcept
+	{
+		if (!m_Read.is_open())
+			return -1;
+
+		int amountChars{};
+		char character{};
+
+		// tellg works here as we are reading a binary file!
+		int currentPos = (int)m_Read.tellg();
+		ResetReadPos();
+		while (!m_Read.eof())
+		{
+			m_Read.read(&character, 1);
+			amountChars++;
+		}
+		ResetReadPos();
+		m_Read.seekg(currentPos, std::ios::beg);
+
+		return amountChars - 1;
+	}
+
+	inline void ResetReadPos() noexcept
+	{
+		m_Read.clear();
+		m_Read.seekg(0, std::ios::beg);
 	}
 
 	std::ofstream m_Write;

@@ -20,6 +20,14 @@ namespace cp
 		down = 0b1000
 	};
 
+	// thanks tom :)
+
+	enum CollisionType
+	{
+		_static,
+		_dynamic
+	};
+
 	class CollisionBox final : public BaseComponent
 	{
 	public:

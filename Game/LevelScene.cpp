@@ -8,8 +8,9 @@ void Game::LevelScene::LoadSceneData() const
 {
 	cp::Scene* scene = cp::SceneManager::GetInstance().CreateScene("LevelScene");
 	BubbleBobbleLevelReader levelReader{};
-	levelReader.ReadLevelData(scene);
+	levelReader.ReadLevelData(scene, "LevelData/SeperatedLevelData.dat", "LevelData/LevelParallaxColors.png");
 
+	// Fps Counter
 	cp::GameObject* fpsCounter = new cp::GameObject();
 	scene->Add(fpsCounter);
 	cp::Font* pFont = cp::ResourceManager::GetInstance().LoadFont("Lingua.otf", 20);

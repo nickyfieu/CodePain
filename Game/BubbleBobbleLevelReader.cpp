@@ -3,311 +3,214 @@
 #include "ResourceManager.h"
 #include "GameObject.h"
 #include "Components.h"
+#include "Logger.h"
 #include <SDL_surface.h>
 
-void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene)
+void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene,const std::string& levelPath, const std::string& parallaxPath)
 {
-	cp::ResourceManager& pResourceManager = cp::ResourceManager::GetInstance();
-	const std::string LevelDataPath = cp::ResourceManager::GetInstance().GetDataPath() + "LevelData/SeperatedLevelData.dat";
-
-	const unsigned int amountOfLevels = 100;
-
+	const std::string LevelDataPath = cp::ResourceManager::GetInstance().GetDataPath() + levelPath;
 	m_ReadWrite.ChangeFilePath(LevelDataPath);
-	m_ReadWrite.OpenFileToRead();
+	if (!m_ReadWrite.OpenFileToRead())
+		return cp::Logger::GetInstance().Log(cp::LogLevel::Error, "BubbleBobbleLevelReader::ReadLevelData could not open file!");
 
-	unsigned char levelBits[amountOfLevels];
+	// assumption check ( amount of chars in a file should equal  bytes per level * amount of levels )
+	int amountOfBytes = m_ReadWrite.AmountCharsInFile();
+	if (amountOfBytes != int(m_BytesPerLevel * m_AmountOfLevels))
+		return cp::Logger::GetInstance().Log(cp::LogLevel::Error, "BubbleBobbleLevelReader::ReadLevelData invalid level file!");
 
-	SDL_Surface* pParallaxPixelData = pResourceManager.LoadSDLSurface("LevelData/LevelParallaxColors.png");
+	// getting the parallax pixel data surface ( surface to be able to sample on a pixel position )
+	SDL_Surface* pParallaxPixelData = cp::ResourceManager::GetInstance().LoadSDLSurface(parallaxPath);
+	Uint32 colorRightParallax = 0;
+	Uint32 colorLeftParallax = 0;
 
-	pScene->ReserveGameObjects(150);
+	// getting the position of the first level gameObject
+	size_t lvl1 = pScene->GetAmountOfGameObjects();
 
-	for (unsigned int i = 0; i < amountOfLevels; i++)
+	// preemptive reserve of extra gameobjects
+	pScene->ReserveGameObjects(int(m_AmountOfLevels * 1.5));
+
+	unsigned char levelBits[m_AmountOfLevels];
+	for (unsigned int i = 0; i < m_AmountOfLevels; i++)
 	{
+		cp::GameObject* levelGameObject = InitLevelGameObject(i,pScene);
+		ReadLevel(levelBits);
 
-		Uint32 colRight = pResourceManager.GetPixel(pParallaxPixelData, i , 0);
-		Uint32 colLeft = pResourceManager.GetPixel(pParallaxPixelData, i, 1);
+		ReadParallaxColors(i, colorRightParallax, colorLeftParallax, pParallaxPixelData);
+		CalculateLevelCollisionAndParallaxBoxes(colorRightParallax, colorLeftParallax, levelGameObject, levelBits);
 
-		cp::GameObject* levelGameObject = new cp::GameObject(cp::GameObjectType::level);
-		pScene->Add(levelGameObject);
-
-		(i == 0) ? levelGameObject->SetActive(true) : levelGameObject->SetActive(false);
-
-		cp::Transform* levelTransform = levelGameObject->GetComponent<cp::Transform>(cp::ComponentType::_Transform);
-		// add a height offset 
-		(levelTransform != nullptr) ? levelTransform->SetPosition(0.f, -float(i * m_WindowTileSize * m_LevelTilesHigh), 0.f) : nullptr;
-
-		for (unsigned int j = 0; j < m_BytesPerLevel; j++)
-		{
-			unsigned char byte;
-			m_ReadWrite.BinaryReading(byte);
-			levelBits[j] = byte;
-		}
-		CalculateLevelCollisionAndParallaxBoxes(levelGameObject, levelBits, colRight, colLeft);
 		CreateLevelTextures(levelGameObject, i, levelBits);
-		// vector was used to save collision due to the way of how rendering works 
-		// if not done like this you cannot debug render the collision ( level would render ontop )
 		CreateLevelCollision(levelGameObject);
 	}
 	m_ReadWrite.CloseFileToRead();
-
-	if (pParallaxPixelData) SDL_FreeSurface(pParallaxPixelData);
+	if (pParallaxPixelData)
+		SDL_FreeSurface(pParallaxPixelData);
+	pScene->GetGameObject(lvl1)->SetActive(true);
 }
 
-void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(cp::GameObject* pLevelObj, const unsigned char levelBlocks[100], Uint32 colRight, Uint32 colDown)
+void Game::BubbleBobbleLevelReader::ReadLevel(unsigned char levelBits[100])
+{
+	for (unsigned int j = 0; j < m_BytesPerLevel; j++)
+	{
+		unsigned char byte;
+		m_ReadWrite.BinaryReading(byte);
+		levelBits[j] = byte;
+	}
+}
+
+void Game::BubbleBobbleLevelReader::ReadParallaxColors(unsigned int levelIndex, Uint32& color1, Uint32& color2, SDL_Surface* img)
+{
+	cp::ResourceManager& pResourceManager = cp::ResourceManager::GetInstance();
+	color1 = pResourceManager.GetPixel(img, levelIndex, 0);
+	color2 = pResourceManager.GetPixel(img, levelIndex, 1);
+}
+
+cp::GameObject* Game::BubbleBobbleLevelReader::InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene)
+{
+	// create a level game object and add it
+	cp::GameObject* levelGameObject = new cp::GameObject(cp::GameObjectType::level);
+	pScene->Add(levelGameObject);
+	// adding a transform with height offset 
+	// so that levels are stacked ( lvl 1 highest 2 below it etc )
+	cp::Transform* levelTransform = levelGameObject->GetComponent<cp::Transform>(cp::ComponentType::_Transform);
+	if (levelTransform != nullptr)
+		levelTransform->SetPosition(0.f, -float(levelIndex * m_WindowTileSize * m_LevelTilesHigh), 0.f);
+	return levelGameObject;
+}
+
+void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
+{
+	m_pCollisionBoxes.reserve((m_LevelTilesWide * m_LevelTilesHigh) / 20);
+	ReadCollisionSide(colRight, colDown, cp::CollisionSide::right, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionSide::up, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionSide::left, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionSide::down, pLevelObj, levelBlocks);
+}
+
+void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 colDown, cp::CollisionSide side, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
 {
 	std::vector<glm::tvec2<int>> collisionIndicies;
-	int cISize{0};
-
-	m_pCollisionBoxes.reserve((m_LevelTilesWide * m_LevelTilesHigh) / 10);
-
-	// read right collision
-	// if block to right of current is false ( valid right collision ) push back collision vector with a pos
-	// read the next one BELOW it ( level data[0] = top left )
-	// when the last one in the row is read create a collision box component  (if size > 0)
-	// OR
-	// when the next block in the row is not a valid create a collision box component
-	// when creating a collision box component clear the vector after that
-	// creating the collision box component requires this data for a right collision box
-	// left = collisionIndicies[first].x + tile size - some value
-	// bottom = collisionIndicies[first].y 
-	// width = some value
-	// height = (collisionIndicies[last].y + blockHeight) - bottom
-
-
-	cp::CollisionSide side = cp::CollisionSide::right;
 	const int colSize = 3;
-	for (int col = 0; col < (int)m_LevelTilesWide - 1; col++) // -1 due to no posible right collision on the full right side
-	{
-		for (int row = 0; row < (int)m_LevelTilesHigh; row++)
-		{
-			unsigned char currentMask = 0b10000000 >> (col % m_BitsInByte);
-			unsigned char toCheckMask = currentMask >> 1;
-			int indexCurrent{int(row * m_BytesWide + (col / m_BitsInByte))};
-			int indexToCheck{ indexCurrent };
-			if (currentMask & 0b00000001)
-			{
-				indexToCheck++;
-				toCheckMask = 0b10000000;
-			}
+	int col = 0, row = 0;
+	int colMax = (int)m_LevelTilesWide, rowMax = (int)m_LevelTilesHigh;
+	int indexCurrent = 0, indexToCheck = 0, cISize = 0;
+	unsigned char currentMask = 0, toCheckMask = 0;
+	InitReadColSideData(col, colMax, row, rowMax, side);
+	bool upDown = side == cp::CollisionSide::up || side == cp::CollisionSide::down;
+	int c = (upDown) ? row : col, r = (upDown) ? col : row;
+	int cm = (upDown) ? rowMax : colMax, rm = (upDown) ? colMax : rowMax;
 
-			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block to the right = false we have collision on the right side of this block
+	for (c; c < cm; c++)
+	{
+		for (r; r < rm; r++)
+		{
+			if (upDown)
+				UpdateReadColSideData(currentMask, toCheckMask, indexCurrent, indexToCheck, r, c, side);
+			else
+				UpdateReadColSideData(currentMask, toCheckMask, indexCurrent, indexToCheck, c, r, side);
+			// current index = true && block to the right = false we have collision on the right side of this block
+			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) 
 			{
 				glm::tvec2<int> pos{ 0,0 };
-				pos.x = col * m_WindowTileSize + m_WindowTileSize - colSize;
-				pos.y = row * m_WindowTileSize;
+				pos.x = (upDown) ? r * m_WindowTileSize : c * m_WindowTileSize;
+				if (side == cp::CollisionSide::right)
+					pos.x += m_WindowTileSize - colSize;
+				pos.y = (upDown) ? c * m_WindowTileSize : r * m_WindowTileSize;
 				collisionIndicies.push_back(pos);
 				cISize++;
 			}
-			else // check if collision indicies size is greater than 0 if true make collision box
+			else
 			{
-				if (cISize > 0)
-				{
-					int x = collisionIndicies[0].x;
-					int y = collisionIndicies[0].y;
-					int width = colSize;
-					int height = (collisionIndicies[cISize - 1].y + m_WindowTileSize) - y;
-					m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-					CreateParallaxBoxTex(pLevelObj, side, x + colSize, y , m_ParallaxSize, height, colRight);
-					collisionIndicies.clear();
-					cISize = 0;
-				}
+				UseColSideData(colRight, colDown, cISize, side, pLevelObj, collisionIndicies);
 			}
 		}
-		
-		if (cISize > 0)
-		{
-			int x = collisionIndicies[0].x;
-			int y = collisionIndicies[0].y;
-			int width = colSize;
-			int height = (collisionIndicies[cISize - 1].y + m_WindowTileSize) - y;
-			m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-			CreateParallaxBoxTex(pLevelObj, side, x + colSize, y, m_ParallaxSize, height, colRight);
-			collisionIndicies.clear();
-			cISize = 0;
-		}
+		UseColSideData(colRight, colDown, cISize, side, pLevelObj, collisionIndicies);
+		r = (upDown) ? col : row;
 	}
+}
 
-	// read up collision 
-	// if block ontop of current is false ( valid up collision ) push back collision vector with a pos
-	// read the next one RIGHT it ( level data[0] = top left )
-	// when the last one in the collumn is read create a collision box component (if size > 0) 
-	// OR
-	// when the next block in the collumn is not a valid create a collision box component
-	// when creating a collision box component clear the vector after that
-	// creating the collision box component requires this data for a up collision box
-	// left = collisionIndicies[first].x
-	// bottom = collisionIndicies[first].y 
-	// width = (collisionIndicies[last].x + blockWidth) - left
-	// height = some value
-	side = cp::CollisionSide::up;
-	for (int row = 1; row < (int)m_LevelTilesHigh; row++) // starts at 1 as you cannot check row 0 ( -1 doesnt exist )
+void Game::BubbleBobbleLevelReader::UseColSideData(Uint32 colRight, Uint32 colDown, int& colIndexSize, cp::CollisionSide side, cp::GameObject* pLevelObj, std::vector<glm::tvec2<int>>& collisionIndicies)
+{
+	if (colIndexSize <= 0)
+		return;
+	// creates collision box + paralax effect
+	const int colSize = 3;
+	int x = collisionIndicies[0].x;
+	int y = collisionIndicies[0].y;
+	int width = colSize;
+	int height = colSize;
+	switch (side)
 	{
-		for (int col = 0; col < (int)m_LevelTilesWide; col++)
-		{
-			unsigned char currentMask = 0b10000000 >> (col % m_BitsInByte);
-			unsigned char toCheckMask = currentMask;
-			int indexCurrent{ int(row * m_BytesWide + (col / m_BitsInByte)) };
-			int indexToCheck{ indexCurrent - (int)m_BytesWide };
-
-			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block ontop = false we have collision on the up side of this block
-			{
-				glm::tvec2<int> pos{ 0,0 };
-				pos.x = col * m_WindowTileSize;
-				pos.y = row * m_WindowTileSize;
-				collisionIndicies.push_back(pos);
-				cISize++;
-			}
-			else // check if collision indicies size is greater than 0 if true make collision box
-			{
-				if (cISize > 0)
-				{
-					int x = collisionIndicies[0].x;
-					int y = collisionIndicies[0].y;
-					int width = (collisionIndicies[cISize - 1].x + m_WindowTileSize) - x;
-					int height = colSize;
-					m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-					collisionIndicies.clear();
-					cISize = 0;
-				}
-			}
-		}
-
-		if (cISize > 0)
-		{
-			int x = collisionIndicies[0].x;
-			int y = collisionIndicies[0].y;
-			int width = (collisionIndicies[cISize - 1].x + m_WindowTileSize) - x;
-			int height = colSize;
-			m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-			collisionIndicies.clear();
-			cISize = 0;
-		}
+	case cp::right:
+		height = (collisionIndicies[colIndexSize - 1].y + m_WindowTileSize) - y;
+		CreateParallaxBoxTex(pLevelObj, side, x + colSize, y, m_ParallaxSize, height, colRight);
+		break;
+	case cp::left:
+		height = (collisionIndicies[colIndexSize - 1].y + m_WindowTileSize) - y;
+		break;
+	case cp::down:
+		y = collisionIndicies[0].y + m_WindowTileSize - colSize;
+		width = (collisionIndicies[colIndexSize - 1].x + m_WindowTileSize) - x;
+		CreateParallaxBoxTex(pLevelObj, side, x, y + colSize, width, m_ParallaxSize, colDown);
+		break;
+	case cp::up:
+		width = (collisionIndicies[colIndexSize - 1].x + m_WindowTileSize) - x;
+		break;
 	}
+	m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
+	collisionIndicies.clear();
+	colIndexSize = 0;
+}
 
-	// read left collision
-	// if block to left of current is false ( valid left collision ) push back collision vector with a pos
-	// read the next one BELOW it ( level data[0] = top left )
-	// when the last one in the row is read create a collision box component  (if size > 0)
-	// OR
-	// when the next block in the row is not a valid create a collision box component
-	// when creating a collision box component clear the vector after that
-	// creating the collision box component requires this data for a right collision box
-	// left = collisionIndicies[first].x 
-	// bottom = collisionIndicies[first].y 
-	// width = some value
-	// height = (collisionIndicies[last].y + blockHeight) - bottom
-
-	side = cp::CollisionSide::left;
-	for (int col = 1; col < (int)m_LevelTilesWide; col++) // starts at 1 due to col 0 doesnt have a -1
+void Game::BubbleBobbleLevelReader::InitReadColSideData(int& col, int& colMax, int& row, int& rowMax, cp::CollisionSide side)
+{
+	switch (side)
 	{
-		for (int row = 0; row < (int)m_LevelTilesHigh; row++)
-		{
-			unsigned char currentMask = 0b10000000 >> (col% m_BitsInByte);
-			unsigned char toCheckMask = currentMask << 1;
-			int indexCurrent{ int(row * m_BytesWide + (col / m_BitsInByte)) };
-			int indexToCheck{ indexCurrent };
-			if (currentMask & 0b10000000)
-			{
-				indexToCheck--;
-				toCheckMask = 0b00000001;
-			}
-
-			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block to the left = false we have collision on the left side of this block
-			{
-				glm::tvec2<int> pos{ 0,0 };
-				pos.x = col * m_WindowTileSize;
-				pos.y = row * m_WindowTileSize;
-				collisionIndicies.push_back(pos);
-				cISize++;
-			}
-			else // check if collision indicies size is greater than 0 if true make collision box
-			{
-				if (cISize > 0)
-				{
-					int x = collisionIndicies[0].x;
-					int y = collisionIndicies[0].y;
-					int width = colSize;
-					int height = (collisionIndicies[cISize - 1].y + m_WindowTileSize) - y;
-					m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-					collisionIndicies.clear();
-					cISize = 0;
-				}
-			}
-		}
-
-		if (cISize > 0)
-		{
-			int x = collisionIndicies[0].x;
-			int y = collisionIndicies[0].y;
-			int width = colSize;
-			int height = (collisionIndicies[cISize - 1].y + m_WindowTileSize) - y;
-			m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-			collisionIndicies.clear();
-			cISize = 0;
-		}
+	case cp::left:
+		col++;
+		break;
+	case cp::right:
+		colMax--;
+		break;
+	case cp::up:
+		row++;
+		break;
+	case cp::down:
+		rowMax--;
+		break;
 	}
+}
 
-	// read down collision
-	// if block below the current is false ( valid down collision ) push back collision vector with a pos
-	// read the next one RIGHT of it ( level data[0] = top left )
-	// when the last one in the column is read create a collision box component  (if size > 0)
-	// OR
-	// when the next block in the column is not a valid create a collision box component
-	// when creating a collision box component clear the vector after that
-	// creating the collision box component requires this data for a down collision box
-	// left = collisionIndicies[first].x 
-	// bottom = collisionIndicies[first].y + blockSide - some value
-	// width = (collisionIndicies[last].y + blockSize) - bottom
-	// height = some value
-
-	side = cp::CollisionSide::down;
-
-	for (int row = 0; row < (int)m_LevelTilesHigh - 1; row++) // -1 due to there beeing no block below the last tile high
+void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& currentMask, unsigned char& toCheckMask, int& indexCurrent, int& indexToCheck, int col, int row, cp::CollisionSide side)
+{
+	currentMask = 0b10000000 >> (col % m_BitsInByte);
+	toCheckMask = currentMask;
+	indexCurrent = int(row * m_BytesWide + (col / m_BitsInByte));
+	indexToCheck = indexCurrent;
+	switch (side)
 	{
-		for (int col = 0; col < (int)m_LevelTilesWide; col++)
+	case cp::right:
+		toCheckMask = currentMask >> 1;
+		if (currentMask & 0b00000001)
 		{
-			unsigned char currentMask = 0b10000000 >> (col% m_BitsInByte);
-			unsigned char toCheckMask = currentMask;
-			int indexCurrent{ int(row * m_BytesWide + (col / m_BitsInByte)) };
-			int indexToCheck{ indexCurrent + (int)m_BytesWide };
-
-			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) // current index = true && block ontop = false we have collision on the up side of this block
-			{
-				glm::tvec2<int> pos{ 0,0 };
-				pos.x = col * m_WindowTileSize;
-				pos.y = row * m_WindowTileSize;
-				collisionIndicies.push_back(pos);
-				cISize++;
-			}
-			else // check if collision indicies size is greater than 0 if true make collision box
-			{
-				if (cISize > 0)
-				{
-					int x = collisionIndicies[0].x;
-					int y = collisionIndicies[0].y + m_WindowTileSize - colSize;
-					int width = (collisionIndicies[cISize - 1].x + m_WindowTileSize) - x;
-					int height = colSize;
-					m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-					CreateParallaxBoxTex(pLevelObj, side, x, y + colSize, width, m_ParallaxSize, colDown);
-					collisionIndicies.clear();
-					cISize = 0;
-				}
-			}
+			indexToCheck++;
+			toCheckMask = 0b10000000;
 		}
-
-		if (cISize > 0)
+		break;
+	case cp::up:
+		indexToCheck = indexCurrent - (int)m_BytesWide;
+		break;
+	case cp::left:
+		toCheckMask = currentMask << 1;
+		if (currentMask & 0b10000000)
 		{
-			int x = collisionIndicies[0].x;
-			int y = collisionIndicies[0].y + m_WindowTileSize - colSize;
-			int width = (collisionIndicies[cISize - 1].x + m_WindowTileSize) - x;
-			int height = colSize;
-			m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
-			CreateParallaxBoxTex(pLevelObj, side, x, y + colSize, width, m_ParallaxSize, colDown);
-			collisionIndicies.clear();
-			cISize = 0;
+			indexToCheck--;
+			toCheckMask = 0b00000001;
 		}
+		break;
+	case cp::down:
+		indexToCheck = indexCurrent + (int)m_BytesWide;
+		break;
 	}
-
 }
 
 void Game::BubbleBobbleLevelReader::CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionSide side, int x, int y, int width, int height, Uint32 rgba)

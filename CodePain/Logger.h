@@ -58,22 +58,17 @@ namespace cp
 
         void Save()
         {
-            
-
             std::stringstream stream;
             SYSTEMTIME st;
             GetSystemTime(&st);
             stream << "[LOGGER][" << st.wDay << "-" << st.wMonth << "-" << st.wYear << "]";
             stream << "_" << st.wHour << "-" << st.wMinute << "-" << st.wSecond << "-" << st.wMilliseconds << "_";
             if (Filter.Filters.size() > 0)
-            {
                 if (!Filter.Filters[0].empty())
-                {
                     stream << Filter.Filters[0].b;
-                }
-            }
-            stream << ".txt";
 
+            stream << ".txt";
+            
             std::ofstream write{};
             write.open(stream.str().c_str(), std::ios::out);
             if (write.is_open())
@@ -218,7 +213,7 @@ namespace cp
 		Logger& operator=(const Logger& other) = delete;
 		Logger& operator=(Logger&& other) noexcept = delete;
 
-		void Log(LogLevel level, const std::string& msg, bool showTime);
+		void Log(LogLevel level, const std::string& msg, bool showTime = false);
 		void DrawLoggedInformation() const;
 
 	private:

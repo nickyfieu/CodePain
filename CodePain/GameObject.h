@@ -25,8 +25,8 @@ namespace cp
 
 		void AddComponent(BaseComponent* pToAdd);
 
-		GameObject();
-		GameObject(GameObjectType type);
+		// game object type is to be able to search for a block of types easier
+		GameObject(GameObjectType type = GameObjectType::none);
 		~GameObject();
 
 		GameObject(const GameObject& other) = delete;
@@ -49,13 +49,13 @@ namespace cp
 
 	public:
 		template <class T>
-		bool HasComponent(ComponentType type)
+		bool HasComponent(ComponentType type) const
 		{
 			return GetComponent<T>(type) != nullptr;
 		}
 
 		template <class T>
-		T* GetComponent(ComponentType type)
+		T* GetComponent(ComponentType type) const
 		{
 			for (BaseComponent* component : m_pComponents)
 			{
@@ -67,7 +67,7 @@ namespace cp
 		}
 
 		template <class T>
-		std::vector<T*> GetAllComponentsOfType(ComponentType type)
+		std::vector<T*> GetAllComponentsOfType(ComponentType type) const
 		{
 			std::vector<T*> componentsOfType;
 			for (BaseComponent* component : m_pComponents)

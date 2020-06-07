@@ -10,16 +10,19 @@
 void Game::Scene1::LoadSceneData() const
 {
 	cp::Scene* scene = cp::SceneManager::GetInstance().CreateScene("Scene1");
+
 	// background
 	cp::GameObject* daeBackground = new cp::GameObject();
 	SDL_Texture* pTex = cp::ResourceManager::GetInstance().LoadSDLTexture("background.jpg");
 	daeBackground->AddComponent(new cp::Texture2D(pTex));
 	scene->Add(daeBackground);
+
 	// dae logo
 	pTex = cp::ResourceManager::GetInstance().LoadSDLTexture("logo.png");
 	cp::Texture2D* pTex2D = new cp::Texture2D(pTex);
 	pTex2D->SetLocalOffset(216.f, -180.f, 0.f);
 	daeBackground->AddComponent(pTex2D);
+
 	// Text
 	cp::Font* pFont = cp::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 	cp::Text* pText = new cp::Text("Programming 4 Assignment", pFont);
@@ -27,6 +30,7 @@ void Game::Scene1::LoadSceneData() const
 	daeBackground->AddComponent(pText);
 	pText->Update(0.0f);
 	pText->GetTexture2D()->SetDstRect(SDL_FRect{ 0, 0, 600, 300 });
+
 	// Fps Counter
 	cp::GameObject* fpsCounter = new cp::GameObject();
 	scene->Add(fpsCounter);

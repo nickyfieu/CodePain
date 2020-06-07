@@ -9,14 +9,18 @@ int main(int, char* [])
 {
 	Game::SceneLoader sceneLoader{};
 	cp::CodePain engine;
-// InitEngine
+
+	// InitEngine
 	engine.Initialize();
 
-// InitGame
-	engine.IsInitialized() ? sceneLoader.LoadAllDefinedScenes() : nullptr;
+	if (engine.IsInitialized())
+	{
+		// InitGame
+		sceneLoader.LoadAllDefinedScenes();
 
-//	update
-	engine.Run();
+		//	update
+		engine.Run();
+	}
 
 	return 0;
 }

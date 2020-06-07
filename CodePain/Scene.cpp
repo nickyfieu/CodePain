@@ -23,6 +23,7 @@ std::vector<cp::GameObject*> cp::Scene::GetAllGameObjectsOfType(GameObjectType t
 void cp::Scene::Add(GameObject* object)
 {
 	m_pObjects.push_back(object);
+	m_AmountOfObjects++;
 }
 
 void cp::Scene::Update(const float elapsedSec)
@@ -48,4 +49,3 @@ cp::Scene::~Scene()
 		SAFE_DELETE(toDelete);
 	}
 }
-

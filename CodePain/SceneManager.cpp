@@ -4,12 +4,14 @@
 
 void cp::SceneManager::Update(const float elapsedSec)
 {
-	(m_pActiveScene == nullptr) ? nullptr : m_pActiveScene->Update(elapsedSec);
+	if (m_pActiveScene != nullptr) 
+		m_pActiveScene->Update(elapsedSec);
 }
 
 void cp::SceneManager::Render() const
 {
-	(m_pActiveScene == nullptr) ? nullptr : m_pActiveScene->Render();
+	if (m_pActiveScene != nullptr)
+		m_pActiveScene->Render();
 }
 
 bool cp::SceneManager::SetActiveScene(const std::string& name)
