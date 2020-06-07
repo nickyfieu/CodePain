@@ -23,20 +23,18 @@ void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene,const std::s
 	Uint32 colorRightParallax = 0;
 	Uint32 colorLeftParallax = 0;
 
-	// getting the position of the first level gameObject
-	size_t lvl1 = pScene->GetAmountOfGameObjects();
-
 	// preemptive reserve of extra gameobjects
 	pScene->ReserveGameObjects(int(m_AmountOfLevels * 1.5));
 
-	unsigned char levelBits[m_AmountOfLevels];
+	unsigned char levelBits[m_AmountOfLevels]{};
 	for (unsigned int i = 0; i < m_AmountOfLevels; i++)
 	{
 		cp::GameObject* levelGameObject = InitLevelGameObject(i,pScene);
-		ReadLevel(levelBits);
+		levelGameObject->SetActive(i == 0);
+		ReadLevel(&levelBits[0]);
 
 		ReadParallaxColors(i, colorRightParallax, colorLeftParallax, pParallaxPixelData);
-		CalculateLevelCollisionAndParallaxBoxes(colorRightParallax, colorLeftParallax, levelGameObject, levelBits);
+		CalculateLevelCollisionAndParallaxBoxes(colorRightParallax, colorLeftParallax, levelGameObject, &levelBits[0]);
 
 		CreateLevelTextures(levelGameObject, i, levelBits);
 		CreateLevelCollision(levelGameObject);
@@ -44,7 +42,6 @@ void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene,const std::s
 	m_ReadWrite.CloseFileToRead();
 	if (pParallaxPixelData)
 		SDL_FreeSurface(pParallaxPixelData);
-	pScene->GetGameObject(lvl1)->SetActive(true);
 }
 
 void Game::BubbleBobbleLevelReader::ReadLevel(unsigned char levelBits[100])
@@ -79,10 +76,9 @@ cp::GameObject* Game::BubbleBobbleLevelReader::InitLevelGameObject(unsigned int 
 
 void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
 {
-	m_pCollisionBoxes.reserve((m_LevelTilesWide * m_LevelTilesHigh) / 20);
-	ReadCollisionSide(colRight, colDown, cp::CollisionSide::right, pLevelObj, levelBlocks);
-	ReadCollisionSide(colRight, colDown, cp::CollisionSide::up, pLevelObj, levelBlocks);
 	ReadCollisionSide(colRight, colDown, cp::CollisionSide::left, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionSide::up, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionSide::right, pLevelObj, levelBlocks);
 	ReadCollisionSide(colRight, colDown, cp::CollisionSide::down, pLevelObj, levelBlocks);
 }
 
@@ -108,7 +104,7 @@ void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 co
 			else
 				UpdateReadColSideData(currentMask, toCheckMask, indexCurrent, indexToCheck, c, r, side);
 			// current index = true && block to the right = false we have collision on the right side of this block
-			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask)) 
+			if ((levelBlocks[indexCurrent] & currentMask) && !(levelBlocks[indexToCheck] & toCheckMask))
 			{
 				glm::tvec2<int> pos{ 0,0 };
 				pos.x = (upDown) ? r * m_WindowTileSize : c * m_WindowTileSize;
@@ -138,6 +134,7 @@ void Game::BubbleBobbleLevelReader::UseColSideData(Uint32 colRight, Uint32 colDo
 	int y = collisionIndicies[0].y;
 	int width = colSize;
 	int height = colSize;
+
 	switch (side)
 	{
 	case cp::right:
@@ -239,51 +236,28 @@ void Game::BubbleBobbleLevelReader::CreateParallaxBoxTex(cp::GameObject* pLevelO
 void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, unsigned char levelBlocks[100])
 {
 	const unsigned int heightAndWithOfTile = 8;
-
-	SDL_Texture* blockTexture = cp::ResourceManager::GetInstance().LoadSDLTexture("LevelData/LevelBlocks.png");
-
-	// source rect of each normal level block
-	SDL_Rect srcNormalBlock{};
-	srcNormalBlock.x = (levelIndex % 10) * heightAndWithOfTile;
-	srcNormalBlock.y = (levelIndex / 10) * heightAndWithOfTile;
-	srcNormalBlock.w = heightAndWithOfTile;
-	srcNormalBlock.h = heightAndWithOfTile;
-
-	SDL_Texture* bigBlockTexture = cp::ResourceManager::GetInstance().LoadSDLTexture("LevelData/LevelBigBlocks.png");
-
-	SDL_Rect srcBigBlock{};
-	srcBigBlock.x = (levelIndex % 10) * heightAndWithOfTile * 2;
-	srcBigBlock.y = (levelIndex / 10) * heightAndWithOfTile * 2;
-	srcBigBlock.w = heightAndWithOfTile * 2;
-	srcBigBlock.h = heightAndWithOfTile * 2;
-
 	const unsigned int levelBytesWide = (m_LevelTilesWide / m_BitsInByte);
+	SDL_Texture* blockTexture = cp::ResourceManager::GetInstance().LoadSDLTexture("LevelData/LevelBlocks.png");
+	SDL_Texture* bigBlockTexture = cp::ResourceManager::GetInstance().LoadSDLTexture("LevelData/LevelBigBlocks.png");
+	// source rect of each normal level block
+	SDL_Rect srcNormalBlock{ (levelIndex % 10) * heightAndWithOfTile, int((levelIndex / 10) * heightAndWithOfTile), heightAndWithOfTile, heightAndWithOfTile};
+	SDL_Rect srcBigBlock{ (levelIndex % 10) * heightAndWithOfTile * 2, int((levelIndex / 10) * heightAndWithOfTile * 2), heightAndWithOfTile * 2, heightAndWithOfTile * 2 };
 
 	for (unsigned int i = 0; i < m_BytesPerLevel; i++)
 	{
 		// base destination rect for each byte in a level
-		SDL_FRect dst{};
-		dst.x = float((i % m_BytesWide) * m_WindowTileSize * m_BitsInByte);
-		dst.y = float((i / m_BytesWide) * m_WindowTileSize);
-		dst.w = float(m_WindowTileSize);
-		dst.h = float(m_WindowTileSize);
+		SDL_FRect dst{ float((i % m_BytesWide) * m_WindowTileSize * m_BitsInByte), float((i / m_BytesWide) * m_WindowTileSize), float(m_WindowTileSize), float(m_WindowTileSize) };
 		unsigned char mask = 0b10000000;
 		for (unsigned int k = 0; k < m_BitsInByte; k++)
 		{
 			if (levelBlocks[i] & mask)
-			{
-				// if true big block
-				// if false small bock
+			{	// true == big block / false == small block
 				if ((((i % m_BytesWide) == 0) && ((levelBlocks[i] & 0b11000000) == 0b11000000) && (k == 0)) || (((i % m_BytesWide) == 3) && ((levelBlocks[i] & 0b00000011) == 0b00000011) && (k == 6)))
-				{
+				{	
 					if ((i % m_BytesWide) == 0)
-					{
 						levelBlocks[i] = unsigned char(levelBlocks[i] & 0b00111111);
-					}
 					else
-					{
 						levelBlocks[i] = unsigned char(levelBlocks[i] & 0b11111100);
-					}
 					
 					float oldDSTW = dst.w;
 					float oldDSTH = dst.h;
@@ -293,13 +267,9 @@ void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelOb
 					if (i < (100 - 4)) // not out of range
 					{
 						if ((i % m_BytesWide) == 0)
-						{
 							levelBlocks[i + 4] = unsigned char(levelBlocks[i + 4] & 0b00111111);
-						}
 						else
-						{
 							levelBlocks[i + 4] = unsigned char(levelBlocks[i + 4] & 0b11111100);
-						}
 
 						dst.h *= 2; // we can assume if not out of range the block under the original one is true (should be true always )
 					}

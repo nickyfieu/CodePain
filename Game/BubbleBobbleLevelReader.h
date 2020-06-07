@@ -40,7 +40,7 @@ namespace Game
 
 		std::vector<cp::CollisionBox*> m_pCollisionBoxes;
 
-		void ReadLevel(unsigned char levelBits[100]);
+		void ReadLevel(unsigned char* levelBits);
 		cp::GameObject* InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene);
 
 		void CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj,const unsigned char levelBlocks[100]);

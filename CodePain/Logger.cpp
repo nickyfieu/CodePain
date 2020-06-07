@@ -49,7 +49,7 @@ void cp::Logger::Log(LogLevel level, const std::string& msg, bool showTime)
 		stream << "[Error]  ";
 		break;
 	case cp::LogLevel::Critical:
-		stream << "[Critical]  ";
+		stream << "[Critical] ";
 		break;
 	}
 
