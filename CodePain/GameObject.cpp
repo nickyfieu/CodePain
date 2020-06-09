@@ -1,171 +1,52 @@
 #include "CodePainPCH.h"
 #include "GameObject.h"
+#include "BaseComponent.h"
 #include "Components.h"
 #include "ResourceManager.h"
 #include "Renderer.h"
+#include "Logger.h"
 #include <iomanip>
 
 void cp::GameObject::Update(const float elapsedSec)
 {
-	for (BaseComponent* components : m_pComponents)
-	{
-		components->Update(elapsedSec);
-	}
+	for (size_t i = 0; i < m_AmountOfComponents; i++)
+		m_pComponents[i]->Update(elapsedSec);
+}
+
+void cp::GameObject::FixedUpdate(float elapsedSec)
+{
+	for (size_t i = 0; i < m_AmountOfComponents; i++)
+		m_pComponents[i]->FixedUpdate(elapsedSec);
 }
 
 void cp::GameObject::Render() const
 {
-	Renderer& rendererRef = Renderer::GetInstance();
-	// are here to be used when needed for functionality if 2 components work together
-	// like text + framerate component
-	Transform* pTransform = nullptr;
-	Texture2D* pTexture2D = nullptr;
-	Text* pText = nullptr;
-	FrameRate* pFrameRate = nullptr;
-	CollisionBox* pCollisionBox = nullptr;
-	ColRect2D* pColRect2D = nullptr;
-	
-	for (BaseComponent* component : m_pComponents)
+	for (size_t i = 0; i < m_AmountOfComponents; i++)
 	{
-		switch (component->GetComponentType())
-		{
-#pragma region Transform
-		case cp::ComponentType::_Transform:
-			pTransform = static_cast<Transform*>(component);
-			break;
-#pragma endregion
-#pragma region Texture2D
-		case cp::ComponentType::_Texture2D:
-			pTexture2D = static_cast<Texture2D*>(component);
-
-			if (IS_VALID(pTexture2D))
-			{
-				SDL_FRect dst = pTexture2D->GetDstRect();
-				SDL_Rect src = pTexture2D->GetSrcRect();
-				// if for whatever reason ptrans == nullptr we have this check
-				// it should never be nullptr as the transform component is the first
-				// component to be added to the components container
-				if (IS_VALID(pTransform))
-				{
-					dst.x += pTransform->GetPosition().x;
-					dst.y += pTransform->GetPosition().y;
-				}
-
-				dst.x += pTexture2D->GetLocalOffset().x;
-				dst.y += pTexture2D->GetLocalOffset().y;
-
-				rendererRef.RenderTexture(*pTexture2D, src, dst);
-			}
-
-			break;
-#pragma endregion
-#pragma region Text
-		case cp::ComponentType::_Text:
-			pText = static_cast<Text*>(component);
-
-			if (IS_VALID(pText))
-			{
-				Texture2D* pTextTexture = pText->GetTexture2D();
-				SDL_FRect dst = pTextTexture->GetDstRect();
-				SDL_Rect src = pTextTexture->GetSrcRect();
-				// if for whatever reason ptrans == nullptr we have this check
-				// it should never be nullptr as the transform component is the first
-				// component to be added to the components container
-				if (IS_VALID(pTransform))
-				{
-					dst.x += pTransform->GetPosition().x;
-					dst.y += pTransform->GetPosition().y;
-				}
-
-				dst.x += pText->GetLocalOffset().x;
-				dst.y += pText->GetLocalOffset().y;
-
-				rendererRef.RenderTexture(*pTextTexture, src, dst);
-			}
-			break;
-#pragma endregion
-#pragma region FPS
-		case cp::ComponentType::_FrameRate:
-			pFrameRate = static_cast<FrameRate*>(component);
-			break;
-#pragma endregion
-#pragma region CollisionBox
-		case ComponentType::_CollisionBox:
-			pCollisionBox = static_cast<CollisionBox*>(component);
-#if _DEBUG
-			{
-				if (rendererRef.gd_RenderCollisionBoxes)
-				{
-					SDL_Rect box = pCollisionBox->GetCollisionBox();
-					CollisionSide side = pCollisionBox->GetCollisionSide();
-					// if for whatever reason ptrans == nullptr we have this check
-					// it should never be nullptr as the transform component is the first
-					// component to be added to the components container
-					if (IS_VALID(pTransform))
-					{
-						box.x += (int)pTransform->GetPosition().x;
-						box.y += (int)pTransform->GetPosition().y;
-					}
-
-					Uint8 red = 0;
-					Uint8 green = 0;
-					Uint8 blue = 0;
-
-					(side & CollisionSide::right) ? blue = 255 : blue;
-					(side & CollisionSide::up) ? green = 255 : green;
-					(side & CollisionSide::left) ? red = 255 : red;
-					(side & CollisionSide::down) ? red = green = 255 : red;
-					rendererRef.RenderCollorRect(box, red, green, blue);
-				}
-			}
+		m_pComponents[i]->Draw();
+#if defined(_DEBUG)
+		m_pComponents[i]->DebugDraw();
 #endif
-			break;
-#pragma endregion
-#pragma region ColRect2D
-		case ComponentType::_ColRect2D:
-			pColRect2D = static_cast<ColRect2D*>(component);
-			{
-				SDL_Rect box = pColRect2D->GetColorBox();
-				// if for whatever reason ptrans == nullptr we have this check
-				// it should never be nullptr as the transform component is the first
-				// component to be added to the components container
-				if (IS_VALID(pTransform))
-				{
-					box.x += (int)pTransform->GetPosition().x;
-					box.y += (int)pTransform->GetPosition().y;
-				}
-
-				Uint32 rgba = pColRect2D->GetRGBA();
-				Uint8 r = Uint8(rgba >> 0);
-				Uint8 g = Uint8(rgba >> 8);
-				Uint8 b = Uint8(rgba >> 16);
-				Uint8 a = Uint8(rgba >> 24);
-
-				rendererRef.RenderCollorRect(box, r, g, b, a);
-			}
-			break;
-#pragma endregion
-		default:
-			break;
-		}
 	}
+}
 
-	if (IS_VALID(pFrameRate) && IS_VALID(pText))
-	{
-		float fps = 0.f;
-		if (pFrameRate->GetFrameRate(fps))
-		{
-			pText->SetText(std::to_string(int(fps)) + " FPS");
-		}
-	}
+void cp::GameObject::RemoveComponent(BaseComponent* pToRemove)
+{
+	if (pToRemove->GetComponentType() == ComponentType::_Transform)
+		return Logger::GetInstance().Log(cp::LogLevel::Warning, "GameObject::RemoveComponent trying to remove transform component!");
+
+	m_pComponents.erase(std::find(m_pComponents.cbegin(), m_pComponents.cend(),pToRemove));
+	m_AmountOfComponents--;
 }
 
 void cp::GameObject::AddComponent(BaseComponent* pToAdd)
 {
 	if ((pToAdd->GetComponentType() == ComponentType::_Transform) && HasComponent<Transform>(ComponentType::_Transform))
-		return;
+		return Logger::GetInstance().Log(cp::LogLevel::Warning, "GameObject::AddComponent trying to add second transform component!");
 
 	m_pComponents.push_back(pToAdd);
+	m_AmountOfComponents++;
+	pToAdd->SetOwner(this);
 }
 
 cp::GameObject::GameObject(GameObjectType type)
@@ -187,4 +68,15 @@ cp::GameObject::~GameObject()
 void cp::GameObject::SetActive(bool active)
 {
 	m_IsActive = active;
+}
+
+void cp::GameObject::SetCollisionCallback(CollisionCallback callback)
+{
+	m_CollisionCallback = callback;
+}
+
+void cp::GameObject::OnCollisionCallback(GameObject* self, GameObject* other, CollisionBox::CollisionSide side)
+{
+	if (m_CollisionCallback)
+		m_CollisionCallback(self, other, side);
 }

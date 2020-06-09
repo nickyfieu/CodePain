@@ -4,7 +4,8 @@
 
 namespace cp
 {
-	class ColRect2D final : public BaseComponent
+	// COLOR RECT 2D
+	class ColorRect2D final : public BaseComponent
 	{
 	public:
 		// to initialize a Uint32 to be rgba correct
@@ -17,15 +18,18 @@ namespace cp
 		// 0b AAAA AAAA BBBB BBBB GGGG GGGG 0000 0000
 		// rgba = (rgba | r) << 0
 		// 0b AAAA AAAA BBBB BBBB GGGG GGGG RRRR RRRR
-		ColRect2D(int x, int y, int width, int height, Uint32 rgba);
-		virtual ~ColRect2D() = default;
+		ColorRect2D(int x, int y, int width, int height, Uint32 rgba);
+		virtual ~ColorRect2D() = default;
 
 		virtual void Update(float elapsedSec) override;
+		virtual void FixedUpdate(float elapsedSec) override;
+		virtual void DebugDraw() const override;
+		virtual void Draw() const override;
 
-		ColRect2D(const ColRect2D& other) = delete;
-		ColRect2D(ColRect2D&& other) = delete;
-		ColRect2D& operator=(const ColRect2D& other) = delete;
-		ColRect2D& operator=(ColRect2D&& other) = delete;
+		ColorRect2D(const ColorRect2D& other) = delete;
+		ColorRect2D(ColorRect2D&& other) = delete;
+		ColorRect2D& operator=(const ColorRect2D& other) = delete;
+		ColorRect2D& operator=(ColorRect2D&& other) = delete;
 
 		inline const SDL_Rect& GetColorBox() const { return m_ColorBox; }
 

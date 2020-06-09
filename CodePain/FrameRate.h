@@ -9,6 +9,9 @@ namespace cp
 		virtual ~FrameRate() = default;
 
 		virtual void Update(float elapsedSec) override;
+		virtual void FixedUpdate(float elapsedSec) override;
+		virtual void DebugDraw() const override;
+		virtual void Draw() const override;
 
 		FrameRate(const FrameRate& other) = delete;
 		FrameRate(FrameRate&& other) = delete;
@@ -16,8 +19,11 @@ namespace cp
 		FrameRate& operator=(FrameRate&& other) = delete;
 
 		bool GetFrameRate(float& container);
+		bool GetFixedFrameRate(float& container);
 	private:
 		float m_Time;
+		float m_FixedTimer;
 		int m_FrameCounter;
+		int m_FixedFrameCounter;
 	};
 }

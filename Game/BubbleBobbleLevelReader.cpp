@@ -6,9 +6,9 @@
 #include "Logger.h"
 #include <SDL_surface.h>
 
-void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene,const std::string& levelPath, const std::string& parallaxPath)
+void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene,const std::string& levelDataPath, const std::string& parallaxPath)
 {
-	const std::string LevelDataPath = cp::ResourceManager::GetInstance().GetDataPath() + levelPath;
+	const std::string LevelDataPath = cp::ResourceManager::GetInstance().GetDataPath() + levelDataPath;
 	m_ReadWrite.ChangeFilePath(LevelDataPath);
 	if (!m_ReadWrite.OpenFileToRead())
 		return cp::Logger::GetInstance().Log(cp::LogLevel::Error, "BubbleBobbleLevelReader::ReadLevelData could not open file!");
@@ -61,28 +61,15 @@ void Game::BubbleBobbleLevelReader::ReadParallaxColors(unsigned int levelIndex, 
 	color2 = pResourceManager.GetPixel(img, levelIndex, 1);
 }
 
-cp::GameObject* Game::BubbleBobbleLevelReader::InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene)
-{
-	// create a level game object and add it
-	cp::GameObject* levelGameObject = new cp::GameObject(cp::GameObjectType::level);
-	pScene->Add(levelGameObject);
-	// adding a transform with height offset 
-	// so that levels are stacked ( lvl 1 highest 2 below it etc )
-	cp::Transform* levelTransform = levelGameObject->GetComponent<cp::Transform>(cp::ComponentType::_Transform);
-	if (levelTransform != nullptr)
-		levelTransform->SetPosition(0.f, -float(levelIndex * m_WindowTileSize * m_LevelTilesHigh), 0.f);
-	return levelGameObject;
-}
-
 void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
 {
-	ReadCollisionSide(colRight, colDown, cp::CollisionSide::left, pLevelObj, levelBlocks);
-	ReadCollisionSide(colRight, colDown, cp::CollisionSide::up, pLevelObj, levelBlocks);
-	ReadCollisionSide(colRight, colDown, cp::CollisionSide::right, pLevelObj, levelBlocks);
-	ReadCollisionSide(colRight, colDown, cp::CollisionSide::down, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionBox::CollisionSide::left, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionBox::CollisionSide::up, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionBox::CollisionSide::right, pLevelObj, levelBlocks);
+	ReadCollisionSide(colRight, colDown, cp::CollisionBox::CollisionSide::down, pLevelObj, levelBlocks);
 }
 
-void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 colDown, cp::CollisionSide side, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
+void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 colDown, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
 {
 	std::vector<glm::tvec2<int>> collisionIndicies;
 	const int colSize = 3;
@@ -91,7 +78,7 @@ void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 co
 	int indexCurrent = 0, indexToCheck = 0, cISize = 0;
 	unsigned char currentMask = 0, toCheckMask = 0;
 	InitReadColSideData(col, colMax, row, rowMax, side);
-	bool upDown = side == cp::CollisionSide::up || side == cp::CollisionSide::down;
+	bool upDown = side == cp::CollisionBox::CollisionSide::up || side == cp::CollisionBox::CollisionSide::down;
 	int c = (upDown) ? row : col, r = (upDown) ? col : row;
 	int cm = (upDown) ? rowMax : colMax, rm = (upDown) ? colMax : rowMax;
 
@@ -108,7 +95,7 @@ void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 co
 			{
 				glm::tvec2<int> pos{ 0,0 };
 				pos.x = (upDown) ? r * m_WindowTileSize : c * m_WindowTileSize;
-				if (side == cp::CollisionSide::right)
+				if (side == cp::CollisionBox::CollisionSide::right)
 					pos.x += m_WindowTileSize - colSize;
 				pos.y = (upDown) ? c * m_WindowTileSize : r * m_WindowTileSize;
 				collisionIndicies.push_back(pos);
@@ -124,7 +111,7 @@ void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 co
 	}
 }
 
-void Game::BubbleBobbleLevelReader::UseColSideData(Uint32 colRight, Uint32 colDown, int& colIndexSize, cp::CollisionSide side, cp::GameObject* pLevelObj, std::vector<glm::tvec2<int>>& collisionIndicies)
+void Game::BubbleBobbleLevelReader::UseColSideData(Uint32 colRight, Uint32 colDown, int& colIndexSize, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, std::vector<glm::tvec2<int>>& collisionIndicies)
 {
 	if (colIndexSize <= 0)
 		return;
@@ -137,47 +124,47 @@ void Game::BubbleBobbleLevelReader::UseColSideData(Uint32 colRight, Uint32 colDo
 
 	switch (side)
 	{
-	case cp::right:
+	case cp::CollisionBox::right:
 		height = (collisionIndicies[colIndexSize - 1].y + m_WindowTileSize) - y;
 		CreateParallaxBoxTex(pLevelObj, side, x + colSize, y, m_ParallaxSize, height, colRight);
 		break;
-	case cp::left:
+	case cp::CollisionBox::left:
 		height = (collisionIndicies[colIndexSize - 1].y + m_WindowTileSize) - y;
 		break;
-	case cp::down:
+	case cp::CollisionBox::down:
 		y = collisionIndicies[0].y + m_WindowTileSize - colSize;
 		width = (collisionIndicies[colIndexSize - 1].x + m_WindowTileSize) - x;
 		CreateParallaxBoxTex(pLevelObj, side, x, y + colSize, width, m_ParallaxSize, colDown);
 		break;
-	case cp::up:
+	case cp::CollisionBox::up:
 		width = (collisionIndicies[colIndexSize - 1].x + m_WindowTileSize) - x;
 		break;
 	}
-	m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side));
+	m_pCollisionBoxes.push_back(new cp::CollisionBox(x, y, width, height, side, cp::CollisionBox::_static));
 	collisionIndicies.clear();
 	colIndexSize = 0;
 }
 
-void Game::BubbleBobbleLevelReader::InitReadColSideData(int& col, int& colMax, int& row, int& rowMax, cp::CollisionSide side)
+void Game::BubbleBobbleLevelReader::InitReadColSideData(int& col, int& colMax, int& row, int& rowMax, cp::CollisionBox::CollisionSide side)
 {
 	switch (side)
 	{
-	case cp::left:
+	case cp::CollisionBox::left:
 		col++;
 		break;
-	case cp::right:
+	case cp::CollisionBox::right:
 		colMax--;
 		break;
-	case cp::up:
+	case cp::CollisionBox::up:
 		row++;
 		break;
-	case cp::down:
+	case cp::CollisionBox::down:
 		rowMax--;
 		break;
 	}
 }
 
-void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& currentMask, unsigned char& toCheckMask, int& indexCurrent, int& indexToCheck, int col, int row, cp::CollisionSide side)
+void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& currentMask, unsigned char& toCheckMask, int& indexCurrent, int& indexToCheck, int col, int row, cp::CollisionBox::CollisionSide side)
 {
 	currentMask = 0b10000000 >> (col % m_BitsInByte);
 	toCheckMask = currentMask;
@@ -185,7 +172,7 @@ void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& current
 	indexToCheck = indexCurrent;
 	switch (side)
 	{
-	case cp::right:
+	case cp::CollisionBox::right:
 		toCheckMask = currentMask >> 1;
 		if (currentMask & 0b00000001)
 		{
@@ -193,10 +180,10 @@ void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& current
 			toCheckMask = 0b10000000;
 		}
 		break;
-	case cp::up:
+	case cp::CollisionBox::up:
 		indexToCheck = indexCurrent - (int)m_BytesWide;
 		break;
-	case cp::left:
+	case cp::CollisionBox::left:
 		toCheckMask = currentMask << 1;
 		if (currentMask & 0b10000000)
 		{
@@ -204,26 +191,26 @@ void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& current
 			toCheckMask = 0b00000001;
 		}
 		break;
-	case cp::down:
+	case cp::CollisionBox::down:
 		indexToCheck = indexCurrent + (int)m_BytesWide;
 		break;
 	}
 }
 
-void Game::BubbleBobbleLevelReader::CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionSide side, int x, int y, int width, int height, Uint32 rgba)
+void Game::BubbleBobbleLevelReader::CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionBox::CollisionSide side, int x, int y, int width, int height, Uint32 rgba)
 {
 	switch (side)
 	{
-	case cp::right:
+	case cp::CollisionBox::right:
 		for (unsigned int i = 0; i < m_AmountOfParallax; i++)
 		{
-			pLevelObj->AddComponent(new cp::ColRect2D(x + (i * m_ParallaxSize), y + (i * m_ParallaxSize), width, height + m_ParallaxSize, rgba));
+			pLevelObj->AddComponent(new cp::ColorRect2D(x + (i * m_ParallaxSize), y + (i * m_ParallaxSize), width, height + m_ParallaxSize, rgba));
 		}
 		break;
-	case cp::down:
+	case cp::CollisionBox::down:
 		for (unsigned int i = 0; i < m_AmountOfParallax; i++)
 		{
-			pLevelObj->AddComponent(new cp::ColRect2D(x + (i * m_ParallaxSize), y + (i * m_ParallaxSize), width, height, rgba));
+			pLevelObj->AddComponent(new cp::ColorRect2D(x + (i * m_ParallaxSize), y + (i * m_ParallaxSize), width, height, rgba));
 		}
 		break;
 	default:
@@ -308,4 +295,17 @@ void Game::BubbleBobbleLevelReader::CreateLevelCollision(cp::GameObject* pLevelO
 		pLevelObj->AddComponent(pComponentToAdd);
 	}
 	m_pCollisionBoxes.clear();
+}
+
+cp::GameObject* Game::BubbleBobbleLevelReader::InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene)
+{
+	// create a level game object and add it
+	cp::GameObject* levelGameObject = new cp::GameObject(cp::GameObjectType::level);
+	pScene->Add(levelGameObject);
+	// adding a transform with height offset 
+	// so that levels are stacked ( lvl 1 highest 2 below it etc )
+	cp::Transform* levelTransform = levelGameObject->GetComponent<cp::Transform>(cp::ComponentType::_Transform);
+	if (levelTransform != nullptr)
+		levelTransform->SetPosition(0.f, -float(levelIndex * m_WindowTileSize * m_LevelTilesHigh), 0.f);
+	return levelGameObject;
 }

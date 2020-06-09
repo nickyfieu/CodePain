@@ -8,6 +8,12 @@ void cp::SceneManager::Update(const float elapsedSec)
 		m_pActiveScene->Update(elapsedSec);
 }
 
+void cp::SceneManager::FixedUpdate(const float elapsedSec)
+{
+	if (m_pActiveScene != nullptr)
+		m_pActiveScene->FixedUpdate(elapsedSec);
+}
+
 void cp::SceneManager::Render() const
 {
 	if (m_pActiveScene != nullptr)

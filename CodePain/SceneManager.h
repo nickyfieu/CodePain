@@ -19,6 +19,7 @@ namespace cp
 		SceneManager& operator=(SceneManager&& other) = delete;
 
 		void Update(float elapsedSec);
+		void FixedUpdate(float elapsedSec);
 		void Render() const;
 
 		inline Scene* GetActiveScene() const { return m_pActiveScene; }

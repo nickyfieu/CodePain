@@ -3,7 +3,7 @@
 #include "SceneManager.h"
 #include "Scenes.h"
 
-#define LoadScene1
+//#define LoadScene1
 #define LoadLevelScene
 
 void Game::SceneLoader::LoadAllDefinedScenes() const

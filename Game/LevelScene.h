@@ -1,4 +1,9 @@
 #pragma once
+namespace cp // predifinitions
+{
+	class GameObject;
+}
+
 namespace Game
 {
 	class LevelScene final

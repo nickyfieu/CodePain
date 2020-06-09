@@ -16,7 +16,7 @@ namespace Game
 		BubbleBobbleLevelReader& operator=(BubbleBobbleLevelReader&& other) = delete;
 
 		// levelpath and parallaxpath both start from ../LevelData
-		void ReadLevelData(cp::Scene* pScene, const std::string& levelPath, const std::string& parallaxPath);
+		void ReadLevelData(cp::Scene* pScene, const std::string& levelDataPath, const std::string& parallaxPath);
 
 		void ReadEnemyData() const;
 
@@ -44,14 +44,14 @@ namespace Game
 		cp::GameObject* InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene);
 
 		void CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj,const unsigned char levelBlocks[100]);
-		void CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionSide side, int x, int y, int width, int height, Uint32 rgba);
+		void CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionBox::CollisionSide side, int x, int y, int width, int height, Uint32 rgba);
 		void CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, unsigned char levelBlocks[100]);
 		void CreateLevelCollision(cp::GameObject* pLevelObj);
 
-		void ReadCollisionSide(Uint32 colRight, Uint32 colDown, cp::CollisionSide side, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100]);
-		void UseColSideData(Uint32 colRight, Uint32 colDown, int& colIndexSize, cp::CollisionSide side, cp::GameObject* pLevelObj, std::vector<glm::tvec2<int>>& collisionIndicies);
-		void InitReadColSideData(int& col, int& colMax, int& row, int& rowMax, cp::CollisionSide side);
-		void UpdateReadColSideData(unsigned char& currentMask, unsigned char& toCheckMask, int& indexCurrent, int& indexToCheck, int col, int row, cp::CollisionSide side);
+		void ReadCollisionSide(Uint32 colRight, Uint32 colDown, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100]);
+		void UseColSideData(Uint32 colRight, Uint32 colDown, int& colIndexSize, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, std::vector<glm::tvec2<int>>& collisionIndicies);
+		void InitReadColSideData(int& col, int& colMax, int& row, int& rowMax, cp::CollisionBox::CollisionSide side);
+		void UpdateReadColSideData(unsigned char& currentMask, unsigned char& toCheckMask, int& indexCurrent, int& indexToCheck, int col, int row, cp::CollisionBox::CollisionSide side);
 
 		void ReadParallaxColors(unsigned int levelIndex, Uint32& color1, Uint32& color2, SDL_Surface* img);
 

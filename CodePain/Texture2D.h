@@ -15,24 +15,28 @@ namespace cp
 		virtual ~Texture2D();
 
 		virtual void Update(float elapsedSec) override;
+		virtual void FixedUpdate(float elapsedSec) override;
+		virtual void DebugDraw() const override;
+		virtual void Draw() const override;
 
 		Texture2D(const Texture2D&) = delete;
 		Texture2D(Texture2D&&) = delete;
 		Texture2D& operator= (const Texture2D&) = delete;
 		Texture2D& operator= (const Texture2D&&) = delete;
 
-		void SetLocalOffset(float x, float y, float z);
+		// adds to the x and y of the dest rect
+		void AddLocalOffset(float x, float y);
+		// sets the w and h of the dest rect
+		void SetLocalScale(float w, float h);
 		void SetDstRect(const SDL_FRect& newDstRect);
 		void SetSrcRect(const SDL_Rect& newSrcRect);
 
-		const glm::vec3& GetLocalOffset() const;
 		const SDL_FRect& GetDstRect() const;
 		const SDL_Rect& GetSrcRect() const;
 		inline SDL_Texture* GetSDLTexture() const { return m_pTexture; };
 
 	private:
 		SDL_Texture* m_pTexture;
-		Transform* m_pLocalOffset;
 		SDL_Rect m_SrcRect;
 		SDL_FRect m_DstRect;
 	};

@@ -13,6 +13,9 @@ namespace cp
 		virtual ~Text();
 	
 		virtual void Update(float elapsedSec) override;
+		virtual void FixedUpdate(float elapsedSec) override;
+		virtual void DebugDraw() const override;
+		virtual void Draw() const override;
 	
 		Text(const Text& other) = delete;
 		Text(Text&& other) = delete;
@@ -21,15 +24,14 @@ namespace cp
 
 		void SetText(const std::string& text);
 		void SetTextColor(const SDL_Color color);
-		void SetLocalOffset(float x, float y, float z);
-		glm::vec3 GetLocalOffset() const;
 		Texture2D* GetTexture2D() const;
 
 	private:
+		SDL_Texture* CreateTextTexture();
+
 		SDL_Color m_Color;
 		bool m_NeedsUpdate;
 		std::string m_Text;
-		Transform* m_pTransform;
 		Font* m_pFont;
 		Texture2D* m_pTexture2D;
 	};
