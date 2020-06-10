@@ -11,6 +11,7 @@
 #endif
 
 bool cp::Renderer::gd_RenderCollisionBoxes = false;
+bool cp::Renderer::gd_RenderTextureTiles = false;
 
 #define	SDL_RENDER_SCALE_QUALITY = 1;
 

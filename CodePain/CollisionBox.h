@@ -4,6 +4,7 @@
 
 namespace cp
 {
+	class RigidBody;
 	class CollisionBox final : public BaseComponent
 	{
 	public:
@@ -44,8 +45,8 @@ namespace cp
 
 		virtual void Update(float elapsedSec) override;
 		virtual void FixedUpdate(float elapsedSec) override;
-		virtual void DebugDraw() const override;
 		virtual void Draw() const override;
+		virtual void DebugDraw() const override;
 
 		CollisionBox(const CollisionBox& other) = delete;
 		CollisionBox(CollisionBox&& other) = delete;
@@ -61,14 +62,13 @@ namespace cp
 	private:
 		bool IsOnGround = false;
 
-		void HandleCollision(const float elapsedSec);
+		void CheckCollision(const float elapsedSec);
+		void HandleCollision(GameObject* other, RigidBody* rigidBody);
 		bool RectCollision(const SDL_Rect& self, const SDL_Rect& other);
 		bool PreCollisionCheck(const CollisionBox* collision);
 		SDL_Rect GetWorldCollision(const GameObject* obj, const CollisionBox* collision) const;
 
 		SDL_Rect m_CurrentWorldBox{};
-
-		glm::vec2 m_SurfaceNormal;
 		const CollisionType m_CollisionType;
 		const CollisionSide m_CollisionSide;
 		const SDL_Rect m_CollisionBox;

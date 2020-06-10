@@ -1,6 +1,6 @@
 #pragma once
 #include "Singleton.h"
-#include <list>
+#include <vector>
 #include <string>
 
 namespace cp
@@ -26,8 +26,9 @@ namespace cp
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
+		size_t m_AmountOfScenes;
 		Scene* m_pActiveScene;
-		std::list<Scene*> m_Scenes;
+		std::vector<Scene*> m_Scenes;
 	public:
 
 		bool SetActiveScene(const std::string& name);

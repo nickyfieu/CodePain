@@ -10,8 +10,8 @@ namespace cp
 
 		virtual void Update(float elapsedSec) override;
 		virtual void FixedUpdate(float elapsedSec) override;
-		virtual void DebugDraw() const override;
 		virtual void Draw() const override;
+		virtual void DebugDraw() const override;
 
 		FrameRate(const FrameRate& other) = delete;
 		FrameRate(FrameRate&& other) = delete;

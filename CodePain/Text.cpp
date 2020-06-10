@@ -49,10 +49,9 @@ void cp::Text::FixedUpdate(const float)
 	if (IS_VALID(pFrameRate))
 	{
 		float fps = 0.f;
-		float fpsFixed = 0.f;
-		if (pFrameRate->GetFrameRate(fps) && pFrameRate->GetFrameRate(fpsFixed))
+		if (pFrameRate->GetFrameRate(fps))
 		{
-			this->SetText(std::to_string(int(fps)) + " FPS\n" + std::to_string(int(fpsFixed)) + " Fixed FPS\n");
+			this->SetText(std::to_string(int(fps)) + " FPS");
 		}
 
 	}

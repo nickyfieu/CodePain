@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "SceneManager.h"
 #include "Scene.h"
+#include "RigidBody.h"
 
 #include <algorithm>
 #include <cmath>
@@ -17,21 +18,6 @@ cp::CollisionBox::CollisionBox(int x, int y, int width, int height, CollisionSid
 	, m_CollisionType{type}
 	, m_CollisionBox{x,y,width,height}
 {
-	switch (m_CollisionSide)
-	{
-	case CollisionSide::left:
-		m_SurfaceNormal = { -1.f,0.f };
-		break;
-	case CollisionSide::up:
-		m_SurfaceNormal = { 0.f,-1.f };
-		break;
-	case CollisionSide::right:
-		m_SurfaceNormal = { 1.f,0.f };
-		break;
-	case CollisionSide::down:
-		m_SurfaceNormal = { 0.f,1.f };
-		break;
-	}
 }
 
 void cp::CollisionBox::Update(const float)
@@ -40,43 +26,37 @@ void cp::CollisionBox::Update(const float)
 
 void cp::CollisionBox::FixedUpdate(const float elapsedSec)
 {
-	HandleCollision(elapsedSec);
+	CheckCollision(elapsedSec);
 }
 
 void cp::CollisionBox::DebugDraw() const
 {
 	Renderer& rendererRef = Renderer::GetInstance();
-	if (rendererRef.gd_RenderCollisionBoxes)
+	if (!rendererRef.gd_RenderCollisionBoxes)
+		return;
+
+	SDL_Rect box = this->GetCollisionBox();
+	CollisionSide side = this->GetCollisionSide();
+	// if for whatever reason ptrans == nullptr we have this check
+	// it should never be nullptr as the transform component is the first
+	// component to be added to the components container
+	Transform* transform = m_pOwner->GetComponent<Transform>(cp::ComponentType::_Transform);
+	if (IS_VALID(transform))
 	{
-		SDL_Rect box = this->GetCollisionBox();
-		CollisionSide side = this->GetCollisionSide();
-		// if for whatever reason ptrans == nullptr we have this check
-		// it should never be nullptr as the transform component is the first
-		// component to be added to the components container
-		Transform* transform = m_pOwner->GetComponent<Transform>(cp::ComponentType::_Transform);
-		if (IS_VALID(transform))
-		{
-			box.x += (int)transform->GetPosition().x;
-			box.y += (int)transform->GetPosition().y;
-		}
-
-		Uint8 red = 0;
-		Uint8 green = 0;
-		Uint8 blue = 0;
-
-		// all will be white
-		(side & CollisionSide::right) ? blue = 255 : blue;
-		(side & CollisionSide::up) ? green = 255 : green;
-		(side & CollisionSide::left) ? red = 255 : red;
-		(side & CollisionSide::down) ? red = green = 255 : red;
-		rendererRef.RenderCollorRect(box, red, green, blue);
-
-		SDL_Point center = { box.x + int(box.w * 0.5f) , box.y + int(box.h * 0.5f) };
-		SDL_Point target = center;
-		target.x += int(m_SurfaceNormal.x * 10);
-		target.y += int(m_SurfaceNormal.y * 10);
-		rendererRef.RenderLine(center, target, red, green, blue);
+		box.x += (int)transform->GetPosition().x;
+		box.y += (int)transform->GetPosition().y;
 	}
+
+	Uint8 red = 0;
+	Uint8 green = 0;
+	Uint8 blue = 0;
+
+	// all will be white
+	(side & CollisionSide::right) ? blue = 255 : blue;
+	(side & CollisionSide::up) ? green = 255 : green;
+	(side & CollisionSide::left) ? red = 255 : red;
+	(side & CollisionSide::down) ? red = green = 255 : red;
+	rendererRef.RenderCollorRect(box, red, green, blue);
 }
 
 void cp::CollisionBox::Draw() const
@@ -118,7 +98,7 @@ bool cp::CollisionBox::PreCollisionCheck(const CollisionBox* collision)
 	return false;
 }
 
-void cp::CollisionBox::HandleCollision(const float elapsedSec)
+void cp::CollisionBox::CheckCollision(const float elapsedSec)
 {
 	GameObject* self = this->m_pOwner;
 	m_CurrentWorldBox = GetWorldCollision(self, this);
@@ -131,10 +111,11 @@ void cp::CollisionBox::HandleCollision(const float elapsedSec)
 		glm::vec2 velocity = { 0.f, -98.1f * elapsedSec };
 
 		Scene* activeScene = SceneManager::GetInstance().GetActiveScene();
-		size_t amountOfObjects = activeScene->GetAmountOfGameObjects();
+		std::vector<GameObject*> levelObjects = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::level);
+		size_t amountOfObjects = levelObjects.size();
 		for (int i = 0; i < amountOfObjects; i++)
 		{
-			GameObject* other = activeScene->GetGameObject(i);
+			GameObject* other = levelObjects[i];
 			if (!other->GetIsActive() || other == self)
 				continue;
 
@@ -143,21 +124,43 @@ void cp::CollisionBox::HandleCollision(const float elapsedSec)
 			for (int j = 0; j < amountOfCollisionBoxes; j++)
 			{
 				CollisionBox* otherCollision = otherCollisions[j];
-
 				if (otherCollision->GetCollisionType() != CollisionType::_static)
 					continue;
 
 				if (!PreCollisionCheck(otherCollision))
 					continue;
 
-				if (RectCollision(m_CurrentWorldBox, GetWorldCollision(other, otherCollision)))
-				{
-					self->OnCollisionCallback(self, other, m_CollisionSide);
-					return;
-				}
+				if (!RectCollision(m_CurrentWorldBox, GetWorldCollision(other, otherCollision)))
+					continue;
+
+				RigidBody* rigidBody = self->GetComponent<RigidBody>(cp::ComponentType::_RigidBody);
+				if (rigidBody == nullptr)
+					continue;
+
+				HandleCollision(other, rigidBody);
 			}
 		}
-		self->GetComponent<Transform>(cp::ComponentType::_Transform)->Translate(velocity.x, velocity.y,0.f);
+	}
+}
+
+void cp::CollisionBox::HandleCollision(GameObject* other, RigidBody* rigidBody)
+{
+	this->m_pOwner->OnCollisionCallback(this->m_pOwner, other, m_CollisionSide);
+
+	if (m_CollisionSide == CollisionSide::all)
+	{
+		// not implemented yet
+	}
+	else if (m_CollisionSide == CollisionSide::right)
+		rigidBody->SetIsColRight(true);
+	else if (m_CollisionSide == CollisionSide::up)
+		rigidBody->SetIsColUp(true);
+	else if (m_CollisionSide == CollisionSide::left)
+		rigidBody->SetIsColLeft(true);
+	else if (m_CollisionSide == CollisionSide::down)
+	{
+		rigidBody->SetIsColDown(true);
+		rigidBody->SetIsOnGround(true);
 	}
 }
 

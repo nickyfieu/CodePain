@@ -4,6 +4,7 @@
 struct SDL_Window;
 namespace cp
 {
+	class FrameRate;
 	class CodePain final
 	{
 	public:
@@ -22,12 +23,19 @@ namespace cp
 		inline bool IsInitialized() const { return m_IsInitialized; }
 	private:
 		//static const int MsPerFrame = 16; //16 for 60 fps, 33 for 30 fps
-		SDL_Window* m_Window{};
 		bool m_IsInitialized = false;
+		SDL_Window* m_Window{};
 
+		// debug imgui stuf
 		const size_t m_DebugLevelsHash = std::hash<std::string>{}("LevelScene");
+		float  m_FrameRate = 0.f;
+		float  m_FixedFrameRate = 0.f;
+		FrameRate* m_DebugFpsComponent = nullptr;
+
 		void ImGuiInit();
 		void ImGuiDebug_Levels();
 		void ImGuiUpdate();
+		void ImGuiDebug_FrameRate();
+
 	};
 }

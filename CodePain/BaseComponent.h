@@ -18,6 +18,7 @@ namespace cp
 		_FrameRate,
 		_CollisionBox,
 		_ColorRect2D,
+		_RigidBody,
 	};
 
 	// BaseComponent is a pure virtual class

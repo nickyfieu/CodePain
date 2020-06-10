@@ -263,6 +263,7 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Singleton.h" />
@@ -325,6 +326,7 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Text.cpp" />

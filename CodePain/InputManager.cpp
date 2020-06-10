@@ -17,7 +17,7 @@ bool cp::InputManager::ProcessInput()
 	SDL_Event e;
 	while (SDL_PollEvent(&e))
 	{
-#ifdef _DEBUG
+#if defined(_DEBUG)
 		ImGui_Input(e);
 #endif
 		if (e.type == SDL_QUIT)
@@ -72,7 +72,7 @@ bool cp::InputManager::IsPressed(ControllerButton button) const
 void cp::InputManager::ImGui_Input(const SDL_Event& sdlEvent)
 {
 	ImGuiIO& io = ImGui::GetIO();
-#ifdef _Debug
+#if defined(_DEBUG)
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
 #endif
 

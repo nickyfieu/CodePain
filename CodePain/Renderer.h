@@ -36,6 +36,7 @@ namespace cp
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; }
 
 		static bool gd_RenderCollisionBoxes;
+		static bool gd_RenderTextureTiles;
 	private:
 		SDL_Renderer* m_Renderer{};
 

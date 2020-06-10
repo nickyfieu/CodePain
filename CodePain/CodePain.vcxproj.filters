@@ -70,6 +70,9 @@
     <ClCompile Include="BaseComponent.cpp">
       <Filter>Resources\Components</Filter>
     </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -154,6 +157,9 @@
       <Filter>Resources\Components</Filter>
     </ClInclude>
     <ClInclude Include="ColorRect2D.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
       <Filter>Resources\Components</Filter>
     </ClInclude>
   </ItemGroup>

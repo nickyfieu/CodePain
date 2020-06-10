@@ -102,6 +102,7 @@ void cp::CodePain::Run()
 #if defined(_DEBUG)
 		ImGuiUpdate();
 #endif
+
 		renderer.Render();
 
 		lastTime = currentTime;
@@ -143,6 +144,30 @@ void cp::CodePain::ImGuiUpdate()
 
 	if (scene->GetNameHash() == m_DebugLevelsHash)
 		ImGuiDebug_Levels();
+
+	ImGuiDebug_FrameRate();
+}
+
+void cp::CodePain::ImGuiDebug_FrameRate()
+{
+	if (m_DebugFpsComponent == nullptr)
+	{
+		GameObject* obj = new GameObject();
+		SceneManager& sceneManager = SceneManager::GetInstance();
+		sceneManager.GetActiveScene()->Add(obj);
+		m_DebugFpsComponent = new cp::FrameRate();
+		obj->AddComponent(m_DebugFpsComponent);
+	}
+	else
+	{
+		m_DebugFpsComponent->GetFrameRate(m_FrameRate);
+		m_DebugFpsComponent->GetFixedFrameRate(m_FixedFrameRate);
+	}
+
+	ImGui::Begin("FrameRates");
+	ImGui::Text("Main framerate: %f fps", m_FrameRate);
+	ImGui::Text("Fixed framerate: %f fps", m_FixedFrameRate);
+	ImGui::End();
 }
 
 void cp::CodePain::ImGuiDebug_Levels()
@@ -189,5 +214,6 @@ void cp::CodePain::ImGuiDebug_Levels()
 		}
 	}
 	ImGui::Checkbox("Visualize Collision", &renderer.gd_RenderCollisionBoxes);
+	ImGui::Checkbox("Visualize Texture Tiles", &renderer.gd_RenderTextureTiles);
 	ImGui::End();
 }

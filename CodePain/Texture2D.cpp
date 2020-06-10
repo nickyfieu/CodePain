@@ -32,16 +32,18 @@ void cp::Texture2D::FixedUpdate(const float)
 void cp::Texture2D::DebugDraw() const
 {
 	Renderer& rendererRef = Renderer::GetInstance();
+	if (!rendererRef.gd_RenderTextureTiles)
+		return;
 	Transform* pTransform = m_pOwner->GetComponent<Transform>(cp::ComponentType::_Transform);
 	glm::vec3 pos = pTransform->GetPosition();
 	SDL_Point p1{ int(m_DstRect.x + pos.x), int(m_DstRect.y + pos.y)};
 	SDL_Point p2{ p1.x + (int)m_DstRect.w, p1.y };
 	SDL_Point p3{ p1.x , p1.y + (int)m_DstRect.h };
 	SDL_Point p4{ p1.x + (int)m_DstRect.w, p1.y + (int)m_DstRect.h };
-	rendererRef.RenderLine(p1, p2, 0, 0, 0);
-	rendererRef.RenderLine(p1, p3, 0, 0, 0);
-	rendererRef.RenderLine(p4, p2, 0, 0, 0);
-	rendererRef.RenderLine(p4, p3, 0, 0, 0);
+	rendererRef.RenderLine(p1, p2, 255, 255, 0);
+	rendererRef.RenderLine(p1, p3, 255, 255, 0);
+	rendererRef.RenderLine(p4, p2, 255, 255, 0);
+	rendererRef.RenderLine(p4, p3, 255, 255, 0);
 }
 
 void cp::Texture2D::Draw() const
