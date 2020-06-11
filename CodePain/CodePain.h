@@ -28,9 +28,10 @@ namespace cp
 
 		// debug imgui stuf
 		const size_t m_DebugLevelsHash = std::hash<std::string>{}("LevelScene");
-		float  m_FrameRate = 0.f;
-		float  m_FixedFrameRate = 0.f;
-		FrameRate* m_DebugFpsComponent = nullptr;
+		int m_MainLoopCPS = 0;
+		int m_InputLoopCPS = 0;
+		int m_DrawLoopCPS = 0;
+		int m_FixedLoopCPS = 0;
 
 		void ImGuiInit();
 		void ImGuiDebug_Levels();

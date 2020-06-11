@@ -4,12 +4,14 @@
 
 namespace cp
 {
+	class InputHandler;
 	class Scene final
 	{
 		friend Scene* SceneManager::CreateScene(const std::string& name);
 	public:
 		void Add(GameObject* object);
 
+		void HandleInput(const cp::InputHandler& inputHandler);
 		void Update(float elapsedSec);
 		void FixedUpdate(float elapsedSec);
 		void Render() const;

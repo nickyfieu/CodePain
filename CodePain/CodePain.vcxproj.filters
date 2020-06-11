@@ -13,9 +13,6 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Resources\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Resources\Base</Filter>
-    </ClCompile>
     <ClCompile Include="Texture2D.cpp">
       <Filter>Resources\Components</Filter>
     </ClCompile>
@@ -73,6 +70,12 @@
     <ClCompile Include="RigidBody.cpp">
       <Filter>Resources\Components</Filter>
     </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Resources\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>Resources\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -86,9 +89,6 @@
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Resources\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Resources\Base</Filter>
     </ClInclude>
     <ClInclude Include="Singleton.h">
       <Filter>Resources\Helpers</Filter>
@@ -162,13 +162,19 @@
     <ClInclude Include="RigidBody.h">
       <Filter>Resources\Components</Filter>
     </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Resources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.h">
+      <Filter>Resources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputCommand.h">
+      <Filter>Resources\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resources">
       <UniqueIdentifier>{19b40ec9-355f-4d0d-8500-e5983c51c35f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\Base">
-      <UniqueIdentifier>{e5918e95-69a7-4950-8105-d50f2e4d256b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resources\Graphics">
       <UniqueIdentifier>{5d4d9538-bb36-47f7-a1aa-65f77e200c7e}</UniqueIdentifier>
@@ -196,6 +202,9 @@
     </Filter>
     <Filter Include="Resources\ImGuiSDL">
       <UniqueIdentifier>{28ca7431-8df1-49ab-9426-c696779d6fd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Input">
+      <UniqueIdentifier>{eed13ea9-b6d7-4900-ac8f-02f145bc2a1d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

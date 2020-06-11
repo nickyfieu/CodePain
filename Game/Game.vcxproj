@@ -183,6 +183,7 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BubbleBobbleLevelReader.cpp" />
+    <ClCompile Include="Commands.cpp" />
     <ClCompile Include="LevelScene.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene1.cpp" />
@@ -196,6 +197,7 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
   <ItemGroup>
     <ClInclude Include="BubbleBobbleData.h" />
     <ClInclude Include="BubbleBobbleLevelReader.h" />
+    <ClInclude Include="Commands.h" />
     <ClInclude Include="LevelScene.h" />
     <ClInclude Include="Scene1.h" />
     <ClInclude Include="SceneLoader.h" />

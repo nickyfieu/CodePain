@@ -1,6 +1,13 @@
 #include "CodePainPCH.h"
 #include "SceneManager.h"
 #include "Scene.h"
+#include "InputHandler.h"
+
+void cp::SceneManager::HandleInput(const cp::InputHandler& inputHandler)
+{
+	if (m_pActiveScene != nullptr)
+		m_pActiveScene->HandleInput(inputHandler);
+}
 
 void cp::SceneManager::Update(const float elapsedSec)
 {

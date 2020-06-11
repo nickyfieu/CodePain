@@ -258,6 +258,8 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="Imgui_Sdl\imgui_impl_sdl.h" />
     <ClInclude Include="Imgui_Sdl\imgui_sdl.h" />
+    <ClInclude Include="InputCommand.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="CodePainPCH.h" />
     <ClInclude Include="Logger.h" />
@@ -315,6 +317,7 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="CodePainPCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

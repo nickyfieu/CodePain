@@ -1,5 +1,6 @@
 #include "CodePainPCH.h"
 #include "Scene.h"
+#include "InputHandler.h"
 #include <vector>
 #include <string>
 
@@ -47,6 +48,13 @@ static void FixedUpdateActiveObject(cp::GameObject* activeObject, float elapsedS
 	activeObject->FixedUpdate(elapsedSec);
 }
 #endif
+
+void cp::Scene::HandleInput(const cp::InputHandler& inputHandler)
+{
+	for (size_t i = 0; i < m_AmountOfObjects; i++)
+		if (m_pObjects[i]->GetIsActive())
+			inputHandler.HandleInput(m_pObjects[i]);
+}
 
 void cp::Scene::Update(const float elapsedSec)
 {

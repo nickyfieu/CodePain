@@ -34,7 +34,19 @@ void cp::RigidBody::FixedUpdate(float elapsedSec)
 	else if (!m_IsColUp && m_Force.y > FLT_EPSILON)
 		m_pTransform->Translate(0.f, m_Force.y * elapsedSec, 0.f);
 
-	m_Force = { 0.f,0.f };
+	if (m_ResetForceEachFrame)
+	{
+		m_Force = { 0.f,0.f };
+	}
+	else
+	{
+		if (m_IsColDown || m_IsColUp)
+			m_Force.y = 0.f;
+
+		if (m_IsColLeft || m_IsColRight)
+			m_Force.x = 0.f;
+	}
+
 	m_IsColLeft = false;
 	m_IsColDown = false;
 	m_IsColRight = false;
@@ -88,6 +100,14 @@ void cp::RigidBody::SetIsOnGround(bool col)
 void cp::RigidBody::SetUseGravit(bool use)
 {
 	m_ApplyGravity = use;
+}
+
+// note disabling this might cause issues as 
+// the force might become so great that you go trough boxes
+// as of currently no sweeping aabb implemented yet
+void cp::RigidBody::SetResetForceEachFrame(bool use)
+{
+	m_ResetForceEachFrame = use;
 }
 
 void cp::RigidBody::SetGravitationalForce(const glm::vec2& gravity)

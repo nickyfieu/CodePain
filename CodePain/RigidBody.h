@@ -35,6 +35,7 @@ namespace cp
 		void SetIsColUp(bool col);
 		void SetIsOnGround(bool col);
 		void SetUseGravit(bool use);
+		void SetResetForceEachFrame(bool use);
 
 		void SetGravitationalForce(const glm::vec2& gravity);
 
@@ -54,5 +55,7 @@ namespace cp
 		glm::vec2 m_Gravity = { 0.f,-98.1f };
 
 		bool m_ApplyGravity;
+		// implemented as it seems some games dont use accelerated gravity but a constant gravity
+		bool m_ResetForceEachFrame = true;
 	};
 }

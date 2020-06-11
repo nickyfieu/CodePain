@@ -22,6 +22,9 @@
     <Filter Include="Source Files\Data\BubbleBobbleDataReading">
       <UniqueIdentifier>{ee563739-120f-463d-ba02-ffb4a13049fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Data\Commands">
+      <UniqueIdentifier>{d9752805-9b79-41a8-9609-d5877b55dfb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -38,6 +41,9 @@
     </ClCompile>
     <ClCompile Include="LevelScene.cpp">
       <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.cpp">
+      <Filter>Source Files\Data\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="LevelScene.h">
       <Filter>Source Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands.h">
+      <Filter>Source Files\Data\Commands</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

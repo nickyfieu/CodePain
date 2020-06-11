@@ -35,8 +35,8 @@ bool cp::FrameRate::GetFrameRate(float& container)
 {
 	if (m_Time > 1.f)
 	{
-		m_Time -= 1.f;
-		container = (float)m_FrameCounter;
+		container = float(int(m_FrameCounter / m_Time));
+		m_Time = fmodf(m_Time - 1.f, 1.f);
 		m_FrameCounter = 0;
 		return true;
 	}
@@ -47,8 +47,8 @@ bool cp::FrameRate::GetFixedFrameRate(float& container)
 {
 	if (m_FixedTimer > 1.f)
 	{
-		m_FixedTimer -= 1.f;
-		container = (float)m_FixedFrameCounter;
+		container = float(int(m_FixedFrameCounter / m_FixedTimer));
+		m_FixedTimer = fmodf(m_FixedTimer - 1.f, 1.f);
 		m_FixedFrameCounter = 0;
 		return true;
 	}

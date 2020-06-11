@@ -6,6 +6,7 @@
 namespace cp
 {
 	class Scene;
+	class InputHandler;
 	class SceneManager final : public Singleton<SceneManager>
 	{
 	public:
@@ -18,6 +19,7 @@ namespace cp
 		SceneManager& operator=(const SceneManager& other) = delete;
 		SceneManager& operator=(SceneManager&& other) = delete;
 
+		void HandleInput(const cp::InputHandler& inputHandler);
 		void Update(float elapsedSec);
 		void FixedUpdate(float elapsedSec);
 		void Render() const;

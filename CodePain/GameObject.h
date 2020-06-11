@@ -8,14 +8,13 @@ namespace cp
 {
 	enum class GameObjectType
 	{
-		// not a specified type ( default constructor )
 		none = 0,
-		// a level game object
 		level = 1,
-		// a enemy game object
-		enemy = 2,
-		// a player game object
-		players = 3,
+		Player1 = 2, // takes keyboard / moouse input
+		Player2 = 3, // takes controller 1 input
+		Player3 = 4, // takes controller 2 input
+		Player4 = 5, // takes controller 3 input
+		Player5 = 6, // takes controller 4 input
 	};
 
 	typedef std::function<void (GameObject* selfObject, GameObject* otherObject, CollisionBox::CollisionSide side)> CollisionCallback;

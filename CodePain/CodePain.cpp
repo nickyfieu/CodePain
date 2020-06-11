@@ -2,6 +2,7 @@
 #include "CodePain.h"
 #include <chrono>
 #include "InputManager.h"
+#include "InputHandler.h"
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
@@ -79,35 +80,92 @@ void cp::CodePain::Run()
 	Renderer& renderer = Renderer::GetInstance();
 	SceneManager& sceneManager = SceneManager::GetInstance();
 	InputManager& input = InputManager::GetInstance();
+	InputHandler& inputHandler = InputHandler::GetInstance();
+	
+	input.Initialize();
+
 	auto lastTime = std::chrono::high_resolution_clock::now();
-	float fixedUpdateTime = 0.f;
-	const float fixedUpdateCycle = 1.f / 40.f;
+
+	float timer = 0.f;
+	int mainCycleCounter = 0;
+	int inputCycleCounter = 0;
+	int drawCycleCounter = 0;
+	int fixedCycleCounter = 0;
+
+	float inputCycleTimer = 0.f;
+	float drawCycleTimer = 0.f;
+	float fixedCycleTimer = 0.f;
+	const float inputCycleTime = 1.f / 1000.f;
+	const float drawCycleTime = 1.f / 240.f;
+	const float fixedCycleTime = 1.f / 40.f;
 
 	bool doContinue = true;
 	while (doContinue)
 	{
 		const auto currentTime = std::chrono::high_resolution_clock::now();
 		float elapsedSec = std::chrono::duration<float>(currentTime - lastTime).count();
-		fixedUpdateTime += elapsedSec;
+		timer += elapsedSec;
+		inputCycleTimer += elapsedSec;
+		drawCycleTimer += elapsedSec;
+		fixedCycleTimer += elapsedSec;
 
-		doContinue = input.ProcessInput();
-		sceneManager.Update(elapsedSec);
-
-		while (fixedUpdateTime > fixedUpdateCycle)
+		if (timer > 1.0f)
 		{
-			sceneManager.FixedUpdate(fixedUpdateCycle);
-			fixedUpdateTime -= fixedUpdateCycle;
+			m_MainLoopCPS = mainCycleCounter;
+			mainCycleCounter = 0;
+			m_InputLoopCPS = inputCycleCounter;
+			inputCycleCounter = 0;
+			m_DrawLoopCPS = drawCycleCounter;
+			drawCycleCounter = 0;
+			m_FixedLoopCPS = fixedCycleCounter;
+			fixedCycleCounter = 0;
+			timer = fmodf(timer - 1.f, 1.f);
 		}
 
-#if defined(_DEBUG)
-		ImGuiUpdate();
-#endif
+		bool inputCycleUpdate = (inputCycleTimer >= inputCycleTime);
+		bool drawCycleUpdate = (drawCycleTimer >= drawCycleTime);
+		bool fixedCycleUpdate = (fixedCycleTimer >= fixedCycleTime);
+		
+		mainCycleCounter++;
 
-		renderer.Render();
+		if (inputCycleUpdate)
+		{
+			inputCycleCounter += int(inputCycleTimer / inputCycleTime);
+			inputCycleTimer = fmodf(inputCycleTimer - inputCycleTime, inputCycleTime);
+			doContinue = input.ProcessInput();
+			sceneManager.HandleInput(inputHandler);
+		}
+
+		if (drawCycleUpdate)
+		{
+			int cycles = int(drawCycleTimer / drawCycleTime);
+			drawCycleCounter += cycles;
+			drawCycleTimer = fmodf(drawCycleTimer - drawCycleTime, drawCycleTime);
+			sceneManager.Update(drawCycleTime * cycles);
+
+#if defined(_DEBUG)
+			ImGuiUpdate();
+#endif
+		}
+		
+		if (fixedCycleUpdate)
+		{
+			int cycles = int(fixedCycleTimer / fixedCycleTime);
+			fixedCycleCounter += cycles;
+			fixedCycleTimer = fmodf(fixedCycleTimer - fixedCycleTime, fixedCycleTime);
+			sceneManager.FixedUpdate(fixedCycleTime);
+		}
+
+		if (drawCycleUpdate)
+		{
+			renderer.Render();
+		}
 
 		lastTime = currentTime;
+
 	}
 
+	inputHandler.Cleanup();
 	Cleanup();
 }
 
@@ -150,23 +208,12 @@ void cp::CodePain::ImGuiUpdate()
 
 void cp::CodePain::ImGuiDebug_FrameRate()
 {
-	if (m_DebugFpsComponent == nullptr)
-	{
-		GameObject* obj = new GameObject();
-		SceneManager& sceneManager = SceneManager::GetInstance();
-		sceneManager.GetActiveScene()->Add(obj);
-		m_DebugFpsComponent = new cp::FrameRate();
-		obj->AddComponent(m_DebugFpsComponent);
-	}
-	else
-	{
-		m_DebugFpsComponent->GetFrameRate(m_FrameRate);
-		m_DebugFpsComponent->GetFixedFrameRate(m_FixedFrameRate);
-	}
-
-	ImGui::Begin("FrameRates");
-	ImGui::Text("Main framerate: %f fps", m_FrameRate);
-	ImGui::Text("Fixed framerate: %f fps", m_FixedFrameRate);
+	ImGui::Begin("Cycles Per Second(CPS)");
+	ImGui::Text("Main loop  	: %i cps", m_MainLoopCPS);
+	ImGui::Text("Input  		: %i cps", m_InputLoopCPS);
+	ImGui::Text("Sound  		: %i cps", 0);
+	ImGui::Text("Draw/Update	: %i cps", m_DrawLoopCPS);
+	ImGui::Text("FixedUpdate	: %i cps", m_FixedLoopCPS);
 	ImGui::End();
 }
 
