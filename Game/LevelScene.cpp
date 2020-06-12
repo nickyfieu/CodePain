@@ -115,11 +115,13 @@ void Game::LevelScene::LoadSceneData() const
 
 #pragma region SideCollision
 
-	cp::GameObject* sideCollision = new cp::GameObject(cp::GameObjectType::level);
-	scene->Add(sideCollision);
+	std::vector<cp::GameObject*> levelObjects = scene->GetAllGameObjectsOfType(cp::GameObjectType::level);
 
-	sideCollision->AddComponent(new cp::CollisionBox((20 * 2) - 3, 0, 3, 20 * 25, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_static));
-	sideCollision->AddComponent(new cp::CollisionBox((20 * 30), 0, 3, 20 * 25, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_static));
+	for (int i = 0; i < levelObjects.size(); i++)
+	{
+		levelObjects[i]->AddComponent(new cp::CollisionBox((20 * 2) - 3, 0, 3, 20 * 25, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_static));
+		levelObjects[i]->AddComponent(new cp::CollisionBox((20 * 30), 0, 3, 20 * 25, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_static));
+	}
 
 #pragma endregion
 

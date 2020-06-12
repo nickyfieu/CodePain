@@ -90,7 +90,7 @@ void cp::CodePain::Run()
 	float T1 = 0.f, T2 = 0.f, T3 = 0.f, T4 = 0.f;
 	int C1 = 0, C2 = 0, C3 = 0, C4 = 0;
 	const float mainCycleTime = 1.f;
-	const float inputCycleTime = 1.f / 1000.f;
+	const float inputCycleTime = 1.f / 1200.f;
 	const float drawCycleTime = 1.f / 240.f;
 	const float fixedCycleTime = 1.f / 40.f;
 
@@ -105,7 +105,7 @@ void cp::CodePain::Run()
 		T4 += elapsedSec;
 		C1++;
 
-		while(T2 >= inputCycleTime)
+		if(T2 >= inputCycleTime)
 		{
 			C2++;
 			T2 -= inputCycleTime;

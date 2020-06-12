@@ -40,6 +40,15 @@ void cp::InputHandler::Cleanup()
 		}
 		m_Controllers.clear();
 	}
+
+	if (!m_ControllerAxies.empty())
+	{
+		for (auto toDelete : m_ControllerAxies)
+		{
+			SAFE_DELETE(toDelete.second);
+		}
+		m_ControllerAxies.clear();
+	}
 }
 
 void cp::InputHandler::HandleInput(const GameObject* actor) const
