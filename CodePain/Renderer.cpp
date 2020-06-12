@@ -81,6 +81,13 @@ void cp::Renderer::RenderTexture(SDL_Texture* texture, const SDL_Rect& src, cons
 	SDL_RenderCopyExF(GetSDLRenderer(), texture, &src, &dst, angle, &center, flip);
 }
 
+void cp::Renderer::RenderRect(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const
+{
+	SDL_SetRenderDrawColor(m_Renderer, r, g, b, a);
+	SDL_RenderDrawRect(m_Renderer, &rect);
+	SDL_SetRenderDrawColor(m_Renderer, 0, 0, 0, 255);
+}
+
 void cp::Renderer::RenderCollorRect(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const
 {
 	SDL_SetRenderDrawColor(m_Renderer, r, g, b, a);

@@ -63,10 +63,16 @@ namespace cp
 		bool IsOnGround = false;
 
 		void CheckCollision(const float elapsedSec);
-		void HandleCollision(GameObject* other, RigidBody* rigidBody);
-		bool RectCollision(const SDL_Rect& self, const SDL_Rect& other);
-		bool PreCollisionCheck(const CollisionBox* collision);
+		void HandleCollision(GameObject* other, RigidBody* rigidBody, float entryTime);
+		bool PreCollisionCheck(const CollisionBox* collision, const RigidBody* rigid);
 		SDL_Rect GetWorldCollision(const GameObject* obj, const CollisionBox* collision) const;
+
+		void CalculateInverseEE(float& entry, float& exit, float vel, float v1, float w1, float v2, float w2) const;
+		void CalculateEE(float& entry, float& exit, float vel, float invEntry, float invExit) const;
+		bool RectCollisionAABB(const SDL_Rect& self, const SDL_Rect& other) const;
+		bool IsColliding(const SDL_Rect& self, const SDL_Rect& other) const;
+		float SweptAABB(SDL_Rect b1, glm::vec2 velocity, SDL_Rect b2, glm::vec2& normal);
+		SDL_Rect CalculateBroadBox(const SDL_Rect& box, glm::vec2 vel) const;
 
 		SDL_Rect m_CurrentWorldBox{};
 		const CollisionType m_CollisionType;

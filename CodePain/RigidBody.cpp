@@ -13,45 +13,42 @@ cp::RigidBody::~RigidBody()
 {
 }
 
-void cp::RigidBody::Update(float)
+void cp::RigidBody::PreFixedUpdate(float elapsedSec)
 {
-}
+	if ((m_IsColDown && (m_Force.y < -FLT_EPSILON)) || (m_IsColUp && (m_Force.y > FLT_EPSILON)))
+		m_Force.y = 0.f;
 
-void cp::RigidBody::FixedUpdate(float elapsedSec)
-{
-	Transform* m_pTransform = this->m_pOwner->GetComponent<Transform>(cp::ComponentType::_Transform);
+	if ((m_IsColLeft && (m_Force.x < -FLT_EPSILON)) || (m_IsColRight && (m_Force.x > FLT_EPSILON)))
+		m_Force.x = 0.f;
 
 	if (m_ApplyGravity)
-		m_Force += m_Gravity;
+		m_Force += m_Gravity * elapsedSec;
 
-	if (!m_IsColLeft && m_Force.x < -FLT_EPSILON)
-		m_pTransform->Translate(m_Force.x * elapsedSec, 0.f, 0.f);
-	else if (!m_IsColRight && m_Force.x > FLT_EPSILON)
-		m_pTransform->Translate(m_Force.x * elapsedSec, 0.f, 0.f);
+	m_Velocity = m_Force * elapsedSec;
 
-	if (!m_IsColDown && m_Force.y < -FLT_EPSILON)
-		m_pTransform->Translate(0.f, m_Force.y * elapsedSec, 0.f);
-	else if (!m_IsColUp && m_Force.y > FLT_EPSILON)
-		m_pTransform->Translate(0.f, m_Force.y * elapsedSec, 0.f);
-
-	if (m_ResetForceEachFrame)
-	{
-		m_Force = { 0.f,0.f };
-	}
-	else
-	{
-		if (m_IsColDown || m_IsColUp)
-			m_Force.y = 0.f;
-
-		if (m_IsColLeft || m_IsColRight)
-			m_Force.x = 0.f;
-	}
-
+	m_EntryUDTime = 1.f;
+	m_EntryLRTime = 1.f;
 	m_IsColLeft = false;
 	m_IsColDown = false;
 	m_IsColRight = false;
 	m_IsColUp = false;
 	m_IsOnGround = false;
+}
+
+void cp::RigidBody::Update(float)
+{
+}
+
+void cp::RigidBody::FixedUpdate(float)
+{
+	Transform* m_pTransform = this->m_pOwner->GetComponent<Transform>(cp::ComponentType::_Transform);
+	
+	m_pTransform->Translate(m_Velocity.x * m_EntryLRTime, m_Velocity.y * m_EntryUDTime, 0.f);
+
+	m_Velocity = { 0.f,0.f };
+
+	if (m_ResetXForceEachFrame)
+		m_Force.x = 0;
 }
 
 void cp::RigidBody::DebugDraw() const
@@ -102,12 +99,21 @@ void cp::RigidBody::SetUseGravit(bool use)
 	m_ApplyGravity = use;
 }
 
-// note disabling this might cause issues as 
-// the force might become so great that you go trough boxes
-// as of currently no sweeping aabb implemented yet
-void cp::RigidBody::SetResetForceEachFrame(bool use)
+void cp::RigidBody::SetResetXForceEachFrame(bool use)
 {
-	m_ResetForceEachFrame = use;
+	m_ResetXForceEachFrame = use;
+}
+
+void cp::RigidBody::SetEntryUDTime(float time)
+{
+	if (time < m_EntryUDTime)
+		m_EntryUDTime = time;
+}
+
+void cp::RigidBody::SetEntryLRTime(float time)
+{
+	if (time < m_EntryLRTime)
+		m_EntryLRTime = time;
 }
 
 void cp::RigidBody::SetGravitationalForce(const glm::vec2& gravity)

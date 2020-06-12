@@ -86,15 +86,10 @@ void cp::CodePain::Run()
 
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
-	float timer = 0.f;
-	int mainCycleCounter = 0;
-	int inputCycleCounter = 0;
-	int drawCycleCounter = 0;
-	int fixedCycleCounter = 0;
 
-	float inputCycleTimer = 0.f;
-	float drawCycleTimer = 0.f;
-	float fixedCycleTimer = 0.f;
+	float T1 = 0.f, T2 = 0.f, T3 = 0.f, T4 = 0.f;
+	int C1 = 0, C2 = 0, C3 = 0, C4 = 0;
+	const float mainCycleTime = 1.f;
 	const float inputCycleTime = 1.f / 1000.f;
 	const float drawCycleTime = 1.f / 240.f;
 	const float fixedCycleTime = 1.f / 40.f;
@@ -104,64 +99,48 @@ void cp::CodePain::Run()
 	{
 		const auto currentTime = std::chrono::high_resolution_clock::now();
 		float elapsedSec = std::chrono::duration<float>(currentTime - lastTime).count();
-		timer += elapsedSec;
-		inputCycleTimer += elapsedSec;
-		drawCycleTimer += elapsedSec;
-		fixedCycleTimer += elapsedSec;
+		T1 += elapsedSec;
+		T2 += elapsedSec;
+		T3 += elapsedSec;
+		T4 += elapsedSec;
+		C1++;
 
-		if (timer > 1.0f)
+		while(T2 >= inputCycleTime)
 		{
-			m_MainLoopCPS = mainCycleCounter;
-			mainCycleCounter = 0;
-			m_InputLoopCPS = inputCycleCounter;
-			inputCycleCounter = 0;
-			m_DrawLoopCPS = drawCycleCounter;
-			drawCycleCounter = 0;
-			m_FixedLoopCPS = fixedCycleCounter;
-			fixedCycleCounter = 0;
-			timer = fmodf(timer - 1.f, 1.f);
-		}
-
-		bool inputCycleUpdate = (inputCycleTimer >= inputCycleTime);
-		bool drawCycleUpdate = (drawCycleTimer >= drawCycleTime);
-		bool fixedCycleUpdate = (fixedCycleTimer >= fixedCycleTime);
-		
-		mainCycleCounter++;
-
-		if (inputCycleUpdate)
-		{
-			inputCycleCounter += int(inputCycleTimer / inputCycleTime);
-			inputCycleTimer = fmodf(inputCycleTimer - inputCycleTime, inputCycleTime);
+			C2++;
+			T2 -= inputCycleTime;
 			doContinue = input.ProcessInput();
 			sceneManager.HandleInput(inputHandler);
 		}
 
-		if (drawCycleUpdate)
+		if (T3 >= drawCycleTime)
 		{
-			int cycles = int(drawCycleTimer / drawCycleTime);
-			drawCycleCounter += cycles;
-			drawCycleTimer = fmodf(drawCycleTimer - drawCycleTime, drawCycleTime);
-			sceneManager.Update(drawCycleTime * cycles);
+			C3++;
+			T3 = 0.f;
+			sceneManager.Update(drawCycleTime);
 
 #if defined(_DEBUG)
 			ImGuiUpdate();
 #endif
-		}
 		
-		if (fixedCycleUpdate)
-		{
-			int cycles = int(fixedCycleTimer / fixedCycleTime);
-			fixedCycleCounter += cycles;
-			fixedCycleTimer = fmodf(fixedCycleTimer - fixedCycleTime, fixedCycleTime);
-			sceneManager.FixedUpdate(fixedCycleTime);
-		}
+			if (T4 >= fixedCycleTime)
+			{
+				C4++;
+				T4 = 0.f;
+				sceneManager.FixedUpdate(fixedCycleTime);
+			}
 
-		if (drawCycleUpdate)
-		{
 			renderer.Render();
 		}
 
 		lastTime = currentTime;
+
+		if (T1 >= mainCycleTime)
+		{
+			T1 = 0.f; T2 = 0.f; T3 = 0.f; T4 = 0.f;
+			m_MainLoopCPS = C1; m_InputLoopCPS = C2; m_DrawLoopCPS = C3; m_FixedLoopCPS = C4;
+			C1 = 0; C2 = 0; C3 = 0; C4 = 0;
+		}
 
 	}
 

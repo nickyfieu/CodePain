@@ -15,8 +15,35 @@ void cp::GameObject::Update(const float elapsedSec)
 
 void cp::GameObject::FixedUpdate(float elapsedSec)
 {
+	size_t amountOfRigidBodies = 0;
+	std::vector<RigidBody*> m_RigidBodies;
+	size_t amountOfCollisionBoxes = 0;
+	std::vector<CollisionBox*> m_CollisionBox;
+
 	for (size_t i = 0; i < m_AmountOfComponents; i++)
-		m_pComponents[i]->FixedUpdate(elapsedSec);
+	{
+		if (m_pComponents[i]->GetComponentType() == cp::ComponentType::_RigidBody)
+		{
+			m_RigidBodies.push_back(static_cast<RigidBody*>(m_pComponents[i]));
+			amountOfRigidBodies++;
+		}
+		else if (m_pComponents[i]->GetComponentType() == cp::ComponentType::_CollisionBox)
+		{
+			m_CollisionBox.push_back(static_cast<CollisionBox*>(m_pComponents[i]));
+			amountOfCollisionBoxes++;
+		}
+		else
+			m_pComponents[i]->FixedUpdate(elapsedSec);
+	}
+
+	for (size_t i = 0; i < amountOfRigidBodies; i++)
+		m_RigidBodies[i]->PreFixedUpdate(elapsedSec);
+
+	for (size_t i = 0; i < amountOfCollisionBoxes; i++)
+		m_CollisionBox[i]->FixedUpdate(elapsedSec);
+
+	for (size_t i = 0; i < amountOfRigidBodies; i++)
+		m_RigidBodies[i]->FixedUpdate(elapsedSec);
 }
 
 void cp::GameObject::Render() const

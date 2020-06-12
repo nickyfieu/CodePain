@@ -63,10 +63,10 @@ void cp::CollisionBox::Draw() const
 {
 }
 
-bool cp::CollisionBox::RectCollision(const SDL_Rect& self, const SDL_Rect& other)
+bool cp::CollisionBox::RectCollisionAABB(const SDL_Rect& self, const SDL_Rect& other) const
 {
 	if (self.x < other.x + other.w &&
-		self.x + self.w > other.x&&
+		self.x + self.w > other.x &&
 		self.y < other.y + other.h &&
 		self.y + self.h > other.y)
 	{
@@ -75,7 +75,17 @@ bool cp::CollisionBox::RectCollision(const SDL_Rect& self, const SDL_Rect& other
 	return false;
 }
 
-bool cp::CollisionBox::PreCollisionCheck(const CollisionBox* collision)
+bool cp::CollisionBox::IsColliding(const SDL_Rect& self, const SDL_Rect& other) const
+{
+	float lft = float(other.x - (self.x + self.w));
+	float top = float((other.y + other.h) - self.y);
+	float rht = float((other.x + other.w) - self.x);
+	float bot = float(other.y - (self.y + self.h));
+
+	return !(lft > 0.f || rht < 0.f || top < 0.f || bot > 0.f);
+}
+
+bool cp::CollisionBox::PreCollisionCheck(const CollisionBox* collision, const RigidBody* rigid)
 {
 	switch (m_CollisionSide)
 	{
@@ -83,33 +93,34 @@ bool cp::CollisionBox::PreCollisionCheck(const CollisionBox* collision)
 		return true;
 		break;
 	case CollisionSide::left:
-		return collision->GetCollisionSide()& CollisionSide::right;
+		return (collision->GetCollisionSide()& CollisionSide::right) && (rigid->GetVelocity().x < -FLT_EPSILON);
 		break;
 	case CollisionSide::up:
-		return collision->GetCollisionSide() & CollisionSide::down;
+		return (collision->GetCollisionSide() & CollisionSide::down) && (rigid->GetVelocity().y > FLT_EPSILON);
 		break;
 	case CollisionSide::right:
-		return collision->GetCollisionSide() & CollisionSide::left;
+		return (collision->GetCollisionSide() & CollisionSide::left) && (rigid->GetVelocity().x > FLT_EPSILON);
 		break;
 	case CollisionSide::down:
-		return collision->GetCollisionSide() & CollisionSide::up;
+		return (collision->GetCollisionSide() & CollisionSide::up) && (rigid->GetVelocity().y < -FLT_EPSILON);
 		break;
 	}
 	return false;
 }
 
-void cp::CollisionBox::CheckCollision(const float elapsedSec)
+void cp::CollisionBox::CheckCollision(const float)
 {
 	GameObject* self = this->m_pOwner;
 	m_CurrentWorldBox = GetWorldCollision(self, this);
+
+	RigidBody* rigidBody = self->GetComponent<RigidBody>(cp::ComponentType::_RigidBody);
+	if (rigidBody == nullptr)
+		return;
 	// for dynamic collision
 	// we check any active gameobject
 	// that has a collision component
 	if (m_CollisionType == CollisionType::_dynamic) 
 	{
-		// to be replaced by the force of rigid body
-		glm::vec2 velocity = { 0.f, -98.1f * elapsedSec };
-
 		Scene* activeScene = SceneManager::GetInstance().GetActiveScene();
 		std::vector<GameObject*> levelObjects = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::level);
 		size_t amountOfObjects = levelObjects.size();
@@ -127,23 +138,25 @@ void cp::CollisionBox::CheckCollision(const float elapsedSec)
 				if (otherCollision->GetCollisionType() != CollisionType::_static)
 					continue;
 
-				if (!PreCollisionCheck(otherCollision))
+				if (!PreCollisionCheck(otherCollision, rigidBody))
 					continue;
 
-				if (!RectCollision(m_CurrentWorldBox, GetWorldCollision(other, otherCollision)))
-					continue;
+				//if (!RectCollisionAABB(m_CurrentWorldBox, GetWorldCollision(other, otherCollision)))
+				//	continue;
 
-				RigidBody* rigidBody = self->GetComponent<RigidBody>(cp::ComponentType::_RigidBody);
-				if (rigidBody == nullptr)
-					continue;
-
-				HandleCollision(other, rigidBody);
+				glm::vec2 normal;
+				float entryTime = SweptAABB(GetWorldCollision(self, this), rigidBody->GetVelocity(), GetWorldCollision(other, otherCollision), normal);
+				
+				if (entryTime < 1.f)
+				{
+					HandleCollision(other, rigidBody, entryTime);
+				}
 			}
 		}
 	}
 }
 
-void cp::CollisionBox::HandleCollision(GameObject* other, RigidBody* rigidBody)
+void cp::CollisionBox::HandleCollision(GameObject* other, RigidBody* rigidBody, float entryTime)
 {
 	this->m_pOwner->OnCollisionCallback(this->m_pOwner, other, m_CollisionSide);
 
@@ -152,15 +165,25 @@ void cp::CollisionBox::HandleCollision(GameObject* other, RigidBody* rigidBody)
 		// not implemented yet
 	}
 	else if (m_CollisionSide == CollisionSide::right)
+	{
 		rigidBody->SetIsColRight(true);
+		rigidBody->SetEntryLRTime(entryTime);
+	}
 	else if (m_CollisionSide == CollisionSide::up)
+	{
 		rigidBody->SetIsColUp(true);
+		rigidBody->SetEntryUDTime(entryTime);
+	}
 	else if (m_CollisionSide == CollisionSide::left)
+	{
 		rigidBody->SetIsColLeft(true);
+		rigidBody->SetEntryLRTime(entryTime);
+	}
 	else if (m_CollisionSide == CollisionSide::down)
 	{
 		rigidBody->SetIsColDown(true);
 		rigidBody->SetIsOnGround(true);
+		rigidBody->SetEntryUDTime(entryTime);
 	}
 }
 
@@ -173,4 +196,74 @@ SDL_Rect cp::CollisionBox::GetWorldCollision(const GameObject* obj, const Collis
 	rect.x += (int)offset.x;
 	rect.y += (int)offset.y;
 	return rect;
+}
+
+void cp::CollisionBox::CalculateInverseEE(float& entry, float& exit, float vel, float v1, float w1, float v2, float w2) const
+{
+	if (vel > 0.0f)
+	{
+		entry = v2 - (v1 + w1);
+		exit = (v2 + w2) - v1;
+	}
+	else
+	{
+		entry = (v2 + w2) - v1;
+		exit = v2 - (v1 + w1);
+	}
+}
+
+void cp::CollisionBox::CalculateEE(float& entry, float& exit, float vel, float invEntry, float invExit) const
+{
+	if (vel == 0.f)
+	{
+		entry = -std::numeric_limits<float>::infinity();
+		exit = std::numeric_limits<float>::infinity();
+	}
+	else
+	{
+		entry = invEntry / vel;
+		exit = invExit / vel;
+	}
+}
+
+SDL_Rect cp::CollisionBox::CalculateBroadBox(const SDL_Rect& box, glm::vec2 vel) const
+{
+	float x = (vel.x > 0.f) ? box.x : box.x + vel.x;
+	float y = (vel.y > 0.f) ? box.y : box.y + vel.y;
+	float w = box.w + abs(vel.x);
+	float h = box.h + abs(vel.y);
+
+	return SDL_Rect{ (int)x, (int)y, (int)w, (int)h };
+}
+
+// https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+float cp::CollisionBox::SweptAABB(SDL_Rect b1, glm::vec2 velocity, SDL_Rect b2, glm::vec2&)
+{
+	glm::vec2 vel = velocity;
+	vel.y *= -1.f;
+	SDL_Rect broadBox = CalculateBroadBox(b1, vel);
+	
+	if (!IsColliding(broadBox, b2))
+	{
+		return 1.f;
+	}
+
+	glm::vec2 inverseEntry{}, inverseExit{};
+
+	// find the distance between the objects on the near and far sides for both x and y 
+	CalculateInverseEE(inverseEntry.x, inverseExit.x, vel.x, (float)b1.x, (float)b1.w, (float)b2.x, (float)b2.w);
+	CalculateInverseEE(inverseEntry.y, inverseExit.y, vel.y, (float)b1.y, (float)b1.h, (float)b2.y, (float)b2.h);
+
+	glm::vec2 entry{}, exit{};
+	
+	CalculateEE(entry.x, exit.x, vel.x, inverseEntry.x, inverseExit.x);
+	CalculateEE(entry.y, exit.y, vel.y, inverseEntry.y, inverseExit.y);
+
+	float entryTime = std::max<float>(entry.x, entry.y);
+	float exitTime = std::min<float>(exit.x, exit.y);
+
+	if (entryTime > exitTime || (entry.x < 0.f && entry.y < 0.f) || entry.x > 1.f || entry.y > 1.f)
+		return 1.f;
+
+	return entryTime;
 }

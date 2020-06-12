@@ -32,4 +32,22 @@ namespace Game
 		virtual void Execute(const cp::GameObject* actor) override;
 	};
 
+
+	class ControllerJumpCommand final : public cp::Command
+	{
+	public:
+		virtual void Execute(const cp::GameObject* actor) override;
+	};
+
+	class ControllerHorizontalCommand final : public cp::Command
+	{
+	public:
+		virtual void Execute(const cp::GameObject* actor) override;
+	};
+
+	class ControllerFIreCommand final : public cp::Command
+	{
+	public:
+		virtual void Execute(const cp::GameObject* actor) override;
+	};
 }

@@ -127,8 +127,24 @@ void cp::InputHandler::HandleInput(const GameObject* actor) const
 				}
 			}
 		}
+
+		for (const auto& axie : m_ControllerAxies)
+		{
+			if (IsActive(axie.first, (int)type - (int)cp::GameObjectType::Player2))
+				Execute(axie.first, actor);
+		}
 	}
 
+}
+
+void cp::InputHandler::AddInput(ControllerAxis axie, Command* command)
+{
+#if defined(_DEBUG)
+	if (m_ControllerAxies[axie] != nullptr)
+		cp::Logger::GetInstance().Log(cp::LogLevel::Warning, "InputHandler::AddInput axis already had a command!");
+#endif
+	m_ControllerAxies[axie] = command;
+	// no need to add the axis as this is a controller input wich is updated evry frame
 }
 
 void cp::InputHandler::AddInput(ControllerButton button, InputState state, Command* command)
@@ -204,6 +220,19 @@ bool cp::InputHandler::IsReleased(KeyboardKey key) const
 bool cp::InputHandler::IsReleased(MouseButton button) const
 {
 	return InputManager::GetInstance().IsReleased(button);
+}
+
+bool cp::InputHandler::IsActive(ControllerAxis axis, int controllerId) const
+{
+	float axisValue = InputManager::GetInstance().GetControllerAxisValue(axis, controllerId);
+	return abs(axisValue) > 0.f;
+}
+
+void cp::InputHandler::Execute(ControllerAxis axie, const GameObject* actor) const
+{
+	Command* pCommand = m_ControllerAxies.at(axie);
+	if (pCommand)
+		pCommand->Execute(actor);
 }
 
 void cp::InputHandler::Execute(ControllerButton button, InputState state, const GameObject* actor) const

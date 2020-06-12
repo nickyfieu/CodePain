@@ -9,6 +9,7 @@ namespace cp
 		RigidBody(bool applyGravity = true);
 		virtual ~RigidBody();
 
+		void PreFixedUpdate(float elapsedSec);
 		virtual void Update(float elapsedSec) override;
 		virtual void FixedUpdate(float elapsedSec) override;
 		virtual void Draw() const override;
@@ -23,6 +24,8 @@ namespace cp
 		void AddForce(const glm::vec2& force, const BaseComponent* owner);
 
 		glm::vec2 GetForce() const { return m_Force; }
+		// note the actual velocity is velocity.x , -velocity.y ! ! ! ! ! 
+		glm::vec2 GetVelocity() const { return m_Velocity; }
 		bool GetColLeft() const { return m_IsColLeft; }
 		bool GetColDown() const { return m_IsColDown; }
 		bool GetColRight() const { return m_IsColRight; }
@@ -35,7 +38,10 @@ namespace cp
 		void SetIsColUp(bool col);
 		void SetIsOnGround(bool col);
 		void SetUseGravit(bool use);
-		void SetResetForceEachFrame(bool use);
+		void SetResetXForceEachFrame(bool use);
+
+		void SetEntryUDTime(float time);
+		void SetEntryLRTime(float time);
 
 		void SetGravitationalForce(const glm::vec2& gravity);
 
@@ -52,10 +58,13 @@ namespace cp
 		bool m_IsOnGround = false;
 
 		glm::vec2 m_Force;
-		glm::vec2 m_Gravity = { 0.f,-98.1f };
+		glm::vec2 m_Gravity = { 0.f,-500.f};
+		glm::vec2 m_Velocity;
+
+		float m_EntryUDTime, m_EntryLRTime;
 
 		bool m_ApplyGravity;
-		// implemented as it seems some games dont use accelerated gravity but a constant gravity
-		bool m_ResetForceEachFrame = true;
+
+		bool m_ResetXForceEachFrame = true;
 	};
 }
