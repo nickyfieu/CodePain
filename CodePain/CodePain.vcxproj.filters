@@ -76,6 +76,9 @@
     <ClCompile Include="InputHandler.cpp">
       <Filter>Resources\Input</Filter>
     </ClCompile>
+    <ClCompile Include="SpriteComponent.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -171,6 +174,15 @@
     <ClInclude Include="InputCommand.h">
       <Filter>Resources\Input</Filter>
     </ClInclude>
+    <ClInclude Include="SpriteComponent.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Resources\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Resources\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resources">
@@ -205,6 +217,12 @@
     </Filter>
     <Filter Include="Resources\Input">
       <UniqueIdentifier>{eed13ea9-b6d7-4900-ac8f-02f145bc2a1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Observer">
+      <UniqueIdentifier>{8587925f-091b-4652-8a2e-ef51ff506004}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\State">
+      <UniqueIdentifier>{a08cd401-ddae-4ae5-b4c5-e55a68238dbb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -28,6 +28,7 @@ namespace cp
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
+		
 		size_t m_AmountOfScenes;
 		Scene* m_pActiveScene;
 		std::vector<Scene*> m_Scenes;

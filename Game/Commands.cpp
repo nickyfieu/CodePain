@@ -71,7 +71,24 @@ void Game::ControllerHorizontalCommand::Execute(const cp::GameObject* actor)
 	
 	glm::vec2 force = rigidBody->GetForce();
 	if (axisValue < -FLT_EPSILON)
+	{
 		rigidBody->SetForce({ -75.f,force.y });
-	else if (axisValue > -FLT_EPSILON)
+	}
+	else if (axisValue > FLT_EPSILON)
+	{
 		rigidBody->SetForce({ 75.f,force.y });
+	}
+}
+
+// this command assumes to be used on the right trigger
+void Game::ControllerFIreCommand::Execute(const cp::GameObject* actor)
+{
+	cp::InputManager& inputManager = cp::InputManager::GetInstance();
+	float AxisValue = inputManager.GetControllerAxisValue(cp::ControllerAxis::RightTrigger, (int)actor->GetType() - (int)cp::GameObjectType::Player2);
+	float prevAxisValue = inputManager.GetPreviousControllerAxisValue(cp::ControllerAxis::RightTrigger, (int)actor->GetType() - (int)cp::GameObjectType::Player2);
+
+	if (!(prevAxisValue > 0.f) && (AxisValue > 0.f))
+	{
+		cp::Logger::GetInstance().Log(cp::LogLevel::Info, "Pew Pew");
+	}
 }

@@ -8,6 +8,7 @@
 #include "SceneManager.h"
 #include "Scene.h"
 #include "RigidBody.h"
+#include "Observer.h"
 
 #include <algorithm>
 #include <cmath>
@@ -124,7 +125,7 @@ void cp::CollisionBox::CheckCollision(const float)
 		Scene* activeScene = SceneManager::GetInstance().GetActiveScene();
 		std::vector<GameObject*> levelObjects = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::level);
 		size_t amountOfObjects = levelObjects.size();
-		for (int i = 0; i < amountOfObjects; i++)
+		for (size_t i = 0; i < amountOfObjects; i++)
 		{
 			GameObject* other = levelObjects[i];
 			if (!other->GetIsActive() || other == self)
@@ -132,7 +133,7 @@ void cp::CollisionBox::CheckCollision(const float)
 
 			std::vector<CollisionBox*> otherCollisions = other->GetAllComponentsOfType<CollisionBox>(cp::ComponentType::_CollisionBox);
 			size_t amountOfCollisionBoxes = otherCollisions.size();
-			for (int j = 0; j < amountOfCollisionBoxes; j++)
+			for (size_t j = 0; j < amountOfCollisionBoxes; j++)
 			{
 				CollisionBox* otherCollision = otherCollisions[j];
 				if (otherCollision->GetCollisionType() != CollisionType::_static)
@@ -149,20 +150,19 @@ void cp::CollisionBox::CheckCollision(const float)
 				
 				if (entryTime < 1.f)
 				{
-					HandleCollision(other, rigidBody, entryTime);
+					HandleCollision(rigidBody, entryTime);
 				}
 			}
 		}
 	}
 }
 
-void cp::CollisionBox::HandleCollision(GameObject* other, RigidBody* rigidBody, float entryTime)
+void cp::CollisionBox::HandleCollision(RigidBody* rigidBody, float entryTime)
 {
-	this->m_pOwner->OnCollisionCallback(this->m_pOwner, other, m_CollisionSide);
-
 	if (m_CollisionSide == CollisionSide::all)
 	{
-		// not implemented yet
+		this->m_pOwner->NotifyObservers(cp::Event::EVENT_COLLISION_OVERLAP);
+		return;
 	}
 	else if (m_CollisionSide == CollisionSide::right)
 	{
@@ -185,6 +185,8 @@ void cp::CollisionBox::HandleCollision(GameObject* other, RigidBody* rigidBody, 
 		rigidBody->SetIsOnGround(true);
 		rigidBody->SetEntryUDTime(entryTime);
 	}
+
+	this->m_pOwner->NotifyObservers(cp::Event::EVENT_COLLISION_COLLIDE);
 }
 
 
@@ -236,7 +238,10 @@ SDL_Rect cp::CollisionBox::CalculateBroadBox(const SDL_Rect& box, glm::vec2 vel)
 	return SDL_Rect{ (int)x, (int)y, (int)w, (int)h };
 }
 
+// based of
 // https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+// and
+// https://amanotes.com/using-swept-aabb-to-detect-and-process-collision/
 float cp::CollisionBox::SweptAABB(SDL_Rect b1, glm::vec2 velocity, SDL_Rect b2, glm::vec2&)
 {
 	glm::vec2 vel = velocity;

@@ -32,6 +32,12 @@ void cp::InputManager::Initialize()
 	m_ControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::LeftThumbStickY,baseAxisValues });
 	m_ControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::RightThumbStickX,baseAxisValues });
 	m_ControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::RightThumbStickY,baseAxisValues });
+	m_PreviousControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::LeftTrigger,baseAxisValues });
+	m_PreviousControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::RightTrigger,baseAxisValues });
+	m_PreviousControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::LeftThumbStickX,baseAxisValues });
+	m_PreviousControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::LeftThumbStickY,baseAxisValues });
+	m_PreviousControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::RightThumbStickX,baseAxisValues });
+	m_PreviousControllerAxisValues.insert(ControllerAxisData{ ControllerAxis::RightThumbStickY,baseAxisValues });
 }
 
 bool cp::InputManager::ProcessInput()
@@ -57,6 +63,12 @@ void cp::InputManager::ProcessControllerInput()
 	{
 		// setting previous values
 		m_PreviousControllerStates[i] = m_ControllerStates[i];
+		m_PreviousControllerAxisValues[ControllerAxis::LeftTrigger][i]		= m_ControllerAxisValues[ControllerAxis::LeftTrigger][i];
+		m_PreviousControllerAxisValues[ControllerAxis::RightTrigger][i]		= m_ControllerAxisValues[ControllerAxis::RightTrigger][i];
+		m_PreviousControllerAxisValues[ControllerAxis::LeftThumbStickX][i]	= m_ControllerAxisValues[ControllerAxis::LeftThumbStickX][i];
+		m_PreviousControllerAxisValues[ControllerAxis::LeftThumbStickY][i]	= m_ControllerAxisValues[ControllerAxis::LeftThumbStickY][i];
+		m_PreviousControllerAxisValues[ControllerAxis::RightThumbStickX][i]	= m_ControllerAxisValues[ControllerAxis::RightThumbStickX][i];
+		m_PreviousControllerAxisValues[ControllerAxis::RightThumbStickY][i] = m_ControllerAxisValues[ControllerAxis::RightThumbStickY][i];
 
 		// getting new state
 		XINPUT_STATE state;
@@ -75,10 +87,10 @@ void cp::InputManager::ProcessControllerInput()
 			float lfty = std::max<float>(-1.f, (float)state.Gamepad.sThumbLY / m_MaxAxisValue);
 			float rhtx = std::max<float>(-1.f, (float)state.Gamepad.sThumbRX / m_MaxAxisValue);
 			float rhty = std::max<float>(-1.f, (float)state.Gamepad.sThumbRY / m_MaxAxisValue);
-			m_ControllerAxisValues[ControllerAxis::LeftThumbStickX][i] = (lftx < m_AxisDreadZone) ? 0.f : lftx;
-			m_ControllerAxisValues[ControllerAxis::LeftThumbStickY][i] = (lfty < m_AxisDreadZone) ? 0.f : lfty;
-			m_ControllerAxisValues[ControllerAxis::RightThumbStickX][i] = (rhtx < m_AxisDreadZone) ? 0.f : rhtx;
-			m_ControllerAxisValues[ControllerAxis::RightThumbStickY][i] = (rhty < m_AxisDreadZone) ? 0.f : rhty;
+			m_ControllerAxisValues[ControllerAxis::LeftThumbStickX][i] = (abs(lftx) < m_AxisDreadZone) ? 0.f : lftx;
+			m_ControllerAxisValues[ControllerAxis::LeftThumbStickY][i] = (abs(lfty) < m_AxisDreadZone) ? 0.f : lfty;
+			m_ControllerAxisValues[ControllerAxis::RightThumbStickX][i] = (abs(rhtx) < m_AxisDreadZone) ? 0.f : rhtx;
+			m_ControllerAxisValues[ControllerAxis::RightThumbStickY][i] = (abs(rhty) < m_AxisDreadZone) ? 0.f : rhty;
 		}
 		else
 		{
@@ -257,9 +269,18 @@ float cp::InputManager::GetControllerAxisValue(ControllerAxis axis, int controll
 	return m_ControllerAxisValues.at(axis)[controllerID];
 }
 
+float cp::InputManager::GetPreviousControllerAxisValue(ControllerAxis axis, int controllerID) const
+{
+#if defined(_DEBUG)
+	if (!IsValidController(controllerID))
+		return 0.f;
+#endif
+	return m_PreviousControllerAxisValues.at(axis)[controllerID];
+}
+
 bool cp::InputManager::IsValidController(int controllerID) const
 {
-	if (controllerID < 0 || controllerID > m_AmountOfControllerStates)
+	if (controllerID < 0 || controllerID > (int)m_AmountOfControllerStates)
 	{
 		Logger::GetInstance().Log(cp::LogLevel::Error, "InputManager::CheckControllerID Invalid ID " + std::to_string(controllerID));
 		return false;

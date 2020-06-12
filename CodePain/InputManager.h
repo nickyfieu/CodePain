@@ -207,6 +207,7 @@ namespace cp
 		bool IsReleased(MouseButton button) const;
 
 		float GetControllerAxisValue(ControllerAxis axis, int controllerID) const;
+		float GetPreviousControllerAxisValue(ControllerAxis axis, int controllerID) const;
 
 	private:
 		bool ProcessQuit();
@@ -236,10 +237,11 @@ namespace cp
 		std::vector<unsigned short> m_ControllerStates;
 		std::vector<unsigned short> m_PreviousControllerStates;
 
-		const float m_AxisDreadZone = 0.05f;
+		const float m_AxisDreadZone = 0.5f;
 		const float m_MaxTriggerValue = 255.f;
 		const float m_MaxAxisValue = 32767.f;
 		std::unordered_map<ControllerAxis, std::vector<float>> m_ControllerAxisValues;
+		std::unordered_map<ControllerAxis, std::vector<float>> m_PreviousControllerAxisValues;
 
 		std::unordered_map<MouseButton, unsigned short> m_MouseButtonStates;
 		std::unordered_map<MouseButton, unsigned short> m_PreviousMouseButtonStates;

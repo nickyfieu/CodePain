@@ -2,10 +2,33 @@
 #include "GameObject.h"
 #include "BaseComponent.h"
 #include "Components.h"
+#include "Observer.h"
 #include "ResourceManager.h"
 #include "Renderer.h"
 #include "Logger.h"
+#include "State.h"
 #include <iomanip>
+
+void cp::GameObject::InitializeState(State* startingState)
+{
+	if (m_pCurrentState != nullptr)
+		return;
+
+	m_pCurrentState = startingState;
+}
+
+void cp::GameObject::UpdateState()
+{
+	if (m_pCurrentState != nullptr)
+	{
+		if (m_pCurrentState->UpdateState(this))
+		{
+			SAFE_DELETE(m_pCurrentState);
+			m_pCurrentState = m_pNewState;
+			m_pNewState = nullptr;
+		}
+	}
+}
 
 void cp::GameObject::Update(const float elapsedSec)
 {
@@ -78,6 +101,8 @@ void cp::GameObject::AddComponent(BaseComponent* pToAdd)
 
 cp::GameObject::GameObject(GameObjectType type)
 	: m_Type{type}
+	, m_pCurrentState{ nullptr }
+	, m_pNewState{ nullptr }
 {
 	// Forces Transform Component to be the first component so it will always be found before anything else
 	// There will also only be 1 transform component per gameobject never more ( unless there are local transform components in other components )
@@ -90,6 +115,14 @@ cp::GameObject::~GameObject()
 	{
 		SAFE_DELETE(components);
 	}
+
+	for (Observer* observer : m_pObservers)
+	{
+		SAFE_DELETE(observer);
+	}
+
+	SAFE_DELETE(m_pCurrentState);
+	SAFE_DELETE(m_pNewState);
 }
 
 void cp::GameObject::SetActive(bool active)
@@ -97,13 +130,31 @@ void cp::GameObject::SetActive(bool active)
 	m_IsActive = active;
 }
 
-void cp::GameObject::SetCollisionCallback(CollisionCallback callback)
+void cp::GameObject::AddObserver(Observer* observerToAdd)
 {
-	m_CollisionCallback = callback;
+	m_AmountOfObservers++;
+	m_pObservers.push_back(observerToAdd);
 }
 
-void cp::GameObject::OnCollisionCallback(GameObject* self, GameObject* other, CollisionBox::CollisionSide side)
+void cp::GameObject::RemoveObserver(Observer* observerToRemove)
 {
-	if (m_CollisionCallback)
-		m_CollisionCallback(self, other, side);
+	auto it = std::find(m_pObservers.cbegin(), m_pObservers.cend(), observerToRemove);
+	if (it != m_pObservers.cend())
+	{
+		m_AmountOfObservers--;
+		m_pObservers.erase(it);
+	}
+}
+
+void cp::GameObject::NotifyObservers(Event event) const
+{
+	for (size_t i = 0; i < m_AmountOfObservers; i++)
+	{
+		m_pObservers[i]->OnNotify(this, event);
+	}
+}
+
+void cp::GameObject::SetNewState(State* newState)
+{
+	m_pNewState = newState;
 }

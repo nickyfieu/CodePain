@@ -5,6 +5,16 @@
 namespace cp
 {
 	class RigidBody;
+
+	// Collision box interaction
+	//		When own collision box = dynamic
+	//			then it collides with static level collision boxes
+	//			and overlaps with other dynamic collision boxes
+	//
+	//		When own collision box = static
+	//			doesnt check for collision with anything
+	//
+	// Make sure all static collision is in a game object with 
 	class CollisionBox final : public BaseComponent
 	{
 	public:
@@ -63,7 +73,7 @@ namespace cp
 		bool IsOnGround = false;
 
 		void CheckCollision(const float elapsedSec);
-		void HandleCollision(GameObject* other, RigidBody* rigidBody, float entryTime);
+		void HandleCollision(RigidBody* rigidBody, float entryTime);
 		bool PreCollisionCheck(const CollisionBox* collision, const RigidBody* rigid);
 		SDL_Rect GetWorldCollision(const GameObject* obj, const CollisionBox* collision) const;
 

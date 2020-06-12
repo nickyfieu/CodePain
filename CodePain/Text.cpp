@@ -1,14 +1,13 @@
 #include "CodePainPCH.h"
-#include <SDL.h>
-#include <SDL_ttf.h>
-
 #include "Text.h"
 #include "Renderer.h"
 #include "Font.h"
 #include "Texture2D.h"
-
 #include "FrameRate.h"
 #include "GameObject.h"
+
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 cp::Text::Text(const std::string& text, Font* font, SDL_Color color)
 	: BaseComponent(cp::ComponentType::_Text)

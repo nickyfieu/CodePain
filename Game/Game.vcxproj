@@ -186,8 +186,10 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="LevelScene.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Observers.cpp" />
     <ClCompile Include="Scene1.cpp" />
     <ClCompile Include="SceneLoader.cpp" />
+    <ClCompile Include="States.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodePain\CodePain.vcxproj">
@@ -199,9 +201,11 @@ xcopy "$(SolutionDir)Data" "$(OutputPath)Data\" /i /s /d /y /e</Command>
     <ClInclude Include="BubbleBobbleLevelReader.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="LevelScene.h" />
+    <ClInclude Include="Observers.h" />
     <ClInclude Include="Scene1.h" />
     <ClInclude Include="SceneLoader.h" />
     <ClInclude Include="Scenes.h" />
+    <ClInclude Include="States.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

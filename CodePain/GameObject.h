@@ -16,13 +16,17 @@ namespace cp
 		Player4 = 5, // takes controller 3 input
 		Player5 = 6, // takes controller 4 input
 	};
-
-	typedef std::function<void (GameObject* selfObject, GameObject* otherObject, CollisionBox::CollisionSide side)> CollisionCallback;
 	
+	struct State;
+	struct Observer;
+	enum class Event;
 	class GameObject final
 	{
 	public:
 
+		void InitializeState(State* startingState);
+
+		void UpdateState();
 		void Update(float elapsedSec);
 		void FixedUpdate(float elapsedSec);
 		void Render() const;
@@ -44,19 +48,24 @@ namespace cp
 
 		void SetActive(bool active);
 
-		void SetCollisionCallback(CollisionCallback callback);
-		// note do not give in functions that delete the original gameobjects in the callback function! (safety)
-		void OnCollisionCallback(GameObject* self, GameObject* other, CollisionBox::CollisionSide side);
+		void AddObserver(Observer* observerToAdd);
+		void RemoveObserver(Observer* observerToRemove);
+		void NotifyObservers(Event event) const;
+
+		void SetNewState(State* newState);
 
 	private:
-		CollisionCallback m_CollisionCallback;
-
 		GameObjectType m_Type;
 
 		bool m_IsActive{ true };
 		size_t m_AmountOfComponents{};
 		std::vector<BaseComponent*> m_pComponents;
 
+		size_t m_AmountOfObservers{};
+		std::vector<Observer*> m_pObservers;
+
+		State* m_pCurrentState;
+		State* m_pNewState;
 	public:
 		template <class T>
 		bool HasComponent(ComponentType type) const

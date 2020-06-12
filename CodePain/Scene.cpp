@@ -40,6 +40,7 @@ void cp::Scene::Add(GameObject* object)
 #ifdef MULTI_THREADING
 static void UpdateActiveObject(cp::GameObject* activeObject, float elapsedSec)
 {
+	activeObject->UpdateState();
 	activeObject->Update(elapsedSec);
 }
 
@@ -59,6 +60,7 @@ void cp::Scene::HandleInput(const cp::InputHandler& inputHandler)
 void cp::Scene::Update(const float elapsedSec)
 {
 #ifdef MULTI_THREADING
+	size_t m_AmountOfFutures = 0;
 	std::vector<std::future<void>> updateFutures;
 #endif
 
@@ -67,12 +69,21 @@ void cp::Scene::Update(const float elapsedSec)
 		if (m_pObjects[i]->GetIsActive())
 		{
 #ifdef MULTI_THREADING
+			m_AmountOfFutures++;
 			updateFutures.push_back(std::async(std::launch::async, UpdateActiveObject, m_pObjects[i], elapsedSec));
 #else
+			m_pObjects[i]->UpdateState();
 			m_pObjects[i]->Update(elapsedSec);
 #endif
 		}
 	}
+
+#ifdef MULTI_THREADING
+	for (size_t i = 0; i < m_AmountOfFutures; i++)
+	{
+		updateFutures[i].get();
+	}
+#endif
 }
 
 void cp::Scene::FixedUpdate(float elapsedSec)

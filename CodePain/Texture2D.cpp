@@ -7,6 +7,7 @@
 
 cp::Texture2D::Texture2D(SDL_Texture* texture)
 	: BaseComponent{ cp::ComponentType::_Texture2D }
+	, m_FlipHorizontal{ false }
 {
 	m_pTexture = texture;
 	int width;
@@ -59,7 +60,11 @@ void cp::Texture2D::Draw() const
 	}
 	SDL_Rect dstNoFlt{};
 	dstNoFlt.x = (int)dst.x; dstNoFlt.y = (int)dst.y; dstNoFlt.w = (int)dst.w; dstNoFlt.h = (int)dst.h;
-	rendererRef.RenderTexture(m_pTexture, src, dstNoFlt);
+	
+	if (m_FlipHorizontal)
+		rendererRef.RenderTexture(m_pTexture, src, dstNoFlt, 0.0, SDL_Point{ 0,0 }, SDL_RendererFlip::SDL_FLIP_HORIZONTAL);
+	else
+		rendererRef.RenderTexture(m_pTexture, src, dstNoFlt, 0.0, SDL_Point{ 0,0 }, SDL_RendererFlip::SDL_FLIP_NONE);
 }
 
 void cp::Texture2D::AddLocalOffset(const float x,const float y)
@@ -72,6 +77,11 @@ void cp::Texture2D::SetLocalScale(float w, float h)
 {
 	m_DstRect.w = w;
 	m_DstRect.h = h;
+}
+
+void cp::Texture2D::FlipTexture(bool flip)
+{
+	m_FlipHorizontal = flip;
 }
 
 void cp::Texture2D::SetDstRect(const SDL_FRect& newDstRect)

@@ -8,3 +8,4 @@
 #include "CollisionBox.h"
 #include "ColorRect2D.h"
 #include "RigidBody.h"
+#include "SpriteComponent.h"

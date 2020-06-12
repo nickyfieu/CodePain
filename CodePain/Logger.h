@@ -112,6 +112,14 @@ namespace cp
         void AddLog(const char* fmt, ...) IM_FMTARGS(2)
         {
             int old_size = Buf.size();
+
+            if (old_size >= 10000)
+            {
+                Save();
+                Clear();
+                old_size = 0;
+            }
+
             va_list args;
             va_start(args, fmt);
             Buf.appendfv(fmt, args);
