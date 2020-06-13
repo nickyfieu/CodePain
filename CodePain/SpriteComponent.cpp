@@ -65,10 +65,10 @@ void cp::SpriteComponent::Update(const float elapsedSec)
 		if (calculateNextFrame)
 		{
 			SDL_Rect newSrcRect{};
-			newSrcRect.x = sprite.xOffset + sprite.spriteWidth * (m_NrOfFinishedFrames % sprite.spritesX);
-			newSrcRect.y = sprite.yOffset + sprite.spriteHeight * (((m_NrOfFinishedFrames % (sprite.spritesX * sprite.spritesY) ) / sprite.spritesX));
-			newSrcRect.w = sprite.spriteWidth;
-			newSrcRect.h = sprite.spriteHeight;
+			newSrcRect.x = int(sprite.xOffset + sprite.spriteWidth * (m_NrOfFinishedFrames % sprite.spritesX));
+			newSrcRect.y = int(sprite.yOffset + sprite.spriteHeight * (((m_NrOfFinishedFrames % (sprite.spritesX * sprite.spritesY) ) / sprite.spritesX)));
+			newSrcRect.w = int(sprite.spriteWidth);
+			newSrcRect.h = int(sprite.spriteHeight);
 			m_TextureComponent->SetSrcRect(newSrcRect);
 		}
 	}
@@ -111,7 +111,7 @@ void cp::SpriteComponent::UnPause()
 
 void cp::SpriteComponent::SetAnimation(const std::string& name)
 {
-	size_t strHash = std::hash<std::string>{}(name);
+	unsigned int strHash = (unsigned int)std::hash<std::string>{}(name);
 
 	if (m_Sprites.find(strHash) != m_Sprites.end())
 	{
@@ -119,10 +119,10 @@ void cp::SpriteComponent::SetAnimation(const std::string& name)
 		ResetSpriteTimeData();
 		Sprite sprite = m_Sprites[strHash];
 		SDL_Rect newSrcRect{};
-		newSrcRect.x = sprite.xOffset + sprite.spriteWidth * (m_NrOfFinishedFrames % sprite.spritesX);
-		newSrcRect.y = sprite.yOffset + sprite.spriteHeight * ((m_NrOfFinishedFrames % (sprite.spritesX * sprite.spritesY)) / sprite.spritesY);
-		newSrcRect.w = sprite.spriteWidth;
-		newSrcRect.h = sprite.spriteHeight;
+		newSrcRect.x = int(sprite.xOffset + sprite.spriteWidth * (m_NrOfFinishedFrames % sprite.spritesX));
+		newSrcRect.y = int(sprite.yOffset + sprite.spriteHeight * ((m_NrOfFinishedFrames % (sprite.spritesX * sprite.spritesY)) / sprite.spritesY));
+		newSrcRect.w = int(sprite.spriteWidth);
+		newSrcRect.h = int(sprite.spriteHeight);
 		m_TextureComponent->SetSrcRect(newSrcRect);
 		m_TextureComponent->FlipTexture(sprite.flipTexture);
 	}
@@ -136,7 +136,7 @@ void cp::SpriteComponent::SetAnimation(const std::string& name)
 
 void cp::SpriteComponent::AddAnimation(const std::string& name, const Sprite& sprite)
 {
-	size_t strHash = std::hash<std::string>{}(name);
+	unsigned int strHash = (unsigned int)std::hash<std::string>{}(name);
 #if defined(_DEBUG)
 	if (m_Sprites.find(strHash) != m_Sprites.end())
 	{

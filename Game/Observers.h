@@ -35,5 +35,18 @@ namespace Game
 		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
 	};
 
+	struct BottomLevelCollision final : public cp::Observer
+	{
+		BottomLevelCollision() = default;
+		virtual ~BottomLevelCollision() = default;
+
+		BottomLevelCollision& operator=(const BottomLevelCollision&) = delete;
+		BottomLevelCollision& operator=(BottomLevelCollision&&) = delete;
+		BottomLevelCollision(const BottomLevelCollision&) = delete;
+		BottomLevelCollision(BottomLevelCollision&&) = delete;
+
+		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
+	};
+
 }
 

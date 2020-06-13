@@ -64,7 +64,7 @@ void Game::BubbleBobbleDataReader::ReadEnemyData(const std::string& enemyDataPat
 	const unsigned int byteCollumnRowShift = 3;
 	const unsigned char boolBitsMask = 0b10000000;
 	const unsigned char delayMask = 0b00111111;
-	const float delayMultiplier = 0.017f;
+	const float delayMultiplier = 0.025f;
 
 	std::vector<BubbleBobbleEnemyData> currentLevelEnemyData;
 	while (m_CurrentLevel < 100 && !m_ReadWrite.IsReadEOF())
@@ -90,7 +90,7 @@ void Game::BubbleBobbleDataReader::ReadEnemyData(const std::string& enemyDataPat
 		enemy.unknown3 = (secondByte & (boolBitsMask >> 7));
 		enemy.unknown4 = (thirdByte & (boolBitsMask >> 0));
 		enemy.isMovingLeft = (thirdByte & (boolBitsMask >> 1));
-		enemy.delay = float(thirdByte << 1) * delayMultiplier;
+		enemy.delay = float((thirdByte & delayMask) << 1) * delayMultiplier;
 		currentLevelEnemyData.push_back(enemy);
 	}
 }
@@ -98,10 +98,7 @@ void Game::BubbleBobbleDataReader::ReadEnemyData(const std::string& enemyDataPat
 const std::vector<Game::BubbleBobbleEnemyData>& Game::BubbleBobbleDataReader::GetLevelEnemyData(size_t level) const
 {
 	if (m_EnemyDataContainer.find(level) == m_EnemyDataContainer.cend())
-	{
-		std::vector<Game::BubbleBobbleEnemyData> empty{};
-		return empty;
-	}
+		return m_EmptyData;
 
 	return m_EnemyDataContainer.at(level);
 }

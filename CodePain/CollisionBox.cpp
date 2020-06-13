@@ -86,12 +86,12 @@ bool cp::CollisionBox::IsColliding(const SDL_Rect& self, const SDL_Rect& other) 
 	return !(lft > 0.f || rht < 0.f || top < 0.f || bot > 0.f);
 }
 
-bool cp::CollisionBox::PreCollisionCheck(const CollisionBox* collision, const RigidBody* rigid)
+bool cp::CollisionBox::StaticPreColCheck(const CollisionBox* collision, const RigidBody* rigid)
 {
 	switch (m_CollisionSide)
 	{
 	case CollisionSide::all:
-		return true;
+		return false;
 		break;
 	case CollisionSide::left:
 		return (collision->GetCollisionSide()& CollisionSide::right) && (rigid->GetVelocity().x < -FLT_EPSILON);
@@ -122,12 +122,12 @@ void cp::CollisionBox::CheckCollision(const float)
 	// that has a collision component
 	if (m_CollisionType == CollisionType::_dynamic) 
 	{
+		m_pOverlapObjRef = nullptr;
 		Scene* activeScene = SceneManager::GetInstance().GetActiveScene();
-		std::vector<GameObject*> levelObjects = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::level);
-		size_t amountOfObjects = levelObjects.size();
+		size_t amountOfObjects = activeScene->GetAmountOfGameObjects();
 		for (size_t i = 0; i < amountOfObjects; i++)
 		{
-			GameObject* other = levelObjects[i];
+			GameObject* other = activeScene->GetGameObject(i);
 			if (!other->GetIsActive() || other == self)
 				continue;
 
@@ -136,21 +136,34 @@ void cp::CollisionBox::CheckCollision(const float)
 			for (size_t j = 0; j < amountOfCollisionBoxes; j++)
 			{
 				CollisionBox* otherCollision = otherCollisions[j];
-				if (otherCollision->GetCollisionType() != CollisionType::_static)
-					continue;
-
-				if (!PreCollisionCheck(otherCollision, rigidBody))
-					continue;
-
-				//if (!RectCollisionAABB(m_CurrentWorldBox, GetWorldCollision(other, otherCollision)))
-				//	continue;
-
-				glm::vec2 normal;
-				float entryTime = SweptAABB(GetWorldCollision(self, this), rigidBody->GetVelocity(), GetWorldCollision(other, otherCollision), normal);
-				
-				if (entryTime < 1.f)
+				if (otherCollision->GetCollisionType() == CollisionType::_static)
 				{
-					HandleCollision(rigidBody, entryTime);
+					if (!StaticPreColCheck(otherCollision, rigidBody))
+						continue;
+
+					glm::vec2 normal;
+					float entryTime = SweptAABB(GetWorldCollision(self, this), rigidBody->GetVelocity(), GetWorldCollision(other, otherCollision), normal);
+					if (entryTime < 1.f)
+					{
+						HandleCollision(rigidBody, entryTime);
+					}
+				}
+				else
+				{
+					if (otherCollision->GetCollisionSide() != CollisionSide::all)
+						continue;
+
+					if (m_CollisionSide != CollisionSide::all)
+						continue;
+					
+					if (m_pOwner->GetType() == other->GetType())
+						continue;
+
+					if (RectCollisionAABB(m_CurrentWorldBox, GetWorldCollision(other, otherCollision)))
+					{
+						m_pOverlapObjRef = other;
+						this->m_pOwner->NotifyObservers(cp::Event::EVENT_COLLISION_OVERLAP);
+					}
 				}
 			}
 		}
@@ -159,11 +172,6 @@ void cp::CollisionBox::CheckCollision(const float)
 
 void cp::CollisionBox::HandleCollision(RigidBody* rigidBody, float entryTime)
 {
-	if (m_CollisionSide == CollisionSide::all)
-	{
-		this->m_pOwner->NotifyObservers(cp::Event::EVENT_COLLISION_OVERLAP);
-		return;
-	}
 	if (m_CollisionSide == CollisionSide::right)
 	{
 		rigidBody->SetIsColRight(true);

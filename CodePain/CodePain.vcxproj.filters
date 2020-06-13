@@ -206,9 +206,6 @@
     <Filter Include="Resources\Context">
       <UniqueIdentifier>{3416675c-7f1c-48d0-920b-f4cbe7fbad0f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources\Diagnostics">
-      <UniqueIdentifier>{eddfc8ca-517b-4c82-be10-7168fe5f943b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resources\SceneGraph">
       <UniqueIdentifier>{3aba5d30-4755-47bd-a7d0-a9ce33d024ef}</UniqueIdentifier>
     </Filter>
@@ -232,6 +229,9 @@
     </Filter>
     <Filter Include="Resources\State">
       <UniqueIdentifier>{a08cd401-ddae-4ae5-b4c5-e55a68238dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Diagnostics">
+      <UniqueIdentifier>{eddfc8ca-517b-4c82-be10-7168fe5f943b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

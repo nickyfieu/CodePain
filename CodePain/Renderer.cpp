@@ -25,7 +25,7 @@ void cp::Renderer::Init(SDL_Window * window)
 
 #ifdef _DEBUG
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(m_Renderer, 960, 500);
+	ImGuiSDL::Initialize(m_Renderer, 1170, 500);
 #endif
 }
 

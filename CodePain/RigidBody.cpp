@@ -24,6 +24,9 @@ void cp::RigidBody::PreFixedUpdate(float elapsedSec)
 	if (m_ApplyGravity)
 		m_Force += m_Gravity * elapsedSec;
 
+	if (m_Force.y < m_TerminalVel)
+		m_Force.y = m_TerminalVel;
+
 	m_Velocity = m_Force * elapsedSec;
 
 	m_EntryUDTime = 1.f;
@@ -114,6 +117,11 @@ void cp::RigidBody::SetEntryLRTime(float time)
 {
 	if (time < m_EntryLRTime)
 		m_EntryLRTime = time;
+}
+
+void cp::RigidBody::SetTerminalVel(float vel)
+{
+	m_TerminalVel = vel;
 }
 
 void cp::RigidBody::SetGravitationalForce(const glm::vec2& gravity)

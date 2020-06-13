@@ -72,11 +72,11 @@ void Game::ControllerHorizontalCommand::Execute(const cp::GameObject* actor)
 	glm::vec2 force = rigidBody->GetForce();
 	if (axisValue < -FLT_EPSILON)
 	{
-		rigidBody->SetForce({ -75.f,force.y });
+		rigidBody->SetForce({ -100.f,force.y });
 	}
 	else if (axisValue > FLT_EPSILON)
 	{
-		rigidBody->SetForce({ 75.f,force.y });
+		rigidBody->SetForce({ 100.f,force.y });
 	}
 }
 

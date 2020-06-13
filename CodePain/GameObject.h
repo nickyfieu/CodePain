@@ -30,7 +30,6 @@ namespace cp
 	class GameObject final
 	{
 	public:
-
 		void InitializeState(State* startingState);
 
 		void UpdateState();
@@ -60,6 +59,7 @@ namespace cp
 		void NotifyObservers(Event event) const;
 
 		void SetNewState(State* newState);
+		void SetInactiveTimer(float inactivityTIme);
 
 	private:
 		GameObjectType m_Type;
@@ -73,6 +73,8 @@ namespace cp
 
 		State* m_pCurrentState;
 		State* m_pNewState;
+
+		float m_InactiveTimer{ 0.f };
 	public:
 		template <class T>
 		bool HasComponent(ComponentType type) const

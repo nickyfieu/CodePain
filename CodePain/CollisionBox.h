@@ -68,13 +68,16 @@ namespace cp
 		inline CollisionSide GetCollisionSide() const { return m_CollisionSide; }
 		inline CollisionType GetCollisionType() const { return m_CollisionType; }
 
+		GameObject* GetOvelapObj() const { return m_pOverlapObjRef; }
 
 	private:
+		GameObject* m_pOverlapObjRef = nullptr;
+
 		bool IsOnGround = false;
 
 		void CheckCollision(const float elapsedSec);
 		void HandleCollision(RigidBody* rigidBody, float entryTime);
-		bool PreCollisionCheck(const CollisionBox* collision, const RigidBody* rigid);
+		bool StaticPreColCheck(const CollisionBox* collision, const RigidBody* rigid);
 		SDL_Rect GetWorldCollision(const GameObject* obj, const CollisionBox* collision) const;
 
 		void CalculateInverseEE(float& entry, float& exit, float vel, float v1, float w1, float v2, float w2) const;

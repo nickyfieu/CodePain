@@ -19,7 +19,7 @@ void Game::LevelScene::LoadSceneData() const
 	BubbleBobbleDataReader& dataReader = BubbleBobbleDataReader::GetInstance();
 	dataReader.ReadLevelData(scene, "LevelData/SeperatedLevelData.dat", "LevelData/LevelParallaxColors.png");
 	dataReader.ReadEnemyData("CharacterData/SeperatedEnemyData.dat");
-	
+
 #pragma region enemySpawner
 	{
 		cp::GameManager& gameManager = cp::GameManager::GetInstance();
@@ -70,7 +70,7 @@ void Game::LevelScene::LoadSceneData() const
 		sprite->AddAnimation("ShootRight", anim);
 		anim.flipTexture = true;
 		sprite->AddAnimation("ShootLeft", anim);
-		sprite->SetAnimation("DieRight");
+		sprite->SetAnimation("IdleRight");
 		sprite->UnPause();
 		p1->AddComponent(sprite);
 		texture->SetOwner(p1);
@@ -79,10 +79,11 @@ void Game::LevelScene::LoadSceneData() const
 		p1->AddComponent(new cp::CollisionBox(31, -18, 3, 15, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_dynamic));
 		p1->AddComponent(new cp::CollisionBox(6, -18, 3, 15, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_dynamic));
 		p1->AddComponent(new cp::CollisionBox(6, -3, 28, 3, cp::CollisionBox::CollisionSide::down, cp::CollisionBox::CollisionType::_dynamic));
+		p1->AddComponent(new cp::CollisionBox(9, -15, 22, 12, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
 		p1->AddComponent(new cp::RigidBody(true));
 
 		// translation
-		p1->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(100, -50, 0);
+		p1->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(60, -480, 0);
 
 		cp::Command* jmpCommand = new Game::JumpCommand();
 		cp::Command* lftCommand = new Game::LeftCommand();
@@ -95,6 +96,7 @@ void Game::LevelScene::LoadSceneData() const
 
 		// notify
 		p1->AddObserver(new Game::IdleEvent());
+		p1->AddObserver(new Game::BottomLevelCollision());
 
 	}
 #pragma endregion
@@ -141,7 +143,7 @@ void Game::LevelScene::LoadSceneData() const
 		sprite->AddAnimation("ShootRight", anim);
 		anim.flipTexture = true;
 		sprite->AddAnimation("ShootLeft", anim);
-		sprite->SetAnimation("ShootLeft");
+		sprite->SetAnimation("IdleLeft");
 		sprite->UnPause();
 		p2->AddComponent(sprite);
 		texture->SetOwner(p2);
@@ -150,10 +152,11 @@ void Game::LevelScene::LoadSceneData() const
 		p2->AddComponent(new cp::CollisionBox(35, -18, 3, 15, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_dynamic));
 		p2->AddComponent(new cp::CollisionBox(3, -18, 3, 15, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_dynamic));
 		p2->AddComponent(new cp::CollisionBox(3, -3, 34, 3, cp::CollisionBox::CollisionSide::down, cp::CollisionBox::CollisionType::_dynamic));
+		p2->AddComponent(new cp::CollisionBox(9, -15, 22, 12, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
 		p2->AddComponent(new cp::RigidBody(true));
 
 		// translation
-		p2->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(100, -50, 0);
+		p2->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(540, -480, 0);
 
 		cp::Command* controllerJmpCommand = new Game::ControllerJumpCommand();
 		cp::Command* controllerHrzCommand = new Game::ControllerHorizontalCommand();
@@ -164,11 +167,12 @@ void Game::LevelScene::LoadSceneData() const
 
 		// notify
 		p2->AddObserver(new Game::IdleEvent());
+		p2->AddObserver(new Game::BottomLevelCollision());
 	}
 
 #pragma endregion
 
-#pragma region SideCollision
+#pragma region ExtraLevelCollision
 
 	std::vector<cp::GameObject*> levelObjects = scene->GetAllGameObjectsOfType(cp::GameObjectType::level);
 
@@ -176,6 +180,7 @@ void Game::LevelScene::LoadSceneData() const
 	{
 		levelObjects[i]->AddComponent(new cp::CollisionBox(0, -500, 2 * 20, 20 * 25 + 2 * 500, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_static));
 		levelObjects[i]->AddComponent(new cp::CollisionBox((20 * 30), -500, 2 * 20, 20 * 25 + 2 * 500, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_static));
+		levelObjects[i]->AddComponent(new cp::CollisionBox(40, 540, 560, 40, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
 	}
 
 #pragma endregion

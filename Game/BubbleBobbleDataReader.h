@@ -27,6 +27,7 @@ namespace Game
 		friend class cp::Singleton<BubbleBobbleDataReader>;
 		BubbleBobbleDataReader() = default;
 
+		const std::vector<Game::BubbleBobbleEnemyData> m_EmptyData{};
 		std::unordered_map<size_t, std::vector<BubbleBobbleEnemyData>> m_EnemyDataContainer;
 
 		static const unsigned int m_AmountOfLevels = 100;

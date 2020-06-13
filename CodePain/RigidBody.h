@@ -42,8 +42,10 @@ namespace cp
 
 		void SetEntryUDTime(float time);
 		void SetEntryLRTime(float time);
+		void SetTerminalVel(float vel);
 
 		void SetGravitationalForce(const glm::vec2& gravity);
+
 
 	private:
 
@@ -56,6 +58,8 @@ namespace cp
 		bool m_IsColUp = false;
 		// same as is col down but only for static
 		bool m_IsOnGround = false;
+
+		float m_TerminalVel = -200.f;
 
 		glm::vec2 m_Force;
 		glm::vec2 m_Gravity = { 0.f,-500.f};

@@ -36,10 +36,10 @@ void cp::CodePain::Initialize()
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 #ifdef _DEBUG
-		960,
+		1170,
 		500,
 #else
-		640,
+		850,
 		500,
 #endif
 		SDL_WINDOW_OPENGL
@@ -51,12 +51,12 @@ void cp::CodePain::Initialize()
 
 	Renderer::GetInstance().Init(m_Window);
 
+	ResourceManager::GetInstance().Init("../Data/");
+
 #ifdef _DEBUG
 	ImGuiInit();
 	AllocConsole();
 #endif
-
-	ResourceManager::GetInstance().Init("../Data/");
 
 	m_IsInitialized = true;
 }
@@ -166,11 +166,11 @@ void cp::CodePain::ImGuiUpdate()
 {
 	ImGui::NewFrame();
 	// debug dockspace
-	ImGui::SetNextWindowPos(ImVec2(640.0f, 0.f));
+	ImGui::SetNextWindowPos(ImVec2(850.f, 0.f));
 	ImGui::SetNextWindowSizeConstraints(ImVec2(320.f, 500.f), ImVec2(320.f, 500.f));
 	ImGui::Begin(" ", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration);
 	ImGuiID dockspace_id = ImGui::GetID(" ");
-	ImGui::DockSpace(dockspace_id, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_NoResize);
+	ImGui::DockSpace(dockspace_id, ImVec2(320.f, 500.f), ImGuiDockNodeFlags_NoResize);
 	ImGui::End();
 
 #if defined(DEBUGLOGGER)
@@ -204,27 +204,24 @@ void cp::CodePain::ImGuiDebug_Levels()
 	SceneManager& sceneManager = SceneManager::GetInstance();
 	Scene* scene = sceneManager.GetActiveScene();
 	GameManager& gameManager = GameManager::GetInstance();
-	int currentLevel = gameManager.GetCurrentLevel();
-	int oldLevel = currentLevel;
+	int currentLevel = (int)gameManager.GetCurrentLevel();
+	int oldLevel = (int)currentLevel;
 
 	ImGui::Begin("Level window", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-	if (ImGui::Button("PreviousLevel") && currentLevel > 1)
-	{
-		currentLevel--;
-		scene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
-	}
+	if (ImGui::Button("PreviousLevel") && currentLevel > 1) currentLevel--;
 	ImGui::SameLine();
-	if (ImGui::Button("NextLevel") && currentLevel < 100)
-	{
-		currentLevel++;
-		scene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
-	}
+	if (ImGui::Button("NextLevel") && currentLevel < 100) currentLevel++;
 	ImGui::SameLine();
 	bool spawnEnemies = ImGui::Button("SpawnEnemies");
 	ImGui::PushItemWidth(-100);
 	ImGui::SliderInt("Current Level", &currentLevel, 1, 100);
 
-	gameManager.SetCurrentLevel(currentLevel);
+	if (currentLevel != oldLevel)
+	{
+		scene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+	}
+
+	gameManager.SetCurrentLevel((size_t)currentLevel);
 	if (spawnEnemies)
 	{
 		gameManager.GetManagerObj()->NotifyObservers(cp::Event::EVENT_SPAWN_ENEMIES);

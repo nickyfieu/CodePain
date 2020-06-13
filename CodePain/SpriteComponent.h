@@ -50,6 +50,7 @@ namespace cp
 		void AddAnimation(const std::string& name, const Sprite& sprite);
 
 		bool IsFinished() const { return m_NrOfFinishedLoops >= m_Sprites.at(m_CurrentAnimation).nrOfLoops; }
+		unsigned int GetCurrentAnim() const { return m_CurrentAnimation; }
 		Texture2D* GetTextureComponent() const { return m_TextureComponent; }
 
 	protected:

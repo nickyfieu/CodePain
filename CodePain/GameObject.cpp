@@ -32,12 +32,21 @@ void cp::GameObject::UpdateState()
 
 void cp::GameObject::Update(const float elapsedSec)
 {
+	if (m_InactiveTimer > 0.f)
+	{
+		m_InactiveTimer -= elapsedSec;
+		return;
+	}
+
 	for (size_t i = 0; i < m_AmountOfComponents; i++)
 		m_pComponents[i]->Update(elapsedSec);
 }
 
 void cp::GameObject::FixedUpdate(float elapsedSec)
 {
+	if (m_InactiveTimer > 0.f)
+		return;
+
 	size_t amountOfRigidBodies = 0;
 	std::vector<RigidBody*> m_RigidBodies;
 	size_t amountOfCollisionBoxes = 0;
@@ -157,4 +166,9 @@ void cp::GameObject::NotifyObservers(Event event) const
 void cp::GameObject::SetNewState(State* newState)
 {
 	m_pNewState = newState;
+}
+
+void cp::GameObject::SetInactiveTimer(float inactivityTIme)
+{
+	m_InactiveTimer = inactivityTIme;
 }
