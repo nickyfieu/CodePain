@@ -22,5 +22,18 @@ namespace Game
 		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
 	};
 
+	struct SpawnLevelEnemies final : public cp::Observer
+	{
+		SpawnLevelEnemies() = default;
+		virtual ~SpawnLevelEnemies() = default;
+
+		SpawnLevelEnemies& operator=(const SpawnLevelEnemies&) = delete;
+		SpawnLevelEnemies& operator=(SpawnLevelEnemies&&) = delete;
+		SpawnLevelEnemies(const SpawnLevelEnemies&) = delete;
+		SpawnLevelEnemies(SpawnLevelEnemies&&) = delete;
+
+		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
+	};
+
 }
 

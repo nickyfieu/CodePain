@@ -2,7 +2,7 @@
 #include "LevelScene.h"
 #include "Scene.h"
 #include "ResourceManager.h"
-#include "BubbleBobbleLevelReader.h"
+#include "BubbleBobbleDataReader.h"
 #include "GameObject.h"
 #include "Logger.h"
 #include "Components.h"
@@ -11,23 +11,20 @@
 #include "Commands.h"
 #include "States.h"
 #include "Observers.h"
+#include "GameManager.h"
 
 void Game::LevelScene::LoadSceneData() const
 {
 	cp::Scene* scene = cp::SceneManager::GetInstance().CreateScene("LevelScene");
-	BubbleBobbleLevelReader levelReader{};
-	levelReader.ReadLevelData(scene, "LevelData/SeperatedLevelData.dat", "LevelData/LevelParallaxColors.png");
-
-#pragma region FpsCounter
-
-	cp::GameObject* fpsCounter = new cp::GameObject();
-	scene->Add(fpsCounter);
-	cp::Font* pFont = cp::ResourceManager::GetInstance().LoadFont("Lingua.otf", 18);
-	cp::Text* pText = new cp::Text("0 FPS", pFont, SDL_Color{ 0, 0, 255 });
-	pText->GetTexture2D()->AddLocalOffset(100, 100.f);
-	fpsCounter->AddComponent(pText);
-	fpsCounter->AddComponent(new cp::FrameRate());
-
+	BubbleBobbleDataReader& dataReader = BubbleBobbleDataReader::GetInstance();
+	dataReader.ReadLevelData(scene, "LevelData/SeperatedLevelData.dat", "LevelData/LevelParallaxColors.png");
+	dataReader.ReadEnemyData("CharacterData/SeperatedEnemyData.dat");
+	
+#pragma region enemySpawner
+	{
+		cp::GameManager& gameManager = cp::GameManager::GetInstance();
+		gameManager.GetManagerObj()->AddObserver(new Game::SpawnLevelEnemies());
+	}
 #pragma endregion
 
 #pragma region P1TestObj
@@ -91,7 +88,7 @@ void Game::LevelScene::LoadSceneData() const
 		cp::Command* lftCommand = new Game::LeftCommand();
 		cp::Command* rhtCommand = new Game::RightCommand();
 		cp::Command* fireCommand = new Game::FireCommand();
-		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyW, cp::InputState::Pressed, jmpCommand);
+		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyW, cp::InputState::Hold, jmpCommand);
 		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyA, cp::InputState::Hold, lftCommand);
 		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyD, cp::InputState::Hold, rhtCommand);
 		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::LeftCtrl, cp::InputState::Pressed, fireCommand);

@@ -1,26 +1,34 @@
 #pragma once
 #include "BinaryReaderWriter.h"
+#include "BubbleBobbleData.h"
+#include "Singleton.h"
 #include "Scene.h"
 
 namespace Game
 {
-	class BubbleBobbleLevelReader final
+	class BubbleBobbleDataReader final : public cp::Singleton<BubbleBobbleDataReader>
 	{
 	public:
-		BubbleBobbleLevelReader() = default;
-		~BubbleBobbleLevelReader() = default;
+		virtual ~BubbleBobbleDataReader() = default;
 
-		BubbleBobbleLevelReader(const BubbleBobbleLevelReader& other) = delete;
-		BubbleBobbleLevelReader(BubbleBobbleLevelReader&& other) = delete;
-		BubbleBobbleLevelReader& operator=(const BubbleBobbleLevelReader& other) = delete;
-		BubbleBobbleLevelReader& operator=(BubbleBobbleLevelReader&& other) = delete;
+		BubbleBobbleDataReader(const BubbleBobbleDataReader& other) = delete;
+		BubbleBobbleDataReader(BubbleBobbleDataReader&& other) = delete;
+		BubbleBobbleDataReader& operator=(const BubbleBobbleDataReader& other) = delete;
+		BubbleBobbleDataReader& operator=(BubbleBobbleDataReader&& other) = delete;
 
 		// levelpath and parallaxpath both start from ../LevelData
 		void ReadLevelData(cp::Scene* pScene, const std::string& levelDataPath, const std::string& parallaxPath);
 
-		void ReadEnemyData() const;
+		void ReadEnemyData(const std::string& enemyDataPath);
+
+		const std::vector<BubbleBobbleEnemyData>& GetLevelEnemyData(size_t level) const;
 
 	private:
+		friend class cp::Singleton<BubbleBobbleDataReader>;
+		BubbleBobbleDataReader() = default;
+
+		std::unordered_map<size_t, std::vector<BubbleBobbleEnemyData>> m_EnemyDataContainer;
+
 		static const unsigned int m_AmountOfLevels = 100;
 		const unsigned int m_BitsInByte = 8;
 		const unsigned int m_LevelTilesWide = 32;
@@ -40,7 +48,7 @@ namespace Game
 
 		std::vector<cp::CollisionBox*> m_pCollisionBoxes;
 
-		void ReadLevel(unsigned char* levelBits);
+		void ReadLevel(unsigned char levelBits[100]);
 		cp::GameObject* InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene);
 
 		void CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj,const unsigned char levelBlocks[100]);

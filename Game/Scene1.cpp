@@ -5,7 +5,7 @@
 #include "GameObject.h"
 #include "ResourceManager.h"
 #include "Components.h"
-#include "BubbleBobbleLevelReader.h"
+#include "BubbleBobbleDataReader.h"
 
 void Game::Scene1::LoadSceneData() const
 {

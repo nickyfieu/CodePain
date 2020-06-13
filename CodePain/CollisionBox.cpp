@@ -112,11 +112,11 @@ bool cp::CollisionBox::PreCollisionCheck(const CollisionBox* collision, const Ri
 void cp::CollisionBox::CheckCollision(const float)
 {
 	GameObject* self = this->m_pOwner;
-	m_CurrentWorldBox = GetWorldCollision(self, this);
-
 	RigidBody* rigidBody = self->GetComponent<RigidBody>(cp::ComponentType::_RigidBody);
 	if (rigidBody == nullptr)
 		return;
+
+	m_CurrentWorldBox = GetWorldCollision(self, this);
 	// for dynamic collision
 	// we check any active gameobject
 	// that has a collision component
@@ -164,7 +164,7 @@ void cp::CollisionBox::HandleCollision(RigidBody* rigidBody, float entryTime)
 		this->m_pOwner->NotifyObservers(cp::Event::EVENT_COLLISION_OVERLAP);
 		return;
 	}
-	else if (m_CollisionSide == CollisionSide::right)
+	if (m_CollisionSide == CollisionSide::right)
 	{
 		rigidBody->SetIsColRight(true);
 		rigidBody->SetEntryLRTime(entryTime);
@@ -184,6 +184,10 @@ void cp::CollisionBox::HandleCollision(RigidBody* rigidBody, float entryTime)
 		rigidBody->SetIsColDown(true);
 		rigidBody->SetIsOnGround(true);
 		rigidBody->SetEntryUDTime(entryTime);
+	}
+	else
+	{
+		return;
 	}
 
 	this->m_pOwner->NotifyObservers(cp::Event::EVENT_COLLISION_COLLIDE);

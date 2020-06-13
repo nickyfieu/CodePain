@@ -79,6 +79,9 @@
     <ClCompile Include="SpriteComponent.cpp">
       <Filter>Resources\Components</Filter>
     </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -182,6 +185,12 @@
     </ClInclude>
     <ClInclude Include="State.h">
       <Filter>Resources\State</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceLocator.h">
+      <Filter>Resources\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

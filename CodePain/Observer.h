@@ -16,12 +16,9 @@ namespace cp
 		EVENT_COLLISION_OVERLAP = 8,
 		EVENT_ANIMATION_FINISHED = 9,
 		EVENT_IDLE = 10,
+		EVENT_SPAWN_ENEMIES = 11,
 	};
 
-	// !!!WARNING!!!
-	// as on notify is ran on a seperate thread
-	// if you run allot of LOGGER::LOG each cycle
-	// the chance of IMGUI crashing on you gets bigger!
 	struct Observer abstract
 	{
 		Observer() = default;
@@ -32,6 +29,11 @@ namespace cp
 		Observer(const Observer&) = delete;
 		Observer(Observer&&) = delete;
 
+		// !!!WARNING!!!
+		// as on notify is ran on a seperate thread
+		// if you run allot of LOGGER::LOG each cycle
+		// the chance of IMGUI crashing on you gets bigger!
+		// prefer printf / std::cout to debug output in the on notify function
 		virtual void OnNotify(const GameObject* entity, Event event) = 0;
 	};
 }

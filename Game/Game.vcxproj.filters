@@ -36,9 +36,6 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BubbleBobbleLevelReader.cpp">
-      <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
-    </ClCompile>
     <ClCompile Include="Scene1.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
@@ -57,11 +54,11 @@
     <ClCompile Include="States.cpp">
       <Filter>Source Files\States</Filter>
     </ClCompile>
+    <ClCompile Include="BubbleBobbleDataReader.cpp">
+      <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BubbleBobbleLevelReader.h">
-      <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
-    </ClInclude>
     <ClInclude Include="Scene1.h">
       <Filter>Source Files\Scenes</Filter>
     </ClInclude>
@@ -85,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="States.h">
       <Filter>Source Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="BubbleBobbleDataReader.h">
+      <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

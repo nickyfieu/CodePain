@@ -1,12 +1,12 @@
 #include "CodePainPCH.h"
-#include "BubbleBobbleLevelReader.h"
+#include "BubbleBobbleDataReader.h"
 #include "ResourceManager.h"
 #include "GameObject.h"
 #include "Components.h"
 #include "Logger.h"
 #include <SDL_surface.h>
 
-void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene,const std::string& levelDataPath, const std::string& parallaxPath)
+void Game::BubbleBobbleDataReader::ReadLevelData(cp::Scene* pScene,const std::string& levelDataPath, const std::string& parallaxPath)
 {
 	const std::string LevelDataPath = cp::ResourceManager::GetInstance().GetDataPath() + levelDataPath;
 	m_ReadWrite.ChangeFilePath(LevelDataPath);
@@ -44,7 +44,69 @@ void Game::BubbleBobbleLevelReader::ReadLevelData(cp::Scene* pScene,const std::s
 		SDL_FreeSurface(pParallaxPixelData);
 }
 
-void Game::BubbleBobbleLevelReader::ReadLevel(unsigned char levelBits[100])
+void Game::BubbleBobbleDataReader::ReadEnemyData(const std::string& enemyDataPath)
+{
+	const std::string enemyPath = cp::ResourceManager::GetInstance().GetDataPath() + enemyDataPath;
+
+	m_ReadWrite.ChangeFilePath(enemyPath);
+	if (!m_ReadWrite.OpenFileToRead())
+		return cp::Logger::GetInstance().Log(cp::LogLevel::Error, "BubbleBobbleLevelReader::ReadLevelData could not open file!");
+
+	size_t m_CurrentLevel{1};
+
+	unsigned char firstByte;
+	unsigned char secondByte; 
+	unsigned char thirdByte;
+
+	const unsigned char nextLevelMask = 0b00000000;
+	const unsigned char enemyTypeMask = 0b00000111;
+	const unsigned char enemyCollumnRowMask = 0b11111000;
+	const unsigned int byteCollumnRowShift = 3;
+	const unsigned char boolBitsMask = 0b10000000;
+	const unsigned char delayMask = 0b00111111;
+	const float delayMultiplier = 0.017f;
+
+	std::vector<BubbleBobbleEnemyData> currentLevelEnemyData;
+	while (m_CurrentLevel < 100 && !m_ReadWrite.IsReadEOF())
+	{
+		m_ReadWrite.BinaryReading(firstByte);
+		if (firstByte == nextLevelMask)
+		{
+			m_EnemyDataContainer[m_CurrentLevel - 1] = currentLevelEnemyData;
+			currentLevelEnemyData.clear();
+			m_CurrentLevel += 1;
+			continue;
+		}
+
+		m_ReadWrite.BinaryReading(secondByte);
+		m_ReadWrite.BinaryReading(thirdByte);
+
+		BubbleBobbleEnemyData enemy;
+		enemy.enemyType = EnemyType(firstByte & enemyTypeMask);
+		enemy.collumn = (firstByte & enemyCollumnRowMask) >> byteCollumnRowShift;
+		enemy.row = (secondByte & enemyCollumnRowMask) >> byteCollumnRowShift;
+		enemy.unknown1 = (secondByte & (boolBitsMask >> 5));
+		enemy.unknown2 = (secondByte & (boolBitsMask >> 6));
+		enemy.unknown3 = (secondByte & (boolBitsMask >> 7));
+		enemy.unknown4 = (thirdByte & (boolBitsMask >> 0));
+		enemy.isMovingLeft = (thirdByte & (boolBitsMask >> 1));
+		enemy.delay = float(thirdByte << 1) * delayMultiplier;
+		currentLevelEnemyData.push_back(enemy);
+	}
+}
+
+const std::vector<Game::BubbleBobbleEnemyData>& Game::BubbleBobbleDataReader::GetLevelEnemyData(size_t level) const
+{
+	if (m_EnemyDataContainer.find(level) == m_EnemyDataContainer.cend())
+	{
+		std::vector<Game::BubbleBobbleEnemyData> empty{};
+		return empty;
+	}
+
+	return m_EnemyDataContainer.at(level);
+}
+
+void Game::BubbleBobbleDataReader::ReadLevel(unsigned char levelBits[100])
 {
 	for (unsigned int j = 0; j < m_BytesPerLevel; j++)
 	{
@@ -54,14 +116,14 @@ void Game::BubbleBobbleLevelReader::ReadLevel(unsigned char levelBits[100])
 	}
 }
 
-void Game::BubbleBobbleLevelReader::ReadParallaxColors(unsigned int levelIndex, Uint32& color1, Uint32& color2, SDL_Surface* img)
+void Game::BubbleBobbleDataReader::ReadParallaxColors(unsigned int levelIndex, Uint32& color1, Uint32& color2, SDL_Surface* img)
 {
 	cp::ResourceManager& pResourceManager = cp::ResourceManager::GetInstance();
 	color1 = pResourceManager.GetPixel(img, levelIndex, 0);
 	color2 = pResourceManager.GetPixel(img, levelIndex, 1);
 }
 
-void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
+void Game::BubbleBobbleDataReader::CalculateLevelCollisionAndParallaxBoxes(Uint32 colRight, Uint32 colDown, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
 {
 	ReadCollisionSide(colRight, colDown, cp::CollisionBox::CollisionSide::left, pLevelObj, levelBlocks);
 	ReadCollisionSide(colRight, colDown, cp::CollisionBox::CollisionSide::up, pLevelObj, levelBlocks);
@@ -69,7 +131,7 @@ void Game::BubbleBobbleLevelReader::CalculateLevelCollisionAndParallaxBoxes(Uint
 	ReadCollisionSide(colRight, colDown, cp::CollisionBox::CollisionSide::down, pLevelObj, levelBlocks);
 }
 
-void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 colDown, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
+void Game::BubbleBobbleDataReader::ReadCollisionSide(Uint32 colRight, Uint32 colDown, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, const unsigned char levelBlocks[100])
 {
 	std::vector<glm::tvec2<int>> collisionIndicies;
 	const int colSize = 3;
@@ -111,7 +173,7 @@ void Game::BubbleBobbleLevelReader::ReadCollisionSide(Uint32 colRight, Uint32 co
 	}
 }
 
-void Game::BubbleBobbleLevelReader::UseColSideData(Uint32 colRight, Uint32 colDown, int& colIndexSize, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, std::vector<glm::tvec2<int>>& collisionIndicies)
+void Game::BubbleBobbleDataReader::UseColSideData(Uint32 colRight, Uint32 colDown, int& colIndexSize, cp::CollisionBox::CollisionSide side, cp::GameObject* pLevelObj, std::vector<glm::tvec2<int>>& collisionIndicies)
 {
 	if (colIndexSize <= 0)
 		return;
@@ -145,7 +207,7 @@ void Game::BubbleBobbleLevelReader::UseColSideData(Uint32 colRight, Uint32 colDo
 	colIndexSize = 0;
 }
 
-void Game::BubbleBobbleLevelReader::InitReadColSideData(int& col, int& colMax, int& row, int& rowMax, cp::CollisionBox::CollisionSide side)
+void Game::BubbleBobbleDataReader::InitReadColSideData(int& col, int& colMax, int& row, int& rowMax, cp::CollisionBox::CollisionSide side)
 {
 	switch (side)
 	{
@@ -164,7 +226,7 @@ void Game::BubbleBobbleLevelReader::InitReadColSideData(int& col, int& colMax, i
 	}
 }
 
-void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& currentMask, unsigned char& toCheckMask, int& indexCurrent, int& indexToCheck, int col, int row, cp::CollisionBox::CollisionSide side)
+void Game::BubbleBobbleDataReader::UpdateReadColSideData(unsigned char& currentMask, unsigned char& toCheckMask, int& indexCurrent, int& indexToCheck, int col, int row, cp::CollisionBox::CollisionSide side)
 {
 	currentMask = 0b10000000 >> (col % m_BitsInByte);
 	toCheckMask = currentMask;
@@ -197,7 +259,7 @@ void Game::BubbleBobbleLevelReader::UpdateReadColSideData(unsigned char& current
 	}
 }
 
-void Game::BubbleBobbleLevelReader::CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionBox::CollisionSide side, int x, int y, int width, int height, Uint32 rgba)
+void Game::BubbleBobbleDataReader::CreateParallaxBoxTex(cp::GameObject* pLevelObj, cp::CollisionBox::CollisionSide side, int x, int y, int width, int height, Uint32 rgba)
 {
 	switch (side)
 	{
@@ -220,7 +282,7 @@ void Game::BubbleBobbleLevelReader::CreateParallaxBoxTex(cp::GameObject* pLevelO
 	
 }
 
-void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, unsigned char levelBlocks[100])
+void Game::BubbleBobbleDataReader::CreateLevelTextures(cp::GameObject* pLevelObj, unsigned int levelIndex, unsigned char levelBlocks[100])
 {
 	const unsigned int heightAndWithOfTile = 8;
 	const unsigned int levelBytesWide = (m_LevelTilesWide / m_BitsInByte);
@@ -288,7 +350,7 @@ void Game::BubbleBobbleLevelReader::CreateLevelTextures(cp::GameObject* pLevelOb
 	}
 }
 
-void Game::BubbleBobbleLevelReader::CreateLevelCollision(cp::GameObject* pLevelObj)
+void Game::BubbleBobbleDataReader::CreateLevelCollision(cp::GameObject* pLevelObj)
 {
 	for (cp::CollisionBox* pComponentToAdd : m_pCollisionBoxes)
 	{
@@ -297,7 +359,7 @@ void Game::BubbleBobbleLevelReader::CreateLevelCollision(cp::GameObject* pLevelO
 	m_pCollisionBoxes.clear();
 }
 
-cp::GameObject* Game::BubbleBobbleLevelReader::InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene)
+cp::GameObject* Game::BubbleBobbleDataReader::InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene)
 {
 	// create a level game object and add it
 	cp::GameObject* levelGameObject = new cp::GameObject(cp::GameObjectType::level);

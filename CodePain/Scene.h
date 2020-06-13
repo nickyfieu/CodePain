@@ -41,6 +41,7 @@ namespace cp
 	public:
 
 		std::vector<GameObject*> GetAllGameObjectsOfType(GameObjectType type);
+		void DeleteAllGameObjectsOfType(GameObjectType type);
 	};
 
 }

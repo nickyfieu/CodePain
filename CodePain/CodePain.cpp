@@ -12,6 +12,8 @@
 #include "Components.h"
 #include "Scene.h"
 #include "Logger.h"
+#include "Observer.h"
+#include "GameManager.h"
 #ifdef _DEBUG
 	#include "Imgui\imgui.h"
 	#include "Imgui_Sdl\imgui_sdl.h"
@@ -201,19 +203,34 @@ void cp::CodePain::ImGuiDebug_Levels()
 	Renderer& renderer = Renderer::GetInstance();
 	SceneManager& sceneManager = SceneManager::GetInstance();
 	Scene* scene = sceneManager.GetActiveScene();
-	static int levelToDisplay = 1;
-	int oldLevel = (int)levelToDisplay;
+	GameManager& gameManager = GameManager::GetInstance();
+	int currentLevel = gameManager.GetCurrentLevel();
+	int oldLevel = currentLevel;
 
 	ImGui::Begin("Level window", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-	if (ImGui::Button("PreviousLevel") && levelToDisplay > 1)
-		levelToDisplay--;
+	if (ImGui::Button("PreviousLevel") && currentLevel > 1)
+	{
+		currentLevel--;
+		scene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+	}
 	ImGui::SameLine();
-	if (ImGui::Button("NextLevel") && levelToDisplay < 100)
-		levelToDisplay++;
+	if (ImGui::Button("NextLevel") && currentLevel < 100)
+	{
+		currentLevel++;
+		scene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+	}
+	ImGui::SameLine();
+	bool spawnEnemies = ImGui::Button("SpawnEnemies");
 	ImGui::PushItemWidth(-100);
-	ImGui::SliderInt("Current Level", &levelToDisplay, 1, 100);
+	ImGui::SliderInt("Current Level", &currentLevel, 1, 100);
 
-	if (scene && (oldLevel != levelToDisplay))
+	gameManager.SetCurrentLevel(currentLevel);
+	if (spawnEnemies)
+	{
+		gameManager.GetManagerObj()->NotifyObservers(cp::Event::EVENT_SPAWN_ENEMIES);
+	}
+
+	if (scene && (oldLevel != currentLevel))
 	{
 		std::vector<GameObject*> level;
 		level = scene->GetAllGameObjectsOfType(GameObjectType::level);
@@ -223,13 +240,13 @@ void cp::CodePain::ImGuiDebug_Levels()
 			GameObject* gameObj = level.at(0);
 			Transform* transform = gameObj->GetComponent<Transform>(ComponentType::_Transform);
 			unsigned int levelHeight = 500;
-			if (abs(transform->GetPosition().y / 500) != (levelToDisplay - 1))
+			if (abs(transform->GetPosition().y / 500) != (currentLevel - 1))
 			{
 				// disabling old level and enableing new level
 				level[oldLevel - 1]->SetActive(false);
-				level[levelToDisplay - 1]->SetActive(true);
+				level[currentLevel - 1]->SetActive(true);
 
-				float heightLvl0 = float((levelToDisplay - 1) * levelHeight);
+				float heightLvl0 = float((currentLevel - 1) * levelHeight);
 				for (size_t i = 0; i < amountOfLevels; i++)
 				{
 					gameObj = level.at(i);

@@ -31,6 +31,27 @@ std::vector<cp::GameObject*> cp::Scene::GetAllGameObjectsOfType(GameObjectType t
 	return vec;
 }
 
+void cp::Scene::DeleteAllGameObjectsOfType(GameObjectType type)
+{
+	size_t amountToRemove = 0;
+	std::vector<GameObject*> toRemove;
+	for (size_t i = 0; i < m_AmountOfObjects; i++)
+	{
+		if (m_pObjects[i]->GetType() == type)
+		{
+			amountToRemove++;
+			toRemove.push_back(m_pObjects[i]);
+		}
+	}
+
+	for (size_t i = 0; i < amountToRemove; i++)
+	{
+		m_AmountOfObjects--;
+		m_pObjects.erase(std::find(m_pObjects.begin(), m_pObjects.end(), toRemove[i]));
+		SAFE_DELETE(toRemove[i]);
+	}
+}
+
 void cp::Scene::Add(GameObject* object)
 {
 	m_pObjects.push_back(object);

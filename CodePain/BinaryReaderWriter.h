@@ -147,6 +147,11 @@ public:
 		m_Read.seekg(0, std::ios::beg);
 	}
 
+	inline bool IsReadEOF() noexcept
+	{
+		return m_Read.eof();
+	}
+
 	std::ofstream m_Write;
 	std::ifstream m_Read;
 private:

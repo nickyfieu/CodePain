@@ -10,11 +10,18 @@ namespace cp
 	{
 		none = 0,
 		level = 1,
-		Player1 = 2, // takes keyboard / moouse input
-		Player2 = 3, // takes controller 1 input
-		Player3 = 4, // takes controller 2 input
-		Player4 = 5, // takes controller 3 input
-		Player5 = 6, // takes controller 4 input
+		// takes keyboard / moouse input
+		Player1 = 2,
+		// takes controller 1 input
+		Player2 = 3,
+		// takes controller 2 input
+		Player3 = 4,
+		// takes controller 3 input
+		Player4 = 5,
+		// takes controller 4 input
+		Player5 = 6,
+		// non player character ( can be enemies )
+		Npc = 7,
 	};
 	
 	struct State;

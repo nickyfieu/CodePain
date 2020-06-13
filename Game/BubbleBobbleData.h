@@ -2,24 +2,24 @@
 
 namespace Game
 {
-	enum EnemyType : unsigned char
+	enum class EnemyType : unsigned char
 	{
 		//0b0000 0(000)
-		ZenChan		= 000,
+		ZenChan		= 0b00000000,
 		//0b0000 0(110)
-		Mighta		= 110,
+		Mighta		= 0b00000110,
 		//0b0000 0(100)
-		Monsta		= 100,
+		Monsta		= 0b00000100,
 		//0b0000 0(011)
-		Pulpul		= 011,
+		Pulpul		= 0b00000011,
 		//0b0000 0(010)
-		Banebou		= 010,
+		Banebou		= 0b00000010,
 		//0b0000 0(001)
-		Hidegons	= 001,
+		Hidegons	= 0b00000001,
 		//0b0000 0(101)
-		Drunk		= 101,
+		Drunk		= 0b00000101,
 		//0b0000 0(111)
-		Invader		= 111,
+		Invader		= 0b00000111,
 	};
 
 	struct BubbleBobbleEnemyData
