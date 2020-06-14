@@ -32,7 +32,7 @@ void cp::CodePain::Initialize()
 	}
 
 	m_Window = SDL_CreateWindow(
-		"Programming 4 assignment",
+		"2DAE01-Fieu_Nicky-CodePain-BubbleBobble",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 #ifdef _DEBUG
