@@ -3,6 +3,7 @@ CodePain/x64/
 x64/
 CodePain/Win32/
 Debug/
+Build/
 Game/Release/Main.obj
 Game/Release/
 Release/
