@@ -31,6 +31,9 @@
     <Filter Include="Source Files\States">
       <UniqueIdentifier>{0975dc69-03da-407a-b96c-bf0ad58af34c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{34a73bb9-1923-4663-8374-c78d576f829b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -56,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="BubbleBobbleDataReader.cpp">
       <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
+    </ClCompile>
+    <ClCompile Include="BubbleBobbleAudio.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="BubbleBobbleDataReader.h">
       <Filter>Source Files\Data\BubbleBobbleDataReading</Filter>
+    </ClInclude>
+    <ClInclude Include="BubbleBobbleAudio.h">
+      <Filter>Source Files\Audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,8 @@
 #include "Logger.h"
 #include "Components.h"
 #include "InputManager.h"
+#include "AudioLocator.h"
+#include "BubbleBobbleAudio.h"
 
 void Game::JumpCommand::Execute(const cp::GameObject* actor)
 {
@@ -11,10 +13,11 @@ void Game::JumpCommand::Execute(const cp::GameObject* actor)
 	if (rigidBody == nullptr)
 		return;
 
-	if (rigidBody->GetOnGround())
+	glm::vec2 force = rigidBody->GetForce();
+	if (rigidBody->GetOnGround() && (rigidBody->GetForce().y <= FLT_EPSILON))
 	{
-		glm::vec2 force = rigidBody->GetForce();
 		rigidBody->SetForce({ force.x,325.f });
+		cp::AudioLocator::GetAudio()->PlaySfx((int)Game::BubbleBobbleAudio::Sfx::Jump);
 	}
 }
 
@@ -51,10 +54,11 @@ void Game::ControllerJumpCommand::Execute(const cp::GameObject* actor)
 	if (rigidBody == nullptr)
 		return;
 
-	if (rigidBody->GetOnGround())
+	glm::vec2 force = rigidBody->GetForce();
+	if (rigidBody->GetOnGround() && (rigidBody->GetForce().y <= FLT_EPSILON))
 	{
-		glm::vec2 force = rigidBody->GetForce();
 		rigidBody->SetForce({ force.x,325.f });
+		cp::AudioLocator::GetAudio()->PlaySfx((int)Game::BubbleBobbleAudio::Sfx::Jump);
 	}
 }
 

@@ -50,6 +50,7 @@ namespace cp
 		GameObject& operator=(GameObject&& other) = delete;
 
 		inline bool GetIsActive() const { return m_IsActive; }
+		inline bool GetToDestroy() const { return m_Destroy; }
 		inline GameObjectType GetType() const { return m_Type; }
 
 		void SetActive(bool active);
@@ -60,6 +61,7 @@ namespace cp
 
 		void SetNewState(State* newState);
 		void SetInactiveTimer(float inactivityTIme);
+		void SetDestroy(bool destroy);
 
 	private:
 		GameObjectType m_Type;
@@ -75,6 +77,7 @@ namespace cp
 		State* m_pNewState;
 
 		float m_InactiveTimer{ 0.f };
+		bool m_Destroy = false;
 	public:
 		template <class T>
 		bool HasComponent(ComponentType type) const

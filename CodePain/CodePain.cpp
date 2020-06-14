@@ -184,17 +184,31 @@ void cp::CodePain::ImGuiUpdate()
 	if (scene->GetNameHash() == m_DebugLevelsHash)
 		ImGuiDebug_Levels();
 
+	ImGuiDebug_Audio();
 	ImGuiDebug_FrameRate();
 }
 
 void cp::CodePain::ImGuiDebug_FrameRate()
 {
-	ImGui::Begin("Cycles Per Second(CPS)");
+	ImGui::Begin("Cycles Per Second(CPS)", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 	ImGui::Text("Main loop  	: %i cps", m_MainLoopCPS);
 	ImGui::Text("Input  		: %i cps", m_InputLoopCPS);
-	ImGui::Text("Sound  		: %i cps", 0);
 	ImGui::Text("Draw/Update	: %i cps", m_DrawLoopCPS);
 	ImGui::Text("FixedUpdate	: %i cps", m_FixedLoopCPS);
+	ImGui::End();
+}
+
+void cp::CodePain::ImGuiDebug_Audio()
+{
+	GameManager& gameManager = GameManager::GetInstance();
+	int volumeSfx = (int)gameManager.GetChannelVolume(1);
+	int volumeMusic = (int)gameManager.GetChannelVolume(2);
+	ImGui::Begin("Volume", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	ImGui::PushItemWidth(-125);
+	if (ImGui::SliderInt("SFX volume", &volumeSfx, 0, 100))
+		gameManager.SetChannelVolume(1, volumeSfx);
+	if (ImGui::SliderInt("Music volume", &volumeMusic, 0, 100))
+		gameManager.SetChannelVolume(2, volumeMusic);
 	ImGui::End();
 }
 
@@ -215,6 +229,7 @@ void cp::CodePain::ImGuiDebug_Levels()
 	bool spawnEnemies = ImGui::Button("SpawnEnemies");
 	ImGui::PushItemWidth(-100);
 	ImGui::SliderInt("Current Level", &currentLevel, 1, 100);
+
 
 	if (currentLevel != oldLevel)
 	{

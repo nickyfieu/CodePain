@@ -107,9 +107,8 @@ void Game::SpawnLevelEnemies::OnNotify(const cp::GameObject*, cp::Event event)
 		switch (enemyLevelData[i].enemyType)
 		{
 		case Game::EnemyType::ZenChan:
-			newEnemy->InitializeState(new Game::ZenChanIdleState());
-			break;
 		case Game::EnemyType::Hidegons:
+			newEnemy->InitializeState(new Game::EnemyMovingState1());
 			break;
 		case Game::EnemyType::Banebou:
 			break;
@@ -122,6 +121,7 @@ void Game::SpawnLevelEnemies::OnNotify(const cp::GameObject*, cp::Event event)
 		case Game::EnemyType::Mighta:
 			break;
 		case Game::EnemyType::Invader:
+			newEnemy->InitializeState(new Game::EnemyMovingState2());
 			break;
 		default:
 			break;

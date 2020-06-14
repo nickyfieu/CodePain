@@ -172,3 +172,8 @@ void cp::GameObject::SetInactiveTimer(float inactivityTIme)
 {
 	m_InactiveTimer = inactivityTIme;
 }
+
+void cp::GameObject::SetDestroy(bool destroy)
+{
+	m_Destroy = destroy;
+}

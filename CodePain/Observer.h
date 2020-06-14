@@ -17,6 +17,8 @@ namespace cp
 		EVENT_ANIMATION_FINISHED = 9,
 		EVENT_IDLE = 10,
 		EVENT_SPAWN_ENEMIES = 11,
+		// unique for the game manager object
+		EVENT_OBJ_DESTROYED = 12,
 	};
 
 	struct Observer abstract

@@ -38,6 +38,7 @@ namespace cp
 		void ImGuiDebug_Levels();
 		void ImGuiUpdate();
 		void ImGuiDebug_FrameRate();
+		void ImGuiDebug_Audio();
 
 	};
 }

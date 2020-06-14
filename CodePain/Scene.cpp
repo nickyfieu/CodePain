@@ -1,6 +1,8 @@
 #include "CodePainPCH.h"
 #include "Scene.h"
 #include "InputHandler.h"
+#include "GameManager.h"
+#include "Observer.h"
 #include <vector>
 #include <string>
 
@@ -46,10 +48,19 @@ void cp::Scene::DeleteAllGameObjectsOfType(GameObjectType type)
 
 	for (size_t i = 0; i < amountToRemove; i++)
 	{
-		m_AmountOfObjects--;
-		m_pObjects.erase(std::find(m_pObjects.begin(), m_pObjects.end(), toRemove[i]));
-		SAFE_DELETE(toRemove[i]);
+		DeleteGameObject(toRemove[i]);
 	}
+}
+
+void cp::Scene::DeleteGameObject(GameObject* ref)
+{
+	m_AmountOfObjects--;
+	m_pObjects.erase(std::find(m_pObjects.begin(), m_pObjects.end(), ref));
+	SAFE_DELETE(ref);
+
+	GameManager& manager = GameManager::GetInstance();
+	if (manager.GetManagerObj())
+		manager.GetManagerObj()->NotifyObservers(cp::Event::EVENT_OBJ_DESTROYED);
 }
 
 void cp::Scene::Add(GameObject* object)
@@ -81,16 +92,21 @@ void cp::Scene::HandleInput(const cp::InputHandler& inputHandler)
 void cp::Scene::Update(const float elapsedSec)
 {
 #ifdef MULTI_THREADING
-	size_t m_AmountOfFutures = 0;
 	std::vector<std::future<void>> updateFutures;
 #endif
+	size_t amountToRemove = 0;
+	std::vector<GameObject*>removeReferences;
 
 	for(size_t i = 0; i < m_AmountOfObjects; i++)
 	{
-		if (m_pObjects[i]->GetIsActive())
+		if (m_pObjects[i]->GetToDestroy())
+		{
+			amountToRemove++;
+			removeReferences.push_back(m_pObjects[i]);
+		}
+		else if (m_pObjects[i]->GetIsActive())
 		{
 #ifdef MULTI_THREADING
-			m_AmountOfFutures++;
 			updateFutures.push_back(std::async(std::launch::async, UpdateActiveObject, m_pObjects[i], elapsedSec));
 #else
 			m_pObjects[i]->UpdateState();
@@ -99,12 +115,10 @@ void cp::Scene::Update(const float elapsedSec)
 		}
 	}
 
-#ifdef MULTI_THREADING
-	for (size_t i = 0; i < m_AmountOfFutures; i++)
+	for (size_t i = 0; i < amountToRemove; i++)
 	{
-		updateFutures[i].get();
+		DeleteGameObject(removeReferences[i]);
 	}
-#endif
 }
 
 void cp::Scene::FixedUpdate(float elapsedSec)

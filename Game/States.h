@@ -23,52 +23,38 @@ namespace Game
 		virtual bool UpdateState(const cp::GameObject* gameObject) override;
 	};
 
-	struct ZenChanIdleState final : public cp::State
+	// moves left right and (up at random)
+	struct EnemyMovingState1 final : public cp::State
 	{
-		ZenChanIdleState() = default;
-		virtual ~ZenChanIdleState() = default;
+		EnemyMovingState1() = default;
+		virtual ~EnemyMovingState1() = default;
 
-		ZenChanIdleState& operator=(const ZenChanIdleState&) = delete;
-		ZenChanIdleState& operator=(ZenChanIdleState&&) = delete;
-		ZenChanIdleState(const ZenChanIdleState&) = delete;
-		ZenChanIdleState(ZenChanIdleState&&) = delete;
+		EnemyMovingState1& operator=(const EnemyMovingState1&) = delete;
+		EnemyMovingState1& operator=(EnemyMovingState1&&) = delete;
+		EnemyMovingState1(const EnemyMovingState1&) = delete;
+		EnemyMovingState1(EnemyMovingState1&&) = delete;
 
 		virtual bool UpdateState(const cp::GameObject* gameObject) override;
 	private:
-		unsigned int m_LeftAnimName = std::hash<std::string>{}("WalkLeft");
-		unsigned int m_RightAnimName = std::hash<std::string>{}("WalkRight");
+		unsigned int m_LeftAnimName = (unsigned int)std::hash<std::string>{}("WalkLeft");
+		unsigned int m_RightAnimName = (unsigned int)std::hash<std::string>{}("WalkRight");
 	};
 
-	struct ZenChanBubbleState final : public cp::State
+	// only moves left right
+	struct EnemyMovingState2 final : public cp::State
 	{
-		ZenChanBubbleState() = default;
-		virtual ~ZenChanBubbleState() = default;
+		EnemyMovingState2() = default;
+		virtual ~EnemyMovingState2() = default;
 
-		ZenChanBubbleState& operator=(const ZenChanBubbleState&) = delete;
-		ZenChanBubbleState& operator=(ZenChanBubbleState&&) = delete;
-		ZenChanBubbleState(const ZenChanBubbleState&) = delete;
-		ZenChanBubbleState(ZenChanBubbleState&&) = delete;
+		EnemyMovingState2& operator=(const EnemyMovingState2&) = delete;
+		EnemyMovingState2& operator=(EnemyMovingState2&&) = delete;
+		EnemyMovingState2(const EnemyMovingState2&) = delete;
+		EnemyMovingState2(EnemyMovingState2&&) = delete;
 
 		virtual bool UpdateState(const cp::GameObject* gameObject) override;
 	private:
-		unsigned int m_LeftAnimName = std::hash<std::string>{}("BubbleLeft");
-		unsigned int m_RightAnimName = std::hash<std::string>{}("BubbleRight");
-	};
-
-	struct ZenChanDeathState final : public cp::State
-	{
-		ZenChanDeathState() = default;
-		virtual ~ZenChanDeathState() = default;
-
-		ZenChanDeathState& operator=(const ZenChanDeathState&) = delete;
-		ZenChanDeathState& operator=(ZenChanDeathState&&) = delete;
-		ZenChanDeathState(const ZenChanDeathState&) = delete;
-		ZenChanDeathState(ZenChanDeathState&&) = delete;
-
-		virtual bool UpdateState(const cp::GameObject* gameObject) override;
-	private:
-		unsigned int m_LeftAnimName = std::hash<std::string>{}("DieLeft");
-		unsigned int m_RightAnimName = std::hash<std::string>{}("DieRight");
+		unsigned int m_LeftAnimName = (unsigned int)std::hash<std::string>{}("WalkLeft");
+		unsigned int m_RightAnimName = (unsigned int)std::hash<std::string>{}("WalkRight");
 	};
 
 }

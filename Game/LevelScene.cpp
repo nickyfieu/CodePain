@@ -12,6 +12,8 @@
 #include "States.h"
 #include "Observers.h"
 #include "GameManager.h"
+#include "AudioLocator.h"
+#include "BubbleBobbleAudio.h"
 
 void Game::LevelScene::LoadSceneData() const
 {
@@ -19,6 +21,26 @@ void Game::LevelScene::LoadSceneData() const
 	BubbleBobbleDataReader& dataReader = BubbleBobbleDataReader::GetInstance();
 	dataReader.ReadLevelData(scene, "LevelData/SeperatedLevelData.dat", "LevelData/LevelParallaxColors.png");
 	dataReader.ReadEnemyData("CharacterData/SeperatedEnemyData.dat");
+
+#pragma region AudioInitialization
+
+	Game::BubbleBobbleAudio* bubbleBobbleAudio = new Game::BubbleBobbleAudio();
+	bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::GameLoop, "Audio/gameloop.wav");
+	// mp3 test file ;)
+	// bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::GameLoop, "Audio/bruhblebrohblemaintheme.mp3");
+	bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::GameOver, "Audio/gameover.wav");
+	bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::Intro, "Audio/intro.wav");
+	bubbleBobbleAudio->SetMusicVolume(STARTVOLUME);
+
+	bubbleBobbleAudio->AddSfx(Game::BubbleBobbleAudio::Sfx::Jump, "Audio/jump.wav");
+	bubbleBobbleAudio->AddSfx(Game::BubbleBobbleAudio::Sfx::BalloonJump, "Audio/balloonjump.wav");
+	bubbleBobbleAudio->AddSfx(Game::BubbleBobbleAudio::Sfx::Catch, "Audio/catch.wav");
+	bubbleBobbleAudio->AddSfx(Game::BubbleBobbleAudio::Sfx::WellDone, "Audio/welldone.wav");
+	bubbleBobbleAudio->SetSfxVolume(STARTVOLUME);
+	cp::AudioLocator::RegisterAudioService(bubbleBobbleAudio);
+	cp::AudioLocator::GetAudio()->PlayMusic((int)Game::BubbleBobbleAudio::Music::GameLoop);
+
+#pragma endregion
 
 #pragma region enemySpawner
 	{

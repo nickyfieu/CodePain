@@ -1,6 +1,7 @@
 #include "CodePain.h"
 #include "SceneLoader.h"
 #include "GameManager.h"
+#include "AudioLocator.h"
 
 #if _DEBUG
 #include <vld.h>
@@ -15,6 +16,7 @@ int main(int, char* [])
 	// InitEngine
 	engine.Initialize();
 	gameManager.Initialize();
+	cp::AudioLocator::Init();
 
 	if (engine.IsInitialized())
 	{
@@ -25,5 +27,6 @@ int main(int, char* [])
 		engine.Run();
 	}
 
+	cp::AudioLocator::DeleteAudio();
 	return 0;
 }
