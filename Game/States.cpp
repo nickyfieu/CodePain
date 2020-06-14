@@ -3,12 +3,6 @@
 #include "GameObject.h"
 #include "Observer.h"
 
-bool Game::IdleState::UpdateState(const cp::GameObject* gameObject)
-{
-	gameObject->NotifyObservers(cp::Event::EVENT_IDLE);
-	return false;
-}
-
 bool Game::EnemyMovingState1::UpdateState(const cp::GameObject* gameObject)
 {
 	cp::RigidBody* rigidBody = gameObject->GetComponent<cp::RigidBody>(cp::ComponentType::_RigidBody);
@@ -241,6 +235,13 @@ bool Game::EnemyMovingState4::UpdateState(const cp::GameObject* gameObject)
 			rigidBody->SetForce({ m_HorizontalForce, currentForce.y });
 		}
 	}
+
+	return false;
+}
+
+bool Game::PlayerMovingState::UpdateState(const cp::GameObject* gameObject)
+{
+	UNREFERENCED_PARAMETER(gameObject);
 
 	return false;
 }

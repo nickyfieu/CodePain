@@ -44,7 +44,7 @@ namespace cp
 		GameManager() = default;
 
 		GameObject* m_ManagerObj;
-		size_t m_CurrentLevel;
+		size_t m_CurrentLevel = 1;
 		// variable between 0 - 100
 		size_t m_ChannelVolume[CHANNELS]{STARTVOLUME,STARTVOLUME};
 

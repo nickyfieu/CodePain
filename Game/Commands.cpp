@@ -53,7 +53,7 @@ void Game::RightCommand::Execute(const cp::GameObject* actor)
 
 void Game::FireCommand::Execute(const cp::GameObject*)
 {
-	cp::Logger::GetInstance().Log(cp::LogLevel::Info, "Pew");
+	cp::Logger::GetInstance().Log(cp::LogLevel::Info, "Non existant bubbles!");
 }
 
 void Game::ControllerJumpCommand::Execute(const cp::GameObject* actor)
@@ -101,7 +101,7 @@ void Game::ControllerFIreCommand::Execute(const cp::GameObject* actor)
 
 	if (!(prevAxisValue > 0.f) && (AxisValue > 0.f))
 	{
-		cp::Logger::GetInstance().Log(cp::LogLevel::Info, "Pew Pew");
+		cp::Logger::GetInstance().Log(cp::LogLevel::Info, "Non existant bubbles!");
 	}
 }
 
@@ -113,11 +113,14 @@ void Game::StartP1Game::Execute(const cp::GameObject*)
 	cp::SceneManager& sceneManager = cp::SceneManager::GetInstance();
 	cp::Scene* activeScene = sceneManager.GetActiveScene();
 
-#pragma region P1TestObj
+	//ugly code i know
+	activeScene->GetAllGameObjectsOfType(cp::GameObjectType::UIElements)[0]->SetActive(false);
+
+#pragma region P1
 
 	{
 		cp::GameObject* p1 = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::Player1)[0];
-		p1->InitializeState(new Game::IdleState());
+		p1->InitializeState(new Game::PlayerMovingState());
 
 		// sprite component
 		cp::SpriteComponent* sprite = new cp::SpriteComponent(cp::ResourceManager::GetInstance().LoadSDLTexture("CharacterData/HeroGreen_Enrique.png"));
@@ -175,7 +178,7 @@ void Game::StartP1Game::Execute(const cp::GameObject*)
 		p1->AddComponent(new cp::Score(0));
 
 		// health
-		cp::Health* healthComp = new cp::Health(false, 5);
+		cp::Health* healthComp = new cp::Health(false, 4);
 		p1->AddComponent(healthComp);
 
 
@@ -189,19 +192,22 @@ void Game::StartP1Game::Execute(const cp::GameObject*)
 		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::LeftCtrl, cp::InputState::Pressed, fireCommand);
 
 		// notify
-		p1->AddObserver(new Game::IdleEvent());
 		p1->AddObserver(new Game::TopBottomLevelCollision());
 		p1->AddObserver(new Game::PlayerHealthChange());
+		p1->AddObserver(new Game::PlayerOverlap());
+		p1->AddObserver(new Game::PlayerScoreChange());
 		
 		healthComp->AddHealth(0);
 	}
 
 #pragma endregion
 
+	activeScene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+	activeScene->SwitchLevel(1);
 	cp::GameManager::GetInstance().SetGameState(cp::GameManager::GameState::Game);
 }
 
-void Game::StartP2Game::Execute(const cp::GameObject* actor)
+void Game::StartP2Game::Execute(const cp::GameObject*)
 {
 	if (cp::GameManager::GetInstance().GetState() != cp::GameManager::GameState::Menu)
 		return;
@@ -209,10 +215,13 @@ void Game::StartP2Game::Execute(const cp::GameObject* actor)
 	cp::SceneManager& sceneManager = cp::SceneManager::GetInstance();
 	cp::Scene* activeScene = sceneManager.GetActiveScene();
 
-#pragma region P1TestObj
+	//ugly code i know
+	activeScene->GetAllGameObjectsOfType(cp::GameObjectType::UIElements)[0]->SetActive(false);
+
+#pragma region P1
 	{
 		cp::GameObject* p1 = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::Player1)[0];
-		p1->InitializeState(new Game::IdleState());
+		p1->InitializeState(new Game::PlayerMovingState());
 
 		// sprite component
 		cp::SpriteComponent* sprite = new cp::SpriteComponent(cp::ResourceManager::GetInstance().LoadSDLTexture("CharacterData/HeroGreen_Enrique.png"));
@@ -270,7 +279,8 @@ void Game::StartP2Game::Execute(const cp::GameObject* actor)
 		p1->AddComponent(new cp::Score(0));
 
 		// health
-		p1->AddComponent(new cp::Health(false, 5));
+		cp::Health* healthComp = new cp::Health(false, 4);
+		p1->AddComponent(healthComp);
 		
 		
 		cp::Command* jmpCommand = new Game::JumpCommand();
@@ -283,17 +293,20 @@ void Game::StartP2Game::Execute(const cp::GameObject* actor)
 		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::LeftCtrl, cp::InputState::Pressed, fireCommand);
 
 		// notify
-		p1->AddObserver(new Game::IdleEvent());
 		p1->AddObserver(new Game::TopBottomLevelCollision());
+		p1->AddObserver(new Game::PlayerHealthChange());
+		p1->AddObserver(new Game::PlayerOverlap());
+		p1->AddObserver(new Game::PlayerScoreChange());
 
+		healthComp->AddHealth(0);
 	}
 #pragma endregion
 
-#pragma region P2TestObj
+#pragma region P2
 	{
 
 		cp::GameObject* p2 = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::Player2)[0];
-		p2->InitializeState(new Game::IdleState());
+		p2->InitializeState(new Game::PlayerMovingState());
 		// sprite component
 		cp::SpriteComponent* sprite = new cp::SpriteComponent(cp::ResourceManager::GetInstance().LoadSDLTexture("CharacterData/HeroBlue_Enrique.png"));
 		cp::Texture2D* texture = sprite->GetTextureComponent();
@@ -347,7 +360,8 @@ void Game::StartP2Game::Execute(const cp::GameObject* actor)
 		p2->AddComponent(new cp::Score(0));
 
 		// health
-		p2->AddComponent(new cp::Health(false, 5));
+		cp::Health* healthComp = new cp::Health(false, 4);
+		p2->AddComponent(healthComp);
 
 		// translation
 		p2->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(540, -480, 0);
@@ -360,20 +374,192 @@ void Game::StartP2Game::Execute(const cp::GameObject* actor)
 		cp::InputHandler::GetInstance().AddInput(cp::ControllerAxis::RightTrigger, controllerFireCommand);
 
 		// notify
-		p2->AddObserver(new Game::IdleEvent());
 		p2->AddObserver(new Game::TopBottomLevelCollision());
+		p2->AddObserver(new Game::PlayerHealthChange());
+		p2->AddObserver(new Game::PlayerOverlap());
+		p2->AddObserver(new Game::PlayerScoreChange());
+		//p2->
+
+		healthComp->AddHealth(0);
 	}
 
 #pragma endregion
 
+	activeScene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+	activeScene->SwitchLevel(1);
 	cp::GameManager::GetInstance().SetGameState(cp::GameManager::GameState::Game);
 }
 
-void Game::Start1v1Game::Execute(const cp::GameObject* actor)
+void Game::Start1v1Game::Execute(const cp::GameObject*)
 {
 	if (cp::GameManager::GetInstance().GetState() != cp::GameManager::GameState::Menu)
 		return;
 
+	cp::SceneManager& sceneManager = cp::SceneManager::GetInstance();
+	cp::Scene* activeScene = sceneManager.GetActiveScene();
 
+	//ugly code i know
+	activeScene->GetAllGameObjectsOfType(cp::GameObjectType::UIElements)[0]->SetActive(false);
+
+#pragma region P1
+	{
+		cp::GameObject* p1 = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::Player1)[0];
+		p1->InitializeState(new Game::PlayerMovingState());
+
+		// sprite component
+		cp::SpriteComponent* sprite = new cp::SpriteComponent(cp::ResourceManager::GetInstance().LoadSDLTexture("CharacterData/HeroGreen_Enrique.png"));
+		cp::Texture2D* texture = sprite->GetTextureComponent();
+		texture->AddLocalOffset(0.f, -40.f);
+		texture->SetLocalScale(40.f, 40.f);
+
+		cp::Sprite anim = cp::Sprite{};
+		anim.endOnFirstFrame = false;
+		anim.flipTexture = false;
+		anim.frameTime = 0.25f;
+		anim.nrOfLoops = 0;
+		anim.spritesX = 4;
+		anim.spritesY = 1;
+		anim.spriteWidth = 16;
+		anim.spriteHeight = 16;
+		anim.xOffset = 0;
+		anim.yOffset = 0;
+		sprite->AddAnimation("WalkRight", anim);
+		anim.flipTexture = true;
+		sprite->AddAnimation("WalkLeft", anim);
+		anim.spritesX = 1;
+		sprite->AddAnimation("IdleLeft", anim);
+		anim.flipTexture = false;
+		sprite->AddAnimation("IdleRight", anim);
+		anim.spritesX = 4;
+		anim.yOffset = 16;
+		anim.frameTime = 0.1f;
+		sprite->AddAnimation("DieRight", anim);
+		anim.flipTexture = true;
+		sprite->AddAnimation("DieLeft", anim);
+		anim.frameTime = 0.5f;
+		anim.flipTexture = false;
+		anim.yOffset = 32;
+		anim.spritesX = 2;
+		sprite->AddAnimation("ShootRight", anim);
+		anim.flipTexture = true;
+		sprite->AddAnimation("ShootLeft", anim);
+		sprite->SetAnimation("IdleRight");
+		sprite->UnPause();
+		p1->AddComponent(sprite);
+		texture->SetOwner(p1);
+
+		// collision
+		p1->AddComponent(new cp::CollisionBox(31, -18, 3, 15, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_dynamic));
+		p1->AddComponent(new cp::CollisionBox(6, -18, 3, 15, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_dynamic));
+		p1->AddComponent(new cp::CollisionBox(6, -3, 28, 3, cp::CollisionBox::CollisionSide::down, cp::CollisionBox::CollisionType::_dynamic));
+		p1->AddComponent(new cp::CollisionBox(9, -15, 22, 12, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
+		p1->AddComponent(new cp::RigidBody(true));
+
+		// translation
+		p1->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(60, -480, 0);
+
+		// score
+		p1->AddComponent(new cp::Score(0));
+
+		// health
+		cp::Health* healthComp = new cp::Health(false, 4);
+		p1->AddComponent(healthComp);
+
+
+		cp::Command* jmpCommand = new Game::JumpCommand();
+		cp::Command* lftCommand = new Game::LeftCommand();
+		cp::Command* rhtCommand = new Game::RightCommand();
+		cp::Command* fireCommand = new Game::FireCommand();
+		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyW, cp::InputState::Hold, jmpCommand);
+		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyA, cp::InputState::Hold, lftCommand);
+		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyD, cp::InputState::Hold, rhtCommand);
+		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::LeftCtrl, cp::InputState::Pressed, fireCommand);
+
+		// notify
+		p1->AddObserver(new Game::TopBottomLevelCollision());
+		p1->AddObserver(new Game::PlayerHealthChange());
+		p1->AddObserver(new Game::PlayerOverlap());
+		p1->AddObserver(new Game::PlayerScoreChange());
+
+		healthComp->AddHealth(0);
+	}
+#pragma endregion
+
+#pragma region P2
+	{
+		cp::GameObject* p2 = activeScene->GetAllGameObjectsOfType(cp::GameObjectType::Player2)[0];
+		p2->InitializeState(new Game::PlayerMovingState());
+
+		// sprite component
+		cp::SpriteComponent* sprite = new cp::SpriteComponent(cp::ResourceManager::GetInstance().LoadSDLTexture("CharacterData/EnemySpriteSheet.png"));
+		cp::Texture2D* texture = sprite->GetTextureComponent();
+		texture->AddLocalOffset(0.f, -40.f);
+		texture->SetLocalScale(40.f, 40.f);
+		SDL_Rect srcRect = texture->GetSrcRect();
+
+		cp::Sprite anim = cp::Sprite{};
+		anim.endOnFirstFrame = false;
+		anim.flipTexture = false;
+		anim.frameTime = 0.25f;
+		anim.nrOfLoops = 0;
+		anim.spritesX = 4;
+		anim.spritesY = 1;
+		anim.spriteWidth = 16;
+		anim.spriteHeight = 16;
+		anim.xOffset = 0;
+		anim.yOffset = anim.spriteHeight * 6;
+		sprite->AddAnimation("WalkRight", anim);
+		anim.flipTexture = true;
+		sprite->AddAnimation("WalkLeft", anim);
+		anim.flipTexture = false;
+		anim.xOffset = 16 * 4;
+		sprite->AddAnimation("BubbleRight", anim);
+		anim.flipTexture = true;
+		sprite->AddAnimation("BubbleLeft", anim);
+		anim.xOffset = 16 * 8;
+		sprite->AddAnimation("DieRight", anim);
+		anim.flipTexture = true;
+		sprite->AddAnimation("DieLeft", anim);
+		sprite->SetAnimation("WalkLeft");
+		sprite->UnPause();
+		p2->AddComponent(sprite);
+		texture->SetOwner(p2);
+
+		// collision
+		p2->AddComponent(new cp::CollisionBox(31, -18, 3, 15, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_dynamic));
+		p2->AddComponent(new cp::CollisionBox(6, -18, 3, 15, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_dynamic));
+		p2->AddComponent(new cp::CollisionBox(6, -3, 28, 3, cp::CollisionBox::CollisionSide::down, cp::CollisionBox::CollisionType::_dynamic));
+		p2->AddComponent(new cp::CollisionBox(9, -15, 22, 12, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
+		p2->AddComponent(new cp::RigidBody(true));
+
+		// translation
+		p2->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(540, -480, 0);
+
+		// score
+		p2->AddComponent(new cp::Score(0));
+
+		// health
+		cp::Health* healthComp = new cp::Health(false, 4);
+		p2->AddComponent(healthComp);
+
+		cp::Command* controllerJmpCommand = new Game::ControllerJumpCommand();
+		cp::Command* controllerHrzCommand = new Game::ControllerHorizontalCommand();
+		cp::Command* controllerFireCommand = new Game::ControllerFIreCommand();
+		cp::InputHandler::GetInstance().AddInput(cp::ControllerButton::ButtonA, cp::InputState::Pressed, controllerJmpCommand);
+		cp::InputHandler::GetInstance().AddInput(cp::ControllerAxis::LeftThumbStickX, controllerHrzCommand);
+		cp::InputHandler::GetInstance().AddInput(cp::ControllerAxis::RightTrigger, controllerFireCommand);
+
+		// notify
+		p2->AddObserver(new Game::TopBottomLevelCollision());
+		p2->AddObserver(new Game::PlayerHealthChange());
+		p2->AddObserver(new Game::PlayerOverlap());
+		p2->AddObserver(new Game::PlayerScoreChange());
+
+		healthComp->AddHealth(0);
+	}
+#pragma endregion
+
+	activeScene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+	activeScene->SwitchLevel(100);
 	cp::GameManager::GetInstance().SetGameState(cp::GameManager::GameState::Game);
 }

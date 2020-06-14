@@ -10,6 +10,15 @@ bool cp::Health::IsDead() const
 
 void cp::Health::AddHealth(int amount)
 {
+	if (m_GotHit && (amount < 0))
+		return;
+
+	if ((m_GotHit == false) && (amount < 0))
+	{
+		m_GotHit = true;
+		m_ImunityTimer = 0.f;
+	}
+
 	m_CurrentHealth += amount;
 
 	if (m_CurrentHealth > m_MaxHealth)
@@ -34,8 +43,13 @@ cp::Health::Health(bool deleteObjOnDeath, int maxHealth)
 {
 }
 
-void cp::Health::Update(float)
+void cp::Health::Update(float elapsedSec)
 {
+	m_ImunityTimer += elapsedSec;
+	if (m_ImunityTimer >= m_ImunityTime)
+	{
+		m_GotHit = false;
+	}
 }
 
 void cp::Health::FixedUpdate(float)

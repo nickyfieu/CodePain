@@ -31,5 +31,8 @@ namespace cp
 
 		int m_CurrentHealth;
 
+		const float m_ImunityTime{ 2.f };
+		float m_ImunityTimer = 3.f;
+		bool m_GotHit{};
 	};
 }

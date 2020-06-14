@@ -83,7 +83,6 @@ void cp::CodePain::Run()
 	SceneManager& sceneManager = SceneManager::GetInstance();
 	InputManager& input = InputManager::GetInstance();
 	InputHandler& inputHandler = InputHandler::GetInstance();
-	GameObject* gameManagerObject = GameManager::GetInstance().GetManagerObj();
 
 	input.Initialize();
 
@@ -132,9 +131,6 @@ void cp::CodePain::Run()
 				T4 = 0.f;
 				sceneManager.FixedUpdate(fixedCycleTime);
 			}
-
-			if (gameManagerObject)
-				gameManagerObject->Render();
 			renderer.Render();
 		}
 
@@ -218,8 +214,7 @@ void cp::CodePain::ImGuiDebug_Audio()
 void cp::CodePain::ImGuiDebug_Levels()
 {
 	Renderer& renderer = Renderer::GetInstance();
-	SceneManager& sceneManager = SceneManager::GetInstance();
-	Scene* scene = sceneManager.GetActiveScene();
+	Scene* activeScene = SceneManager::GetInstance().GetActiveScene();
 	GameManager& gameManager = GameManager::GetInstance();
 	int currentLevel = (int)gameManager.GetCurrentLevel();
 	int oldLevel = (int)currentLevel;
@@ -233,22 +228,23 @@ void cp::CodePain::ImGuiDebug_Levels()
 	ImGui::PushItemWidth(-100);
 	ImGui::SliderInt("Current Level", &currentLevel, 1, 100);
 
+	UNREFERENCED_PARAMETER(activeScene);
+	UNREFERENCED_PARAMETER(oldLevel);
+	UNREFERENCED_PARAMETER(spawnEnemies);
 
-	if (currentLevel != oldLevel)
-	{
-		scene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
-		gameManager.SetCurrentLevel((size_t)currentLevel);
-	}
+	// in to use disable Game::ProceedToNextLevel::OnNotify in observers.cpp/h
 
-	if (spawnEnemies)
-	{
-		gameManager.GetManagerObj()->NotifyObservers(cp::Event::EVENT_SPAWN_ENEMIES);
-	}
+	//if (currentLevel != oldLevel)
+	//{
+	//	activeScene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+	//	activeScene->SwitchLevel(currentLevel);
+	//}
+	//
+	//if (spawnEnemies)
+	//{
+	//	gameManager.GetManagerObj()->NotifyObservers(cp::Event::EVENT_SPAWN_ENEMIES);
+	//}
 
-	if (scene && (oldLevel != currentLevel))
-	{
-		scene->SwitchLevel(currentLevel);
-	}
 	ImGui::Checkbox("Visualize Collision", &renderer.gd_RenderCollisionBoxes);
 	ImGui::Checkbox("Visualize Texture Tiles", &renderer.gd_RenderTextureTiles);
 	ImGui::End();

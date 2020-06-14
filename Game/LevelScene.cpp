@@ -62,48 +62,62 @@ void Game::LevelScene::LoadSceneData() const
 
 	cp::GameObject* p2 = new cp::GameObject(cp::GameObjectType::Player2);
 	scene->Add(p2);
+	{
+		cp::GameObject* startMenu = new cp::GameObject(cp::GameObjectType::UIElements);
+		cp::Texture2D* BubbleBobbleText = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/Modes.png"));
+		BubbleBobbleText->SetDstRect({ 175,20,300,160});
+		startMenu->AddComponent(BubbleBobbleText);
+		startMenu->SetActive(true);
+		scene->Add(startMenu); 
+	}
 
-	cp::GameObject* startMenu = new cp::GameObject(cp::GameObjectType::UIElements);
-	scene->Add(startMenu);
+	{
+		cp::GameObject* bubbleBobbleStatistics = new cp::GameObject(cp::GameObjectType::UIElements);
 
-	cp::GameObject* bubbleBobbleStatistics = new cp::GameObject(cp::GameObjectType::UIElements);
+		cp::Texture2D* BubbleBobbleText = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/BubbleBobble.png"));
+		BubbleBobbleText->SetDstRect({ 652,0,200,90 });
+		bubbleBobbleStatistics->AddComponent(BubbleBobbleText);
 
-	cp::Texture2D* BubbleBobbleText = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/BubbleBobble.png"));
-	BubbleBobbleText->SetDstRect({ 652,0,200,90 });
-	bubbleBobbleStatistics->AddComponent(BubbleBobbleText);
+		cp::Texture2D* bubbleBobbleP1 = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/InfoPlayers.png"));
+		bubbleBobbleP1->SetSrcRect({ 0,0,64,16 });
+		bubbleBobbleP1->SetDstRect({ 652,150,200,50 });
+		bubbleBobbleStatistics->AddComponent(bubbleBobbleP1);
 
-	cp::Texture2D* bubbleBobbleP1 = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/InfoPlayers.png"));
-	bubbleBobbleP1->SetSrcRect({ 0,0,64,16 });
-	bubbleBobbleP1->SetDstRect({ 652,150,200,50 });
-	bubbleBobbleStatistics->AddComponent(bubbleBobbleP1);
+		cp::Text* bubbleBobbleP1Lives = new cp::Text("0 HP", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 0,204,0 });
+		bubbleBobbleP1Lives->GetTexture2D()->AddLocalOffset(652, 200);
+		bubbleBobbleStatistics->AddComponent(bubbleBobbleP1Lives);
 
-	cp::Text* bubbleBobbleP1Lives = new cp::Text("0 HP", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 0,204,0 });
-	bubbleBobbleP1Lives->GetTexture2D()->AddLocalOffset(652, 200);
-	bubbleBobbleStatistics->AddComponent(bubbleBobbleP1Lives);
+		cp::Texture2D* bubbleBobbleP2 = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/InfoPlayers.png"));
+		bubbleBobbleP2->SetSrcRect({ 0,16,64,16 });
+		bubbleBobbleP2->SetDstRect({ 652,300,200,50 });
+		bubbleBobbleStatistics->AddComponent(bubbleBobbleP2);
 
-	cp::Texture2D* bubbleBobbleP2 = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/InfoPlayers.png"));
-	bubbleBobbleP2->SetSrcRect({ 0,16,64,16 });
-	bubbleBobbleP2->SetDstRect({ 652,300,200,50 });
-	bubbleBobbleStatistics->AddComponent(bubbleBobbleP2);
+		cp::Text* bubbleBobbleP2Lives = new cp::Text("0 HP", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 68,170,221 });
+		bubbleBobbleP2Lives->GetTexture2D()->AddLocalOffset(652, 350);
+		bubbleBobbleStatistics->AddComponent(bubbleBobbleP2Lives);
 
-	cp::Text* bubbleBobbleP2Lives = new cp::Text("0 HP", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 68,170,221 });
-	bubbleBobbleP2Lives->GetTexture2D()->AddLocalOffset(652, 350);
-	bubbleBobbleStatistics->AddComponent(bubbleBobbleP2Lives);
+		Uint32 levelSquareColor{};
+		levelSquareColor = (levelSquareColor | 255) << 8;
+		levelSquareColor = (levelSquareColor | 0) << 8;
+		levelSquareColor = (levelSquareColor | 0) << 8;
+		levelSquareColor = (levelSquareColor | 0) << 0;
+		cp::ColorRect2D* bubbleBobbleLevelSquare = new cp::ColorRect2D(0, 0, 40, 20, levelSquareColor);
+		bubbleBobbleStatistics->AddComponent(bubbleBobbleLevelSquare);
 
-	Uint32 levelSquareColor{};
-	levelSquareColor = (levelSquareColor | 255) << 8;
-	levelSquareColor = (levelSquareColor | 0) << 8;
-	levelSquareColor = (levelSquareColor | 0) << 8;
-	levelSquareColor = (levelSquareColor | 0) << 0;
-	cp::ColorRect2D* bubbleBobbleLevelSquare = new cp::ColorRect2D(0,0, 40,20, levelSquareColor);
-	bubbleBobbleStatistics->AddComponent(bubbleBobbleLevelSquare);
+		cp::Text* levelText = new cp::Text(" 01", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 25), { 255,255,255 });
+		levelText->GetTexture2D()->AddLocalOffset(0, -5);
+		bubbleBobbleStatistics->AddComponent(levelText);
+		scene->Add(bubbleBobbleStatistics);
 
-	cp::Text* levelText = new cp::Text(" 01", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 25), { 255,255,255 });
-	levelText->GetTexture2D()->AddLocalOffset(0, -5);
-	bubbleBobbleStatistics->AddComponent(levelText);
+		cp::Text* bubbleBobbleP1Score = new cp::Text("0", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 0,204,0 });
+		bubbleBobbleP1Score->GetTexture2D()->AddLocalOffset(652, 250);
+		bubbleBobbleStatistics->AddComponent(bubbleBobbleP1Score);
 
+		cp::Text* bubbleBobbleP2Score = new cp::Text("0", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 68,170,221 });
+		bubbleBobbleP2Score->GetTexture2D()->AddLocalOffset(652, 400);
+		bubbleBobbleStatistics->AddComponent(bubbleBobbleP2Score);
+	}
 
-	scene->Add(bubbleBobbleStatistics);
 #pragma region ExtraLevelCollision
 
 	std::vector<cp::GameObject*> levelObjects = scene->GetAllGameObjectsOfType(cp::GameObjectType::level);
@@ -118,5 +132,6 @@ void Game::LevelScene::LoadSceneData() const
 
 #pragma endregion
 
+	cp::GameManager::GetInstance().GetManagerObj()->AddObserver(new ProceedToNextLevel());
 
 }

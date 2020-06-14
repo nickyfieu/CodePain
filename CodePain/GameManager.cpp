@@ -2,6 +2,8 @@
 #include "GameManager.h"
 #include "GameObject.h"
 #include "Observer.h"
+#include "SceneManager.h"
+#include "Scene.h"
 #include <SDL_mixer.h>
 
 cp::GameManager::~GameManager()
@@ -25,6 +27,7 @@ size_t cp::GameManager::GetChannelVolume(int channel) const
 void cp::GameManager::SetCurrentLevel(size_t currentLevel)
 {
 	m_CurrentLevel = currentLevel;
+
 	m_ManagerObj->NotifyObservers(cp::Event::EVENT_SPAWN_ENEMIES);
 }
 

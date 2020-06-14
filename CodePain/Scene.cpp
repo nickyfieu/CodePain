@@ -117,14 +117,23 @@ void cp::Scene::Update(const float elapsedSec)
 	size_t amountToRemove = 0;
 	std::vector<GameObject*>removeReferences;
 
-	for(size_t i = 0; i < m_AmountOfObjects; i++)
+	for (size_t i = 0; i < m_AmountOfObjects; i++)
 	{
 		if (m_pObjects[i]->GetToDestroy())
 		{
 			amountToRemove++;
 			removeReferences.push_back(m_pObjects[i]);
 		}
-		else if (m_pObjects[i]->GetIsActive())
+	}
+
+	for (size_t i = 0; i < amountToRemove; i++)
+	{
+		DeleteGameObject(removeReferences[i]);
+	}
+
+	for(size_t i = 0; i < m_AmountOfObjects; i++)
+	{
+		if (m_pObjects[i]->GetIsActive())
 		{
 #ifdef MULTI_THREADING
 			updateFutures.push_back(std::async(std::launch::async, UpdateActiveObject, m_pObjects[i], elapsedSec));
@@ -133,11 +142,6 @@ void cp::Scene::Update(const float elapsedSec)
 			m_pObjects[i]->Update(elapsedSec);
 #endif
 		}
-	}
-
-	for (size_t i = 0; i < amountToRemove; i++)
-	{
-		DeleteGameObject(removeReferences[i]);
 	}
 }
 

@@ -10,17 +10,20 @@ namespace cp
 namespace Game
 {
 
-	struct IdleState final : public cp::State
+	struct PlayerMovingState final : public cp::State
 	{
-		IdleState() = default;
-		virtual ~IdleState() = default;
+		PlayerMovingState() = default;
+		virtual ~PlayerMovingState() = default;
 
-		IdleState& operator=(const IdleState&) = delete;
-		IdleState& operator=(IdleState&&) = delete;
-		IdleState(const IdleState&) = delete;
-		IdleState(IdleState&&) = delete;
+		PlayerMovingState& operator=(const PlayerMovingState&) = delete;
+		PlayerMovingState& operator=(PlayerMovingState&&) = delete;
+		PlayerMovingState(const PlayerMovingState&) = delete;
+		PlayerMovingState(PlayerMovingState&&) = delete;
 
-		virtual bool UpdateState(const cp::GameObject* gameObject) override;
+		virtual bool UpdateState(const cp::GameObject * gameObject) override;
+	private:
+		unsigned int m_LeftAnimName = (unsigned int)std::hash<std::string>{}("WalkLeft");
+		unsigned int m_RightAnimName = (unsigned int)std::hash<std::string>{}("WalkRight");
 	};
 
 	// moves left right and (up at random)

@@ -8,20 +8,6 @@ namespace cp
 
 namespace Game
 {
-
-	struct IdleEvent final : public cp::Observer
-	{
-		IdleEvent() = default;
-		virtual ~IdleEvent() = default;
-
-		IdleEvent& operator=(const IdleEvent&) = delete;
-		IdleEvent& operator=(IdleEvent&&) = delete;
-		IdleEvent(const IdleEvent&) = delete;
-		IdleEvent(IdleEvent&&) = delete;
-
-		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
-	};
-
 	struct SpawnLevelEnemies final : public cp::Observer
 	{
 		SpawnLevelEnemies() = default;
@@ -60,6 +46,45 @@ namespace Game
 		PlayerHealthChange(PlayerHealthChange&&) = delete;
 
 		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
+	};
+
+	struct PlayerScoreChange final : public cp::Observer
+	{
+		PlayerScoreChange() = default;
+		virtual ~PlayerScoreChange() = default;
+
+		PlayerScoreChange& operator=(const PlayerScoreChange&) = delete;
+		PlayerScoreChange& operator=(PlayerScoreChange&&) = delete;
+		PlayerScoreChange(const PlayerScoreChange&) = delete;
+		PlayerScoreChange(PlayerScoreChange&&) = delete;
+
+		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
+	};
+
+	struct PlayerOverlap final : public cp::Observer
+	{
+		PlayerOverlap() = default;
+		virtual ~PlayerOverlap() = default;
+
+		PlayerOverlap& operator=(const PlayerOverlap&) = delete;
+		PlayerOverlap& operator=(PlayerOverlap&&) = delete;
+		PlayerOverlap(const PlayerOverlap&) = delete;
+		PlayerOverlap(PlayerOverlap&&) = delete;
+
+		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
+	};
+
+	struct ProceedToNextLevel final : public cp::Observer
+	{
+		ProceedToNextLevel() = default;
+		virtual ~ProceedToNextLevel() = default;
+
+		ProceedToNextLevel& operator=(const ProceedToNextLevel&) = delete;
+		ProceedToNextLevel& operator=(ProceedToNextLevel&&) = delete;
+		ProceedToNextLevel(const ProceedToNextLevel&) = delete;
+		ProceedToNextLevel(ProceedToNextLevel&&) = delete;
+
+		virtual void OnNotify(const cp::GameObject * entity, cp::Event event) override;
 	};
 
 }
