@@ -1,9 +1,8 @@
 .vs/
 CodePain/x64/
-x64/
 CodePain/Win32/
 Debug/
-Build/Win32/Data
+Build/
 Game/Release/Main.obj
 Game/Release/
 Release/
