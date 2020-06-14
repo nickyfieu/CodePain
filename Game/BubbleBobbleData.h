@@ -27,7 +27,7 @@ namespace Game
 		EnemyType enemyType;
 		unsigned char collumn;
 		unsigned char row;
-		bool unknown1;
+		bool isMovingDown;
 		bool unknown2;
 		bool unknown3;
 		bool unknown4;

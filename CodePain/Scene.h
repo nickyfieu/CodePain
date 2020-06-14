@@ -43,6 +43,7 @@ namespace cp
 		std::vector<GameObject*> GetAllGameObjectsOfType(GameObjectType type);
 		void DeleteAllGameObjectsOfType(GameObjectType type);
 		void DeleteGameObject(GameObject* ref);
+		void SwitchLevel(size_t levelIndex);
 	};
 
 }

@@ -85,7 +85,7 @@ void Game::BubbleBobbleDataReader::ReadEnemyData(const std::string& enemyDataPat
 		enemy.enemyType = EnemyType(firstByte & enemyTypeMask);
 		enemy.collumn = (firstByte & enemyCollumnRowMask) >> byteCollumnRowShift;
 		enemy.row = (secondByte & enemyCollumnRowMask) >> byteCollumnRowShift;
-		enemy.unknown1 = (secondByte & (boolBitsMask >> 5));
+		enemy.isMovingDown = (secondByte & (boolBitsMask >> 5));
 		enemy.unknown2 = (secondByte & (boolBitsMask >> 6));
 		enemy.unknown3 = (secondByte & (boolBitsMask >> 7));
 		enemy.unknown4 = (thirdByte & (boolBitsMask >> 0));
@@ -358,13 +358,15 @@ void Game::BubbleBobbleDataReader::CreateLevelCollision(cp::GameObject* pLevelOb
 
 cp::GameObject* Game::BubbleBobbleDataReader::InitLevelGameObject(unsigned int levelIndex, cp::Scene* pScene)
 {
+	UNREFERENCED_PARAMETER(levelIndex);
 	// create a level game object and add it
 	cp::GameObject* levelGameObject = new cp::GameObject(cp::GameObjectType::level);
 	pScene->Add(levelGameObject);
 	// adding a transform with height offset 
 	// so that levels are stacked ( lvl 1 highest 2 below it etc )
-	cp::Transform* levelTransform = levelGameObject->GetComponent<cp::Transform>(cp::ComponentType::_Transform);
-	if (levelTransform != nullptr)
-		levelTransform->SetPosition(0.f, -float(levelIndex * m_WindowTileSize * m_LevelTilesHigh), 0.f);
+	//cp::Transform* levelTransform = levelGameObject->GetComponent<cp::Transform>(cp::ComponentType::_Transform);
+	//uncomment if level transitions are a thing(probs wont be a thing)
+	//if (levelTransform != nullptr)
+	//	levelTransform->SetPosition(0.f, -float(levelIndex * m_WindowTileSize * m_LevelTilesHigh), 0.f);
 	return levelGameObject;
 }

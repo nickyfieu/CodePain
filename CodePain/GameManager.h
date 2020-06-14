@@ -8,6 +8,13 @@ namespace cp
 	class GameManager final : public Singleton<GameManager>
 	{
 	public:
+
+		enum class GameState
+		{
+			Menu,
+			Game,
+		};
+
 		virtual ~GameManager();
 
 		GameManager(const GameManager& other) = delete;
@@ -27,6 +34,8 @@ namespace cp
 		// channel if -1 means all channels otherwise starts from 1
 		void SetChannelVolume(int channel, size_t volume);
 
+		GameState GetState() const { return m_CurrentState; }
+		void SetGameState(GameState state) { m_CurrentState = state; }
 
 	private:
 		bool IsValidChannel(int channel) const;
@@ -38,5 +47,7 @@ namespace cp
 		size_t m_CurrentLevel;
 		// variable between 0 - 100
 		size_t m_ChannelVolume[CHANNELS]{STARTVOLUME,STARTVOLUME};
+
+		GameState m_CurrentState = GameState::Menu;
 	};
 }

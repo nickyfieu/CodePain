@@ -26,7 +26,7 @@ void Game::LevelScene::LoadSceneData() const
 
 	Game::BubbleBobbleAudio* bubbleBobbleAudio = new Game::BubbleBobbleAudio();
 	bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::GameLoop, "Audio/gameloop.wav");
-	// mp3 test file ;)
+	// mp3 test file ;) (note loud)
 	// bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::GameLoop, "Audio/bruhblebrohblemaintheme.mp3");
 	bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::GameOver, "Audio/gameover.wav");
 	bubbleBobbleAudio->AddMusic(Game::BubbleBobbleAudio::Music::Intro, "Audio/intro.wav");
@@ -43,157 +43,67 @@ void Game::LevelScene::LoadSceneData() const
 #pragma endregion
 
 #pragma region enemySpawner
+
 	{
 		cp::GameManager& gameManager = cp::GameManager::GetInstance();
 		gameManager.GetManagerObj()->AddObserver(new Game::SpawnLevelEnemies());
 	}
-#pragma endregion
-
-#pragma region P1TestObj
-	{
-		cp::GameObject* p1 = new cp::GameObject(cp::GameObjectType::Player1);
-		p1->InitializeState(new Game::IdleState());
-		scene->Add(p1);
-
-		// sprite component
-		cp::SpriteComponent* sprite = new cp::SpriteComponent(cp::ResourceManager::GetInstance().LoadSDLTexture("CharacterData/HeroGreen_Enrique.png"));
-		cp::Texture2D* texture = sprite->GetTextureComponent();
-		texture->AddLocalOffset(0.f, -40.f);
-		texture->SetLocalScale(40.f, 40.f);
-
-		cp::Sprite anim = cp::Sprite{};
-		anim.endOnFirstFrame = false;
-		anim.flipTexture = false;
-		anim.frameTime = 0.25f;
-		anim.nrOfLoops = 0;
-		anim.spritesX = 4;
-		anim.spritesY = 1;
-		anim.spriteWidth = 16;
-		anim.spriteHeight = 16;
-		anim.xOffset = 0;
-		anim.yOffset = 0;
-		sprite->AddAnimation("WalkRight", anim);
-		anim.flipTexture = true;
-		sprite->AddAnimation("WalkLeft", anim);
-		anim.spritesX = 1;
-		sprite->AddAnimation("IdleLeft", anim);
-		anim.flipTexture = false;
-		sprite->AddAnimation("IdleRight", anim);
-		anim.spritesX = 4;
-		anim.yOffset = 16;
-		anim.frameTime = 0.1f;
-		sprite->AddAnimation("DieRight", anim);
-		anim.flipTexture = true;
-		sprite->AddAnimation("DieLeft", anim);
-		anim.frameTime = 0.5f;
-		anim.flipTexture = false;
-		anim.yOffset = 32;
-		anim.spritesX = 2;
-		sprite->AddAnimation("ShootRight", anim);
-		anim.flipTexture = true;
-		sprite->AddAnimation("ShootLeft", anim);
-		sprite->SetAnimation("IdleRight");
-		sprite->UnPause();
-		p1->AddComponent(sprite);
-		texture->SetOwner(p1);
-
-		// collision
-		p1->AddComponent(new cp::CollisionBox(31, -18, 3, 15, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_dynamic));
-		p1->AddComponent(new cp::CollisionBox(6, -18, 3, 15, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_dynamic));
-		p1->AddComponent(new cp::CollisionBox(6, -3, 28, 3, cp::CollisionBox::CollisionSide::down, cp::CollisionBox::CollisionType::_dynamic));
-		p1->AddComponent(new cp::CollisionBox(9, -15, 22, 12, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
-		p1->AddComponent(new cp::RigidBody(true));
-
-		// translation
-		p1->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(60, -480, 0);
-
-		cp::Command* jmpCommand = new Game::JumpCommand();
-		cp::Command* lftCommand = new Game::LeftCommand();
-		cp::Command* rhtCommand = new Game::RightCommand();
-		cp::Command* fireCommand = new Game::FireCommand();
-		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyW, cp::InputState::Hold, jmpCommand);
-		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyA, cp::InputState::Hold, lftCommand);
-		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::KeyD, cp::InputState::Hold, rhtCommand);
-		cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::LeftCtrl, cp::InputState::Pressed, fireCommand);
-
-		// notify
-		p1->AddObserver(new Game::IdleEvent());
-		p1->AddObserver(new Game::BottomLevelCollision());
-
-	}
-#pragma endregion
-
-#pragma region P2TestObj
-	{
-		cp::GameObject* p2 = new cp::GameObject(cp::GameObjectType::Player2);
-		p2->InitializeState(new Game::IdleState());
-		scene->Add(p2);
-		// sprite component
-		cp::SpriteComponent* sprite = new cp::SpriteComponent(cp::ResourceManager::GetInstance().LoadSDLTexture("CharacterData/HeroBlue_Enrique.png"));
-		cp::Texture2D* texture = sprite->GetTextureComponent();
-		texture->AddLocalOffset(0.f, -40.f);
-		texture->SetLocalScale(40.f, 40.f);
-
-		cp::Sprite anim = cp::Sprite{};
-		anim.endOnFirstFrame = false;
-		anim.flipTexture = false;
-		anim.frameTime = 0.25f;
-		anim.nrOfLoops = 0;
-		anim.spritesX = 4;
-		anim.spritesY = 1;
-		anim.spriteWidth = 16;
-		anim.spriteHeight = 16;
-		anim.xOffset = 0;
-		anim.yOffset = 0;
-		sprite->AddAnimation("WalkRight", anim);
-		anim.flipTexture = true;
-		sprite->AddAnimation("WalkLeft", anim);
-		anim.spritesX = 1;
-		sprite->AddAnimation("IdleLeft", anim);
-		anim.flipTexture = false;
-		sprite->AddAnimation("IdleRight", anim);
-		anim.yOffset = 16;
-		anim.spritesX = 4;
-		anim.frameTime = 0.1f;
-		sprite->AddAnimation("DieRight", anim);
-		anim.flipTexture = true;
-		sprite->AddAnimation("DieLeft", anim);
-		anim.frameTime = 0.5f;
-		anim.flipTexture = false;
-		anim.yOffset = 32;
-		anim.spritesX = 2;
-		sprite->AddAnimation("ShootRight", anim);
-		anim.flipTexture = true;
-		sprite->AddAnimation("ShootLeft", anim);
-		sprite->SetAnimation("IdleLeft");
-		sprite->UnPause();
-		p2->AddComponent(sprite);
-		texture->SetOwner(p2);
-
-		// collision
-		p2->AddComponent(new cp::CollisionBox(35, -18, 3, 15, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_dynamic));
-		p2->AddComponent(new cp::CollisionBox(3, -18, 3, 15, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_dynamic));
-		p2->AddComponent(new cp::CollisionBox(3, -3, 34, 3, cp::CollisionBox::CollisionSide::down, cp::CollisionBox::CollisionType::_dynamic));
-		p2->AddComponent(new cp::CollisionBox(9, -15, 22, 12, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
-		p2->AddComponent(new cp::RigidBody(true));
-
-		// translation
-		p2->GetComponent<cp::Transform>(cp::ComponentType::_Transform)->Translate(540, -480, 0);
-
-		cp::Command* controllerJmpCommand = new Game::ControllerJumpCommand();
-		cp::Command* controllerHrzCommand = new Game::ControllerHorizontalCommand();
-		cp::Command* controllerFireCommand = new Game::ControllerFIreCommand();
-		cp::InputHandler::GetInstance().AddInput(cp::ControllerButton::ButtonA, cp::InputState::Pressed, controllerJmpCommand);
-		cp::InputHandler::GetInstance().AddInput(cp::ControllerAxis::LeftThumbStickX, controllerHrzCommand);
-		cp::InputHandler::GetInstance().AddInput(cp::ControllerAxis::RightTrigger, controllerFireCommand);
-
-		// notify
-		p2->AddObserver(new Game::IdleEvent());
-		p2->AddObserver(new Game::BottomLevelCollision());
-	}
 
 #pragma endregion
 
+	cp::GameObject* p1 = new cp::GameObject(cp::GameObjectType::Player1);
+	scene->Add(p1);
+	cp::Command* start1PCommand = new Game::StartP1Game();
+	cp::Command* start2PCommand = new Game::StartP2Game();
+	cp::Command* start1V1Command = new Game::Start1v1Game();
+	cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::Key1, cp::InputState::Hold, start1PCommand);
+	cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::Key2, cp::InputState::Hold, start2PCommand);
+	cp::InputHandler::GetInstance().AddInput(cp::KeyboardKey::Key3, cp::InputState::Hold, start1V1Command);
+
+	cp::GameObject* p2 = new cp::GameObject(cp::GameObjectType::Player2);
+	scene->Add(p2);
+
+	cp::GameObject* startMenu = new cp::GameObject(cp::GameObjectType::UIElements);
+	scene->Add(startMenu);
+
+	cp::GameObject* bubbleBobbleStatistics = new cp::GameObject(cp::GameObjectType::UIElements);
+
+	cp::Texture2D* BubbleBobbleText = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/BubbleBobble.png"));
+	BubbleBobbleText->SetDstRect({ 652,0,200,90 });
+	bubbleBobbleStatistics->AddComponent(BubbleBobbleText);
+
+	cp::Texture2D* bubbleBobbleP1 = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/InfoPlayers.png"));
+	bubbleBobbleP1->SetSrcRect({ 0,0,64,16 });
+	bubbleBobbleP1->SetDstRect({ 652,150,200,50 });
+	bubbleBobbleStatistics->AddComponent(bubbleBobbleP1);
+
+	cp::Text* bubbleBobbleP1Lives = new cp::Text("0 HP", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 0,204,0 });
+	bubbleBobbleP1Lives->GetTexture2D()->AddLocalOffset(652, 200);
+	bubbleBobbleStatistics->AddComponent(bubbleBobbleP1Lives);
+
+	cp::Texture2D* bubbleBobbleP2 = new cp::Texture2D(cp::ResourceManager::GetInstance().LoadSDLTexture("UI/InfoPlayers.png"));
+	bubbleBobbleP2->SetSrcRect({ 0,16,64,16 });
+	bubbleBobbleP2->SetDstRect({ 652,300,200,50 });
+	bubbleBobbleStatistics->AddComponent(bubbleBobbleP2);
+
+	cp::Text* bubbleBobbleP2Lives = new cp::Text("0 HP", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 40), { 68,170,221 });
+	bubbleBobbleP2Lives->GetTexture2D()->AddLocalOffset(652, 350);
+	bubbleBobbleStatistics->AddComponent(bubbleBobbleP2Lives);
+
+	Uint32 levelSquareColor{};
+	levelSquareColor = (levelSquareColor | 255) << 8;
+	levelSquareColor = (levelSquareColor | 0) << 8;
+	levelSquareColor = (levelSquareColor | 0) << 8;
+	levelSquareColor = (levelSquareColor | 0) << 0;
+	cp::ColorRect2D* bubbleBobbleLevelSquare = new cp::ColorRect2D(0,0, 40,20, levelSquareColor);
+	bubbleBobbleStatistics->AddComponent(bubbleBobbleLevelSquare);
+
+	cp::Text* levelText = new cp::Text(" 01", cp::ResourceManager::GetInstance().LoadFont("Font/BubbleBobble.otf", 25), { 255,255,255 });
+	levelText->GetTexture2D()->AddLocalOffset(0, -5);
+	bubbleBobbleStatistics->AddComponent(levelText);
+
+
+	scene->Add(bubbleBobbleStatistics);
 #pragma region ExtraLevelCollision
 
 	std::vector<cp::GameObject*> levelObjects = scene->GetAllGameObjectsOfType(cp::GameObjectType::level);
@@ -202,7 +112,8 @@ void Game::LevelScene::LoadSceneData() const
 	{
 		levelObjects[i]->AddComponent(new cp::CollisionBox(0, -500, 2 * 20, 20 * 25 + 2 * 500, cp::CollisionBox::CollisionSide::right, cp::CollisionBox::CollisionType::_static));
 		levelObjects[i]->AddComponent(new cp::CollisionBox((20 * 30), -500, 2 * 20, 20 * 25 + 2 * 500, cp::CollisionBox::CollisionSide::left, cp::CollisionBox::CollisionType::_static));
-		levelObjects[i]->AddComponent(new cp::CollisionBox(40, 540, 560, 40, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
+		levelObjects[i]->AddComponent(new cp::CollisionBox(40, 550, 560, 30, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
+		levelObjects[i]->AddComponent(new cp::CollisionBox(40, -20, 560, 30, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
 	}
 
 #pragma endregion

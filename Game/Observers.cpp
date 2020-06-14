@@ -8,6 +8,8 @@
 #include "Logger.h"
 #include "ResourceManager.h"
 #include "States.h"
+#include "SceneManager.h"
+
 
 void Game::IdleEvent::OnNotify(const cp::GameObject* entity, cp::Event event)
 {
@@ -32,6 +34,9 @@ void Game::SpawnLevelEnemies::OnNotify(const cp::GameObject*, cp::Event event)
 
 	size_t currentLevel = gameManager.GetCurrentLevel();
 	const std::vector<Game::BubbleBobbleEnemyData>& enemyLevelData = dataReader.GetLevelEnemyData(currentLevel - 1);
+
+	cp::GameObject* player1Obj = currentScene->GetAllGameObjectsOfType(cp::GameObjectType::Player1)[0];
+	cp::GameObject* player2Obj = currentScene->GetAllGameObjectsOfType(cp::GameObjectType::Player2)[0];
 
 	size_t amountOfEnemies = enemyLevelData.size();
 	for (size_t i = 0; i < amountOfEnemies; i++)
@@ -99,7 +104,8 @@ void Game::SpawnLevelEnemies::OnNotify(const cp::GameObject*, cp::Event event)
 		newEnemy->AddComponent(new cp::CollisionBox(9, -15, 22, 12, cp::CollisionBox::CollisionSide::all, cp::CollisionBox::CollisionType::_dynamic));
 		newEnemy->AddComponent(new cp::RigidBody(!flyingType));
 
-		newEnemy->AddObserver(new Game::BottomLevelCollision());
+		newEnemy->AddObserver(new Game::TopBottomLevelCollision());
+		newEnemy->AddObserver(new Game::TopBottomLevelCollision());
 
 		currentScene->Add(newEnemy);
 
@@ -107,17 +113,20 @@ void Game::SpawnLevelEnemies::OnNotify(const cp::GameObject*, cp::Event event)
 		switch (enemyLevelData[i].enemyType)
 		{
 		case Game::EnemyType::ZenChan:
-		case Game::EnemyType::Hidegons:
 			newEnemy->InitializeState(new Game::EnemyMovingState1());
 			break;
 		case Game::EnemyType::Banebou:
+			newEnemy->InitializeState(new Game::EnemyMovingState3());
 			break;
 		case Game::EnemyType::Pulpul:
+			// bool bit 1 => up = false / down = true
+			newEnemy->InitializeState(new Game::EnemyMovingState4(enemyLevelData[i].isMovingDown, 200.f,100.f));
 			break;
 		case Game::EnemyType::Monsta:
+			newEnemy->InitializeState(new Game::EnemyMovingState4(enemyLevelData[i].isMovingDown, 125.f, 125.f));
 			break;
+		case Game::EnemyType::Hidegons:
 		case Game::EnemyType::Drunk:
-			break;
 		case Game::EnemyType::Mighta:
 			break;
 		case Game::EnemyType::Invader:
@@ -127,11 +136,17 @@ void Game::SpawnLevelEnemies::OnNotify(const cp::GameObject*, cp::Event event)
 			break;
 		}
 
-
+		// target component
+		cp::Target* pTarget = new cp::Target();
+		if (player1Obj)
+			pTarget->AddTarget(player1Obj);
+		if (player2Obj)
+			pTarget->AddTarget(player2Obj);
+		newEnemy->AddComponent(pTarget);
 	}
 }
 
-void Game::BottomLevelCollision::OnNotify(const cp::GameObject* entity, cp::Event event)
+void Game::TopBottomLevelCollision::OnNotify(const cp::GameObject* entity, cp::Event event)
 {
 	if (event != cp::Event::EVENT_COLLISION_OVERLAP)
 		return;
@@ -149,10 +164,50 @@ void Game::BottomLevelCollision::OnNotify(const cp::GameObject* entity, cp::Even
 	if (!IsOverlappingWithLevel)
 		return;
 
-	if (!entity->HasComponent<cp::RigidBody>(cp::ComponentType::_RigidBody))
+	cp::RigidBody* rigid = entity->GetComponent<cp::RigidBody>(cp::ComponentType::_RigidBody);
+	if (rigid == nullptr)
 		return;
 
 	cp::Transform* transform = entity->GetComponent<cp::Transform>(cp::ComponentType::_Transform);
 	glm::vec3 currPos = transform->GetPosition();
-	transform->SetPosition(currPos.x, 20, currPos.z);
+	if (currPos.y >= 250.f)
+	{
+		if (rigid->GetForce().y < 0)
+		{
+			transform->SetPosition(currPos.x, 5, currPos.z);
+		}
+	}
+	else
+	{
+		if (rigid->GetForce().y > 0)
+		{
+			transform->SetPosition(currPos.x, -525, currPos.z);
+		}
+	}
+}
+
+void Game::PlayerHealthChange::OnNotify(const cp::GameObject* entity, cp::Event event)
+{
+	if (event != cp::Event::EVENT_HP_CHANGE)
+		return;
+
+	if ((entity->GetType() != cp::GameObjectType::Player1) && (entity->GetType() != cp::GameObjectType::Player2))
+		return;
+
+	cp::Health* health = entity->GetComponent<cp::Health>(cp::ComponentType::_Health);
+	if (health == nullptr)
+		return;
+
+	cp::Scene* currentScene = cp::SceneManager::GetInstance().GetActiveScene();
+	std::vector<cp::GameObject*> uiObjectVector = currentScene->GetAllGameObjectsOfType(cp::GameObjectType::UIElements);
+	const size_t bubbleBobbleStatisticsIndex = 2 - 1;
+	std::vector<cp::Text*> textComponents = uiObjectVector[bubbleBobbleStatisticsIndex]->GetAllComponentsOfType<cp::Text>(cp::ComponentType::_Text);
+	if (entity->GetType() == cp::GameObjectType::Player1)
+	{
+		textComponents[0]->SetText(std::to_string(health->GetHealth()) + " HP");
+	}
+	else if (entity->GetType() == cp::GameObjectType::Player2)
+	{
+		textComponents[1]->SetText(std::to_string(health->GetHealth()) + " HP");
+	}
 }

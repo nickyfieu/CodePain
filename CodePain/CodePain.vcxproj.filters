@@ -85,6 +85,15 @@
     <ClCompile Include="AudioLocator.cpp">
       <Filter>Resources\AudioLocator</Filter>
     </ClCompile>
+    <ClCompile Include="Score.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Health.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Target.cpp">
+      <Filter>Resources\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePainPCH.h">
@@ -194,6 +203,15 @@
     </ClInclude>
     <ClInclude Include="AudioLocator.h">
       <Filter>Resources\AudioLocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Score.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Health.h">
+      <Filter>Resources\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Target.h">
+      <Filter>Resources\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

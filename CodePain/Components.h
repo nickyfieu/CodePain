@@ -9,3 +9,6 @@
 #include "ColorRect2D.h"
 #include "RigidBody.h"
 #include "SpriteComponent.h"
+#include "Health.h"
+#include "Score.h"
+#include "Target.h"

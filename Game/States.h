@@ -57,6 +57,47 @@ namespace Game
 		unsigned int m_RightAnimName = (unsigned int)std::hash<std::string>{}("WalkRight");
 	};
 
+	// only moves left right up constantly
+	struct EnemyMovingState3 final : public cp::State
+	{
+		EnemyMovingState3() = default;
+		virtual ~EnemyMovingState3() = default;
+
+		EnemyMovingState3& operator=(const EnemyMovingState3&) = delete;
+		EnemyMovingState3& operator=(EnemyMovingState3&&) = delete;
+		EnemyMovingState3(const EnemyMovingState3&) = delete;
+		EnemyMovingState3(EnemyMovingState3&&) = delete;
+
+		virtual bool UpdateState(const cp::GameObject* gameObject) override;
+	private:
+		unsigned int m_LeftAnimName = (unsigned int)std::hash<std::string>{}("WalkLeft");
+		unsigned int m_RightAnimName = (unsigned int)std::hash<std::string>{}("WalkRight");
+
+		bool m_HasHitGround = false;
+	};
+
+	// flying enemies moves left right up down  at a speed and have a bool move up / move down
+	struct EnemyMovingState4 final : public cp::State
+	{
+		EnemyMovingState4(bool isMovingDown, float horizontalForce, float verticalForce);
+		virtual ~EnemyMovingState4() = default;
+
+		EnemyMovingState4& operator=(const EnemyMovingState4&) = delete;
+		EnemyMovingState4& operator=(EnemyMovingState4&&) = delete;
+		EnemyMovingState4(const EnemyMovingState4&) = delete;
+		EnemyMovingState4(EnemyMovingState4&&) = delete;
+
+		virtual bool UpdateState(const cp::GameObject* gameObject) override;
+
+	private:
+		unsigned int m_LeftAnimName = (unsigned int)std::hash<std::string>{}("WalkLeft");
+		unsigned int m_RightAnimName = (unsigned int)std::hash<std::string>{}("WalkRight");
+
+		bool m_IsMovingDown = false;
+		float m_HorizontalForce = 0.f;
+		float m_VerticalForce = 0.f;
+	};
+
 }
 
 

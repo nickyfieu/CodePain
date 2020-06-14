@@ -63,6 +63,26 @@ void cp::Scene::DeleteGameObject(GameObject* ref)
 		manager.GetManagerObj()->NotifyObservers(cp::Event::EVENT_OBJ_DESTROYED);
 }
 
+void cp::Scene::SwitchLevel(size_t levelIndex)
+{
+	std::vector<GameObject*> levels = GetAllGameObjectsOfType(GameObjectType::level);
+	GameManager& manager = GameManager::GetInstance();
+	GameObject* currLevel = nullptr;
+	for (GameObject* level : levels)
+	{
+		if (level->GetIsActive())
+			currLevel = level;
+	}
+	GameObject* nextLevel = levels[levelIndex-1];
+	if (nextLevel != nullptr)
+	{
+		if (currLevel)
+			currLevel->SetActive(false);
+		nextLevel->SetActive(true);
+		manager.SetCurrentLevel(levelIndex);
+	}
+}
+
 void cp::Scene::Add(GameObject* object)
 {
 	m_pObjects.push_back(object);

@@ -20,6 +20,9 @@ namespace cp
 		_ColorRect2D,
 		_RigidBody,
 		_SpriteComponent,
+		_Health,
+		_Score,
+		_Target,
 	};
 
 	// BaseComponent is a pure virtual class

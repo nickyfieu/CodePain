@@ -35,15 +35,29 @@ namespace Game
 		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
 	};
 
-	struct BottomLevelCollision final : public cp::Observer
+	struct TopBottomLevelCollision final : public cp::Observer
 	{
-		BottomLevelCollision() = default;
-		virtual ~BottomLevelCollision() = default;
+		TopBottomLevelCollision() = default;
+		virtual ~TopBottomLevelCollision() = default;
 
-		BottomLevelCollision& operator=(const BottomLevelCollision&) = delete;
-		BottomLevelCollision& operator=(BottomLevelCollision&&) = delete;
-		BottomLevelCollision(const BottomLevelCollision&) = delete;
-		BottomLevelCollision(BottomLevelCollision&&) = delete;
+		TopBottomLevelCollision& operator=(const TopBottomLevelCollision&) = delete;
+		TopBottomLevelCollision& operator=(TopBottomLevelCollision&&) = delete;
+		TopBottomLevelCollision(const TopBottomLevelCollision&) = delete;
+		TopBottomLevelCollision(TopBottomLevelCollision&&) = delete;
+
+		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
+	};
+
+
+	struct PlayerHealthChange final : public cp::Observer
+	{
+		PlayerHealthChange() = default;
+		virtual ~PlayerHealthChange() = default;
+
+		PlayerHealthChange& operator=(const PlayerHealthChange&) = delete;
+		PlayerHealthChange& operator=(PlayerHealthChange&&) = delete;
+		PlayerHealthChange(const PlayerHealthChange&) = delete;
+		PlayerHealthChange(PlayerHealthChange&&) = delete;
 
 		virtual void OnNotify(const cp::GameObject* entity, cp::Event event) override;
 	};

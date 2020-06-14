@@ -4,9 +4,6 @@
 
 namespace cp
 {
-	/**
-	 * Simple RAII wrapper for an SDL_Texture
-	 */
 	class Transform;
 	class Texture2D final: public BaseComponent
 	{
@@ -31,15 +28,18 @@ namespace cp
 		void FlipTexture(bool flip);
 		void SetDstRect(const SDL_FRect& newDstRect);
 		void SetSrcRect(const SDL_Rect& newSrcRect);
+		void SetPivot(const SDL_Point& newPivot);
 
 		const SDL_FRect& GetDstRect() const;
 		const SDL_Rect& GetSrcRect() const;
+		const SDL_Point& GetPivot() const;
 		inline SDL_Texture* GetSDLTexture() const { return m_pTexture; };
 
 	protected:
 		SDL_Texture* m_pTexture;
 		SDL_Rect m_SrcRect;
 		SDL_FRect m_DstRect;
+		SDL_Point m_Pivot;
 
 		bool m_FlipHorizontal;
 	};

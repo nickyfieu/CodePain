@@ -83,7 +83,8 @@ void cp::CodePain::Run()
 	SceneManager& sceneManager = SceneManager::GetInstance();
 	InputManager& input = InputManager::GetInstance();
 	InputHandler& inputHandler = InputHandler::GetInstance();
-	
+	GameObject* gameManagerObject = GameManager::GetInstance().GetManagerObj();
+
 	input.Initialize();
 
 	auto lastTime = std::chrono::high_resolution_clock::now();
@@ -132,6 +133,8 @@ void cp::CodePain::Run()
 				sceneManager.FixedUpdate(fixedCycleTime);
 			}
 
+			if (gameManagerObject)
+				gameManagerObject->Render();
 			renderer.Render();
 		}
 
@@ -234,9 +237,9 @@ void cp::CodePain::ImGuiDebug_Levels()
 	if (currentLevel != oldLevel)
 	{
 		scene->DeleteAllGameObjectsOfType(cp::GameObjectType::Npc);
+		gameManager.SetCurrentLevel((size_t)currentLevel);
 	}
 
-	gameManager.SetCurrentLevel((size_t)currentLevel);
 	if (spawnEnemies)
 	{
 		gameManager.GetManagerObj()->NotifyObservers(cp::Event::EVENT_SPAWN_ENEMIES);
@@ -244,29 +247,7 @@ void cp::CodePain::ImGuiDebug_Levels()
 
 	if (scene && (oldLevel != currentLevel))
 	{
-		std::vector<GameObject*> level;
-		level = scene->GetAllGameObjectsOfType(GameObjectType::level);
-		size_t amountOfLevels = level.size();
-		if (amountOfLevels > 0)
-		{
-			GameObject* gameObj = level.at(0);
-			Transform* transform = gameObj->GetComponent<Transform>(ComponentType::_Transform);
-			unsigned int levelHeight = 500;
-			if (abs(transform->GetPosition().y / 500) != (currentLevel - 1))
-			{
-				// disabling old level and enableing new level
-				level[oldLevel - 1]->SetActive(false);
-				level[currentLevel - 1]->SetActive(true);
-
-				float heightLvl0 = float((currentLevel - 1) * levelHeight);
-				for (size_t i = 0; i < amountOfLevels; i++)
-				{
-					gameObj = level.at(i);
-					transform = gameObj->GetComponent<Transform>(ComponentType::_Transform);
-					transform->SetPosition(0.f, float(heightLvl0 - (i * levelHeight)), 0.f);
-				}
-			}
-		}
+		scene->SwitchLevel(currentLevel);
 	}
 	ImGui::Checkbox("Visualize Collision", &renderer.gd_RenderCollisionBoxes);
 	ImGui::Checkbox("Visualize Texture Tiles", &renderer.gd_RenderTextureTiles);

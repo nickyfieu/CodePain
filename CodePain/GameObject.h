@@ -22,6 +22,7 @@ namespace cp
 		Player5 = 6,
 		// non player character ( can be enemies )
 		Npc = 7,
+		UIElements = 8,
 	};
 	
 	struct State;

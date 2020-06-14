@@ -15,6 +15,7 @@ cp::Texture2D::Texture2D(SDL_Texture* texture)
 	SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
 	m_SrcRect = SDL_Rect{ 0,0,width,height};
 	m_DstRect = SDL_FRect{ 0.f,0.f,(float)width,(float)height };
+	m_Pivot = { 0,0 };
 }
 
 cp::Texture2D::~Texture2D()
@@ -62,9 +63,9 @@ void cp::Texture2D::Draw() const
 	dstNoFlt.x = (int)dst.x; dstNoFlt.y = (int)dst.y; dstNoFlt.w = (int)dst.w; dstNoFlt.h = (int)dst.h;
 	
 	if (m_FlipHorizontal)
-		rendererRef.RenderTexture(m_pTexture, src, dstNoFlt, 0.0, SDL_Point{ 0,0 }, SDL_RendererFlip::SDL_FLIP_HORIZONTAL);
+		rendererRef.RenderTexture(m_pTexture, src, dstNoFlt, 0.0, m_Pivot, SDL_RendererFlip::SDL_FLIP_HORIZONTAL);
 	else
-		rendererRef.RenderTexture(m_pTexture, src, dstNoFlt, 0.0, SDL_Point{ 0,0 }, SDL_RendererFlip::SDL_FLIP_NONE);
+		rendererRef.RenderTexture(m_pTexture, src, dstNoFlt, 0.0, m_Pivot, SDL_RendererFlip::SDL_FLIP_NONE);
 }
 
 void cp::Texture2D::AddLocalOffset(const float x,const float y)
@@ -94,6 +95,11 @@ void cp::Texture2D::SetSrcRect(const SDL_Rect& newSrcRect)
 	m_SrcRect = newSrcRect;
 }
 
+void cp::Texture2D::SetPivot(const SDL_Point& newPivot)
+{
+	m_Pivot = newPivot;
+}
+
 const SDL_FRect& cp::Texture2D::GetDstRect() const
 {
 	return m_DstRect;
@@ -102,4 +108,9 @@ const SDL_FRect& cp::Texture2D::GetDstRect() const
 const SDL_Rect& cp::Texture2D::GetSrcRect() const
 {
 	return m_SrcRect;
+}
+
+const SDL_Point& cp::Texture2D::GetPivot() const
+{
+	return m_Pivot;
 }
